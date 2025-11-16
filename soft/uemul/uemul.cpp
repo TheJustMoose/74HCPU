@@ -256,6 +256,18 @@ void PrintPorts() {
   cout << endl << endl;
 }
 
+// stack<uint16_t> Stack;
+void PrintStack() {
+  cout << "Stack: ";
+  stack<uint16_t> cpy = Stack;
+  while (!cpy.empty()) {
+    cout << hex << setw(4) << cpy.top() << " ";
+    cpy.pop();
+  }
+
+  cout << endl << endl;
+}
+
 void SyncFlags(uint8_t port) {
   //cout << "port: " << dec << (uint16_t)port << endl;
   if (port == 10)
@@ -280,8 +292,11 @@ string BranchAddr(uint16_t cmd, uint16_t ip) {
   cmd &= 0xFF;  // 8 low bits have offset value
   uint16_t branch_addr = ip + ByteOffsetToInt(cmd);
   stringstream ss;
-  ss << " " << hex << setw(2) << branch_addr;
-  return ss.str();
+  ss << hex << branch_addr;
+  string res = ss.str();
+  while (res.size() < 4)
+    res = "0" + res;
+  return res;
 }
 
 void Step(uint16_t cmd, uint16_t &ip) {
@@ -291,7 +306,7 @@ void Step(uint16_t cmd, uint16_t &ip) {
   else  // arithm instructions
     op &= 0xF0;  // have to clean low bits
 
-  cout << "IP: " << hex << ip
+  cout << "IP: " << hex << setw(4) << ip
        << ", cmd: " << cmd
        << ", " << Op(op);
 
@@ -364,7 +379,10 @@ void Step(uint16_t cmd, uint16_t &ip) {
     ip++;
   } else if (op >= 0xF0 && op <= 0xFF) {  // BRANCH
     int16_t offset = ByteOffsetToInt(cmd & 0xFF);
-    cout << BranchAddr(cmd, ip) << ", offs: " << offset << endl;
+    if (op == 0xF2 || op == 0xF3)
+      cout << endl;
+    else
+      cout << " " << BranchAddr(cmd, ip) << ", offs: " << offset << endl;
     switch (op) {
       case 0xF0: Stack.push(ip + 1); ip += offset; break;            // CALL
       case 0xF1: ip += offset; break;                                // JMP
@@ -383,7 +401,8 @@ void Step(uint16_t cmd, uint16_t &ip) {
       case 0xFE: Stack.push(ip + 1); ip = offset << 8; break;        // AFCALL
       case 0xFF: ip++; if ((offset & 0x01) == 0) Stop = true; break; // NOP/STOP
     }
-    cout << "new ip: " << ip << endl;
+    cout << "new ip: " << hex << setw(4) << ip << endl;
+    PrintStack();
   } else {  // it's impossible I hope
     cout << "WTF?! Error opcode: " << op << endl;
   }
