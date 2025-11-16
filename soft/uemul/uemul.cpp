@@ -41,6 +41,7 @@
  names: | HCF | CF | ZF | LF | ~EQ | GF | BF | -- | read only
 */
 
+#include <conio.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <fstream>
@@ -379,7 +380,7 @@ void Step(uint16_t cmd, uint16_t &ip) {
     ip++;
   } else if (op >= 0xF0 && op <= 0xFF) {  // BRANCH
     int16_t offset = ByteOffsetToInt(cmd & 0xFF);
-    if (op == 0xF2 || op == 0xF3)
+    if (op == 0xF2 || op == 0xF3 || op == 0xFF)
       cout << endl;
     else
       cout << " " << BranchAddr(cmd, ip) << ", offs: " << offset << endl;
@@ -451,8 +452,10 @@ int main(int argc, char* argv[]) {
   }
 
   PrintRegs();
-  for (uint16_t ip = 0; ip < Cmds.size() && !Stop;)
+  for (uint16_t ip = 0; ip < Cmds.size() && !Stop;) {
     Step(Cmds[ip], ip);
+    getch();
+  }
 
   return 0;
 }
