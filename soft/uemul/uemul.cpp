@@ -233,17 +233,18 @@ class PortCmd: public Cmd {
 };
 
 uint16_t CPU::GetPair(uint8_t idx) {
-  uint16_t res = RegsBank1[idx*2 + 1]; res <<= 8; res += RegsBank1[idx*2];
+  uint16_t res = RegsBank1[idx*2 + 1];
+  res <<= 8;
+  res += RegsBank1[idx*2];
   return res;
 }
 
 uint16_t CPU::GetPtr(uint8_t ptr) {
-  switch (ptr) {
-    case 0: return GetPair(0);
-    case 1: return GetPair(1);
-    case 2: return GetPair(2);
-    case 3: return GetPair(3);
-    default: cout << "Error pointer register number: " << ptr << endl; return 0;
+  if (ptr >= 0 && ptr <= 3)
+    return GetPair(ptr);
+  else {
+    cout << "Error pointer register number: " << ptr << endl;
+    return 0;
   }
 }
 
