@@ -75,6 +75,10 @@ const char* PtrNames[] {
   "X", "Y", "Z", "SP"
 };
 
+const char* UnoNames[] {
+  "INV", "SWAP", "LSR", "LSRC"
+};
+
 const char* Op(uint8_t op) {
   return (op & 0xF0) == 0xF0 ? BranchNames[op & 0x0F] : OpNames[op >> 4];
 }
@@ -145,6 +149,24 @@ class ArithmCmd: public Cmd {
   }
 };
 
+//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
+//|   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*| унарные команды не используют операнд SRC, поэтому нельзя использовать инверторы и отдельные нибблы
+class UnaryCmd: public Cmd {
+ public:
+  UnaryCmd(uint16_t cmd): Cmd(cmd) {}
+
+  uint8_t dst() { return (cmd_ >> 9) & 0x07; }
+  uint8_t type() { return (cmd_ >> 5) & 0x03; }
+
+  virtual string Params() {
+    string res = UnoNames[type()];
+    res += " ";
+    res += RegNames[dst()];
+    return res;
+  }
+};
+
+//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
 //|    LD |  DST |0|EXT|D|U|OFFSET4| 90 1001 0000| |
 //|    ST |  SRC |0|EXT|D|U|OFFSET4| C0 1100 0000| |
 class MemoryCmd: public Cmd {
@@ -312,7 +334,20 @@ void Step(uint16_t cmd, uint16_t &ip) {
        << ", " << Op(op);
 
   if (op == 0x60) {  // UNO
-    // TODO: unary operation must be here
+    UnaryCmd ucmd(cmd);
+    cout << " " << ucmd.Params() << "  -->  ";
+    uint8_t rsrc = ActiveRegsBank()[ucmd.dst()];
+    uint8_t rdst = 0;
+    bool cf = Flags[CF];
+    switch (ucmd.type()) {
+      case 0: rdst = rsrc ^ 0xFF; break;  // INV
+      case 1: rdst = ((rsrc & 0x0F) << 4) + ((rsrc & 0xF0) >> 4); break;  // SWAP
+      case 2: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
+      case 3: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
+      default: cout << "Unknown op for this switch: " << op << endl; break;
+    }
+    ActiveRegsBank()[ucmd.dst()] = rdst;
+    PrintRegs();
     ip++;
   } else if (op >= 0x00 && op <= 0x80) {  // ARITHM
     ArithmCmd acmd(cmd);
@@ -320,14 +355,14 @@ void Step(uint16_t cmd, uint16_t &ip) {
     uint8_t rdst = ActiveRegsBank()[acmd.dst()];
     uint8_t rsrc = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
     switch (op) {
-      case 0x00: Flags[CF] = (rdst + rsrc > 255); rdst += rsrc; break;  // ADD
+      case 0x00: Flags[CF] = (rdst + rsrc > 255); rdst += rsrc; break;  // ADD // TODO: add sub operation here
       case 0x10: Flags[CF] = (rdst + rsrc > 255); rdst += rsrc + Flags[CF]; break;  // ADDC
       case 0x20: rdst &= rsrc; break;  // AND
       case 0x30: rdst |= rsrc; break;  // OR
       case 0x40: rdst ^= rsrc; break;  // XOR
       case 0x50: rdst *= rsrc; break;  // MUL
       // 0x60 is UNO op
-      case 0x70: rdst = rsrc; break;   // MOV
+      case 0x70: rdst = rsrc; break;   // MOV  // TODO: have to write into register pair
       case 0x80: break;  // LPM operation must be here
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
