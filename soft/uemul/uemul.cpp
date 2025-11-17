@@ -104,13 +104,6 @@ const char* FlagNames[FLAGS_CNT] {
 
 class CPU {
  public:
-  uint8_t RAM[65536];
-  uint8_t PORTS[32];
-  uint8_t PINS[32];
-  bool Flags[FLAGS_CNT];
-  uint8_t RegsBank0[8];
-  uint8_t RegsBank1[8];
-
   void Step(uint16_t cmd, uint16_t &ip);
   void Run(bool dbg);
 
@@ -118,6 +111,19 @@ class CPU {
   void PrintRegs();
   void PrintPorts();
   void PrintStack();
+
+  uint16_t GetX();
+  uint16_t GetY();
+  uint16_t GetZ();
+  uint16_t GetSP();
+  uint16_t GetPtr(uint8_t ptr);
+
+  uint8_t RAM[65536];
+  uint8_t PORTS[32];
+  uint8_t PINS[32];
+  bool Flags[FLAGS_CNT];
+  uint8_t RegsBank0[8];
+  uint8_t RegsBank1[8];
 
   bool Stop = false;
   stack<uint16_t> Stack;
@@ -229,27 +235,27 @@ class PortCmd: public Cmd {
   }
 };
 
-uint16_t GetX() {
-  uint16_t res = cpu.RegsBank1[1]; res <<= 8; res += cpu.RegsBank1[0];
+uint16_t CPU::GetX() {
+  uint16_t res = RegsBank1[1]; res <<= 8; res += RegsBank1[0];
   return res;
 }
 
-uint16_t GetY() {
-  uint16_t res = cpu.RegsBank1[3]; res <<= 8; res += cpu.RegsBank1[2];
+uint16_t CPU::GetY() {
+  uint16_t res = RegsBank1[3]; res <<= 8; res += RegsBank1[2];
   return res;
 }
 
-uint16_t GetZ() {
-  uint16_t res = cpu.RegsBank1[5]; res <<= 8; res += cpu.RegsBank1[4];
+uint16_t CPU::GetZ() {
+  uint16_t res = RegsBank1[5]; res <<= 8; res += RegsBank1[4];
   return res;
 }
 
-uint16_t GetSP() {
-  uint16_t res = cpu.RegsBank1[7]; res <<= 8; res += cpu.RegsBank1[6];
+uint16_t CPU::GetSP() {
+  uint16_t res = RegsBank1[7]; res <<= 8; res += RegsBank1[6];
   return res;
 }
 
-uint16_t GetPtr(uint8_t ptr) {
+uint16_t CPU::GetPtr(uint8_t ptr) {
   switch (ptr) {
     case 0: return GetX();
     case 1: return GetY();
