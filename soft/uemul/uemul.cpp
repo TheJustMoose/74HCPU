@@ -110,6 +110,11 @@ class CPU {
   bool Flags[FLAGS_CNT];
   uint8_t RegsBank0[8];
   uint8_t RegsBank1[8];
+
+  void Step(uint16_t cmd, uint16_t &ip);
+  void Run(bool dbg);
+
+  bool Stop = false;
 };
 
 CPU cpu;
@@ -119,8 +124,6 @@ uint8_t *ActiveRegsBank() { // current bank of registers
 }
 
 stack<uint16_t> Stack;
-
-bool Stop = false;
 
 class Cmd {
  public:
@@ -324,7 +327,7 @@ string BranchAddr(uint16_t cmd, uint16_t ip) {
   return res;
 }
 
-void Step(uint16_t cmd, uint16_t &ip) {
+void CPU::Step(uint16_t cmd, uint16_t &ip) {
   uint8_t op = (cmd >> 8) & 0xFF;
   if ((cmd & 0xF000) == 0xF000)  // branches
     ;
@@ -446,7 +449,7 @@ void Step(uint16_t cmd, uint16_t &ip) {
   }
 }
 
-void Run(bool dbg) {
+void CPU::Run(bool dbg) {
   PrintRegs();
   for (uint16_t ip = 0; ip < Cmds.size() && !Stop;) {
     Step(Cmds[ip], ip);
@@ -503,7 +506,7 @@ int main(int argc, char* argv[]) {
     dbg = (a == "-dbg" || a == "--debug");
   }
 
-  Run(dbg);
+  cpu.Run(dbg);
 
   return 0;
 }
