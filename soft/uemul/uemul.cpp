@@ -290,7 +290,6 @@ void CPU::PrintStack() {
 }
 
 void SyncFlags(uint8_t port) {
-  //cout << "port: " << dec << (uint16_t)port << endl;
   if (port == 10)
     cpu.Flags[BF] = cpu.PORTS[10] & 0x40;
 }
@@ -304,8 +303,9 @@ int16_t OffsetToInt(uint8_t offset) {
 
 int16_t ByteOffsetToInt(uint8_t offset) {
   uint16_t res = offset;
-  if (offset & 0x80)  // offset is 4 bit two's complement value
-    res |= 0xFF00;    // so bit 3 is the sign bit and we have to extend it to high bits
+  if (offset & 0x80)  // offset is 8 bit two's complement value
+    res |= 0xFF00;    // so bit 7 is the sign bit and we have to extend it to high bits
+  // TODO: check it:
   return (uint32_t)res;  // now it's int!
 }
 
