@@ -102,7 +102,8 @@ const char* FlagNames[FLAGS_CNT] {
   "HCF", "CF", "ZF", "LF", "EF", "GF", "BF", "R"
 };
 
-struct CPU {
+class CPU {
+ public:
   uint8_t RAM[65536];
   uint8_t PORTS[32];
   uint8_t PINS[32];
@@ -445,6 +446,15 @@ void Step(uint16_t cmd, uint16_t &ip) {
   }
 }
 
+void Run(bool dbg) {
+  PrintRegs();
+  for (uint16_t ip = 0; ip < Cmds.size() && !Stop;) {
+    Step(Cmds[ip], ip);
+    if (dbg)
+      getch();
+  }
+}
+
 bool ReadHex(std::string fname, vector<uint16_t>& buf) {
   ifstream f;
   f.open(fname, ios::binary);
@@ -493,12 +503,7 @@ int main(int argc, char* argv[]) {
     dbg = (a == "-dbg" || a == "--debug");
   }
 
-  PrintRegs();
-  for (uint16_t ip = 0; ip < Cmds.size() && !Stop;) {
-    Step(Cmds[ip], ip);
-    if (dbg)
-      getch();
-  }
+  Run(dbg);
 
   return 0;
 }
