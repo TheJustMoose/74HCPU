@@ -114,7 +114,13 @@ class CPU {
   void Step(uint16_t cmd, uint16_t &ip);
   void Run(bool dbg);
 
+  void PrintFlags();
+  void PrintRegs();
+  void PrintPorts();
+  void PrintStack();
+
   bool Stop = false;
+  stack<uint16_t> Stack;
 };
 
 CPU cpu;
@@ -122,8 +128,6 @@ CPU cpu;
 uint8_t *ActiveRegsBank() { // current bank of registers
   return cpu.Flags[BF] ? cpu.RegsBank1 : cpu.RegsBank0;
 }
-
-stack<uint16_t> Stack;
 
 class Cmd {
  public:
@@ -255,37 +259,37 @@ uint16_t GetPtr(uint8_t ptr) {
   }
 }
 
-void PrintFlags() {
+void CPU::PrintFlags() {
   cout << "Flags: ";
   for (int i = 0; i < FLAGS_CNT; i++)
-    cout << (cpu.Flags[i] ? FlagNames[i] : "--") << " ";
+    cout << (Flags[i] ? FlagNames[i] : "--") << " ";
 }
 
-void PrintRegs() {
+void CPU::PrintRegs() {
   cout << "Regs: ";
   for (int i = 0; i < 8; i++)
-    cout << hex << setw(2) << (uint16_t)cpu.RegsBank0[i] << " ";
+    cout << hex << setw(2) << (uint16_t)RegsBank0[i] << " ";
 
   cout << " Ptrs: " << setfill('0');
-  cout << hex << setw(2) << (uint16_t)cpu.RegsBank1[7] << hex << setw(2) << (uint16_t)cpu.RegsBank1[6] << " ";
-  cout << hex << setw(2) << (uint16_t)cpu.RegsBank1[5] << hex << setw(2) << (uint16_t)cpu.RegsBank1[4] << " ";
-  cout << hex << setw(2) << (uint16_t)cpu.RegsBank1[3] << hex << setw(2) << (uint16_t)cpu.RegsBank1[2] << " ";
-  cout << hex << setw(2) << (uint16_t)cpu.RegsBank1[1] << hex << setw(2) << (uint16_t)cpu.RegsBank1[0] << " ";
+  cout << hex << setw(2) << (uint16_t)RegsBank1[7] << hex << setw(2) << (uint16_t)RegsBank1[6] << " ";
+  cout << hex << setw(2) << (uint16_t)RegsBank1[5] << hex << setw(2) << (uint16_t)RegsBank1[4] << " ";
+  cout << hex << setw(2) << (uint16_t)RegsBank1[3] << hex << setw(2) << (uint16_t)RegsBank1[2] << " ";
+  cout << hex << setw(2) << (uint16_t)RegsBank1[1] << hex << setw(2) << (uint16_t)RegsBank1[0] << " ";
 
   PrintFlags();
 
   cout << endl << endl;
 }
 
-void PrintPorts() {
+void CPU::PrintPorts() {
   cout << "Ports: ";
   for (int i = 0; i < 8; i++)
-    cout << hex << setw(2) << (uint16_t)cpu.PORTS[i] << " ";
+    cout << hex << setw(2) << (uint16_t)PORTS[i] << " ";
 
   cout << endl << endl;
 }
 
-void PrintStack() {
+void CPU::PrintStack() {
   cout << "Stack: ";
   stack<uint16_t> cpy = Stack;
   while (!cpy.empty()) {
