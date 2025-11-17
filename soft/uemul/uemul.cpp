@@ -260,10 +260,10 @@ void CPU::PrintRegs() {
     cout << hex << setw(2) << (uint16_t)RegsBank0[i] << " ";
 
   cout << " Ptrs: " << setfill('0');
-  cout << hex << setw(2) << (uint16_t)RegsBank1[7] << hex << setw(2) << (uint16_t)RegsBank1[6] << " ";
-  cout << hex << setw(2) << (uint16_t)RegsBank1[5] << hex << setw(2) << (uint16_t)RegsBank1[4] << " ";
-  cout << hex << setw(2) << (uint16_t)RegsBank1[3] << hex << setw(2) << (uint16_t)RegsBank1[2] << " ";
-  cout << hex << setw(2) << (uint16_t)RegsBank1[1] << hex << setw(2) << (uint16_t)RegsBank1[0] << " ";
+  cout << hex << setw(4) << GetPtr(3) << " ";
+  cout << hex << setw(4) << GetPtr(2) << " ";
+  cout << hex << setw(4) << GetPtr(1) << " ";
+  cout << hex << setw(4) << GetPtr(0) << " ";
 
   PrintFlags();
 
