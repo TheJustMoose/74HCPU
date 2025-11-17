@@ -486,10 +486,17 @@ int main(int argc, char* argv[]) {
       return 1;
   }
 
+  bool dbg = false;
+  if (argc >= 3 && argv[2]) {
+    string a(argv[2]);
+    dbg = (a == "-dbg" || a == "--debug");
+  }
+
   PrintRegs();
   for (uint16_t ip = 0; ip < Cmds.size() && !Stop;) {
     Step(Cmds[ip], ip);
-    getch();
+    if (dbg)
+      getch();
   }
 
   return 0;
