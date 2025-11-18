@@ -12,6 +12,8 @@ TEST_CASE("test OffsetToInt") {
   CHECK(OffsetToInt(7) == 7);
   CHECK(OffsetToInt(8) == -8);
   CHECK(OffsetToInt(15) == -1);
+  CHECK(OffsetToInt(16) == 0);
+  CHECK(OffsetToInt(255) == 0);
 }
 
 TEST_CASE("test ByteOffsetToInt") {
