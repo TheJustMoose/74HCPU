@@ -7,3 +7,6 @@
 [submodule "soft/emul/doctest"]
 	path = soft/emul/doctest
 	url = https://github.com/doctest/doctest.git
+[submodule "soft/uemul/doctest"]
+	path = soft/uemul/doctest
+	url = https://github.com/doctest/doctest.git
