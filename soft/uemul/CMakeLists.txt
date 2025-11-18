@@ -10,9 +10,9 @@ add_executable(uemul
 	uemul.cpp
 )
 
-#include_directories("doctest/doctest")
-#
-#project(unit_tests CXX)
-#add_executable(unit_tests
-#	unit_tests.cc
-#)
+include_directories("doctest/doctest")
+
+project(unit_tests CXX)
+add_executable(unit_tests
+	unit_tests.cc
+)
