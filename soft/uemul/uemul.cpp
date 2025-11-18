@@ -51,6 +51,8 @@
 #include <stack>
 #include <vector>
 
+#include "offset2int.h"
+
 using namespace std;
 
 const char* OpNames[] {
@@ -292,21 +294,6 @@ void CPU::PrintStack() {
 void SyncFlags(uint8_t port) {
   if (port == 10)
     cpu.Flags[BF] = cpu.PORTS[10] & 0x40;
-}
-
-int16_t OffsetToInt(uint8_t offset) {
-  uint16_t res = offset;
-  if (offset & 0x08)  // offset is 4 bit two's complement value
-    res |= 0xFFF0;    // so bit 3 is the sign bit and we have to extend it to high bits
-  return res;  // now it's int!
-}
-
-int16_t ByteOffsetToInt(uint8_t offset) {
-  uint16_t res = offset;
-  if (offset & 0x80)  // offset is 8 bit two's complement value
-    res |= 0xFF00;    // so bit 7 is the sign bit and we have to extend it to high bits
-  // TODO: check it:
-  return (uint32_t)res;  // now it's int!
 }
 
 string BranchAddr(uint16_t cmd, uint16_t ip) {

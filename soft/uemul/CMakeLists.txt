@@ -7,6 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "../Release")
 
 project(asm CXX)
 add_executable(uemul
+	offset2int.cc
 	uemul.cpp
 )
 
@@ -14,5 +15,6 @@ include_directories("doctest/doctest")
 
 project(unit_tests CXX)
 add_executable(unit_tests
+	offset2int.cc
 	unit_tests.cc
 )
