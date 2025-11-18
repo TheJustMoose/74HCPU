@@ -22,4 +22,5 @@ TEST_CASE("test ByteOffsetToInt") {
   CHECK(ByteOffsetToInt(1) == 1);
   CHECK(ByteOffsetToInt(127) == 127);
   CHECK(ByteOffsetToInt(128) == -128);
+  CHECK(ByteOffsetToInt(255) == -1);
 }
