@@ -11,6 +11,5 @@ int16_t ByteOffsetToInt(uint8_t offset) {
   uint16_t res = offset;
   if (offset & 0x80)  // offset is 8 bit two's complement value
     res |= 0xFF00;    // so bit 7 is the sign bit and we have to extend it to high bits
-  // TODO: check it:
-  return (uint32_t)res;  // now it's int!
+  return res;  // now it's int!
 }
