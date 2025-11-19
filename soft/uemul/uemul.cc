@@ -117,6 +117,10 @@ class CPU {
   uint16_t GetPair(uint8_t idx);
   uint16_t GetPtr(uint8_t ptr);
 
+  uint8_t *ActiveRegsBank() { // current bank of registers
+    return Flags[BF] ? RegsBank1 : RegsBank0;
+  }
+
   uint8_t RAM[65536];
   uint8_t PORTS[32];
   uint8_t PINS[32];
@@ -124,15 +128,11 @@ class CPU {
   uint8_t RegsBank0[8];
   uint8_t RegsBank1[8];
 
-  bool Stop = false;
+  bool Stop { false };
   stack<uint16_t> Stack;
 };
 
 CPU cpu;
-
-uint8_t *ActiveRegsBank() { // current bank of registers
-  return cpu.Flags[BF] ? cpu.RegsBank1 : cpu.RegsBank0;
-}
 
 class Cmd {
  public:
@@ -298,7 +298,7 @@ void SyncFlags(uint8_t port) {
 
 string BranchAddr(uint16_t cmd, uint16_t ip) {
   cmd &= 0xFF;  // 8 low bits have offset value
-  uint16_t branch_addr = ip + ByteOffsetToInt(cmd);
+  uint16_t branch_addr = ip + ByteOffsetToInt(static_cast<uint8_t>(cmd));
   stringstream ss;
   ss << hex << branch_addr;
   string res = ss.str();
@@ -434,7 +434,7 @@ void CPU::Run(bool dbg) {
   for (uint16_t ip = 0; ip < Cmds.size() && !Stop;) {
     Step(Cmds[ip], ip);
     if (dbg)
-      getch();
+      _getch();
   }
 }
 
