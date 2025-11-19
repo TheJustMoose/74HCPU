@@ -323,12 +323,12 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     cout << " " << ucmd.Params() << "  -->  ";
     uint8_t rsrc = ActiveRegsBank()[ucmd.dst()];
     uint8_t rdst = 0;
-    bool cf = cpu.Flags[CF];
+    bool cf = Flags[CF];
     switch (ucmd.type()) {
       case 0: rdst = rsrc ^ 0xFF; break;  // INV
       case 1: rdst = ((rsrc & 0x0F) << 4) + ((rsrc & 0xF0) >> 4); break;  // SWAP
-      case 2: cpu.Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
-      case 3: cpu.Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
+      case 2: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
+      case 3: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
     ActiveRegsBank()[ucmd.dst()] = rdst;
@@ -340,8 +340,8 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     uint8_t rdst = ActiveRegsBank()[acmd.dst()];
     uint8_t rsrc = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
     switch (op) {
-      case 0x00: cpu.Flags[CF] = (rdst + rsrc > 255); rdst += rsrc; break;  // ADD // TODO: add sub operation here
-      case 0x10: cpu.Flags[CF] = (rdst + rsrc > 255); rdst += rsrc + cpu.Flags[CF]; break;  // ADDC
+      case 0x00: Flags[CF] = (rdst + rsrc > 255); rdst += rsrc; break;  // ADD // TODO: add sub operation here
+      case 0x10: Flags[CF] = (rdst + rsrc > 255); rdst += rsrc + Flags[CF]; break;  // ADDC
       case 0x20: rdst &= rsrc; break;  // AND
       case 0x30: rdst |= rsrc; break;  // OR
       case 0x40: rdst ^= rsrc; break;  // XOR
@@ -352,28 +352,28 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
     if (op != 0x70)
-      cpu.Flags[ZF] = (rdst == 0);
+      Flags[ZF] = (rdst == 0);
     ActiveRegsBank()[acmd.dst()] = rdst;
     PrintRegs();
     ip++;
   } else if (op == 0x90) {  // LD
     MemoryCmd mcmd(cmd);
     cout << mcmd.Params() << "  -->  ";
-    uint8_t val = cpu.RAM[GetPtr(mcmd.ptr()) + (op & 0x0F)];  // TODO: replace it to mcmd.offs()
+    uint8_t val = RAM[GetPtr(mcmd.ptr()) + (op & 0x0F)];  // TODO: replace it to mcmd.offs()
     ActiveRegsBank()[mcmd.reg()] = val;
     PrintRegs();
     ip++;
   } else if (op == 0xA0) {  // IN
     PortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
-    uint8_t rdst = cpu.PINS[(op >> 4) & 0x1F];
+    uint8_t rdst = PINS[(op >> 4) & 0x1F];
     ActiveRegsBank()[pcmd.reg()] = rdst;
     PrintRegs();
     ip++;
   } else if (op == 0xB0) {  // OUT
     PortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
-    cpu.PORTS[pcmd.port()] = ActiveRegsBank()[pcmd.reg()];
+    PORTS[pcmd.port()] = ActiveRegsBank()[pcmd.reg()];
     SyncFlags(pcmd.port());
     PrintPorts();
     ip++;
@@ -381,7 +381,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     MemoryCmd mcmd(cmd);
     cout << mcmd.Params() << "  -->  ";
     uint8_t val = ActiveRegsBank()[mcmd.reg()];
-    cpu.RAM[GetPtr(mcmd.ptr()) + (op & 0x0F)] = val;
+    RAM[GetPtr(mcmd.ptr()) + (op & 0x0F)] = val;
     PrintRegs();
     ip++;
   } else if (op == 0xD0 || op == 0xE0) {  // CMP
@@ -391,11 +391,11 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     uint8_t rdst = ActiveRegsBank()[acmd.dst()];
     uint8_t rsrc = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
     if (rdst < rsrc) {
-      cpu.Flags[LF] = true; cpu.Flags[EF] = false; cpu.Flags[GF] = false;
+      Flags[LF] = true; Flags[EF] = false; Flags[GF] = false;
     } else if (rdst == rsrc) {
-      cpu.Flags[LF] = false; cpu.Flags[EF] = true; cpu.Flags[GF] = false;
+      Flags[LF] = false; Flags[EF] = true; Flags[GF] = false;
     } else if (rdst > rsrc) {
-      cpu.Flags[LF] = false; cpu.Flags[EF] = false; cpu.Flags[GF] = true;
+      Flags[LF] = false; Flags[EF] = false; Flags[GF] = true;
     }
     ip++;
   } else if (op >= 0xF0 && op <= 0xFF) {  // BRANCH
@@ -409,16 +409,16 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
       case 0xF1: ip += offset; break;                                // JMP
       case 0xF2: ip = Stack.top(); Stack.pop(); break;               // RET
       case 0xF3: ip = Stack.top(); Stack.pop(); break;               // RETI
-      case 0xF4: if (cpu.Flags[LF]) ip += offset; else ip++; break;      // JL
-      case 0xF5: if (cpu.Flags[EF]) ip += offset; else ip++; break;      // JE
-      case 0xF6: if (!cpu.Flags[EF]) ip += offset; else ip++; break;     // JNE
-      case 0xF7: if (cpu.Flags[ZF]) ip += offset; else ip++; break;      // JG
-      case 0xF8: if (cpu.Flags[ZF]) ip += offset; else ip++; break;      // JZ
-      case 0xF9: if (!cpu.Flags[ZF]) ip += offset; else ip++; break;     // JNZ
-      case 0xFA: if (cpu.Flags[CF]) ip += offset; else ip++; break;      // JC
-      case 0xFB: if (!cpu.Flags[CF]) ip += offset; else ip++; break;     // JNC
-      case 0xFC: if (cpu.Flags[HCF]) ip += offset; else ip++; break;     // JHC
-      case 0xFD: if (!cpu.Flags[HCF]) ip += offset; else ip++; break;    // JHNC
+      case 0xF4: if (Flags[LF]) ip += offset; else ip++; break;      // JL
+      case 0xF5: if (Flags[EF]) ip += offset; else ip++; break;      // JE
+      case 0xF6: if (!Flags[EF]) ip += offset; else ip++; break;     // JNE
+      case 0xF7: if (Flags[ZF]) ip += offset; else ip++; break;      // JG
+      case 0xF8: if (Flags[ZF]) ip += offset; else ip++; break;      // JZ
+      case 0xF9: if (!Flags[ZF]) ip += offset; else ip++; break;     // JNZ
+      case 0xFA: if (Flags[CF]) ip += offset; else ip++; break;      // JC
+      case 0xFB: if (!Flags[CF]) ip += offset; else ip++; break;     // JNC
+      case 0xFC: if (Flags[HCF]) ip += offset; else ip++; break;     // JHC
+      case 0xFD: if (!Flags[HCF]) ip += offset; else ip++; break;    // JHNC
       case 0xFE: Stack.push(ip + 1); ip = offset << 8; break;        // AFCALL
       case 0xFF: ip++; if ((offset & 0x01) == 0) Stop = true; break; // NOP/STOP
     }
