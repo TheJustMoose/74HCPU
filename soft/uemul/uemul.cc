@@ -81,8 +81,18 @@ const char* UnoNames[] {
   "INV", "SWAP", "LSR", "LSRC"
 };
 
-const char* Op(uint8_t op) {
-  return (op & 0xF0) == 0xF0 ? BranchNames[op & 0x0F] : OpNames[op >> 4];
+const char* StopName {
+  "STOP"
+};
+
+const char* Op(uint16_t cmd) {
+  uint8_t op = (cmd >> 8) & 0xFF;
+  if (cmd == 0xFFFE)
+    return StopName;
+  else if ((op & 0xF0) == 0xF0)
+    return BranchNames[op & 0x0F];
+  else
+    return OpNames[op >> 4];
 }
 
 vector<uint16_t> Cmds {
@@ -92,7 +102,7 @@ vector<uint16_t> Cmds {
   0x7F7F,  // MOV SPH, 0x7F
   0x7122,  // MOV R0, 22h
   0x7F33,  // MOV R7, 33h
-  0xFF00,
+  0xFFFE,
   0xFD00
 };
 
@@ -311,12 +321,11 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   uint8_t op = (cmd >> 8) & 0xFF;
   if ((cmd & 0xF000) == 0xF000)  // branches
     ;
-  else  // arithm instructions
+  else           // arithm instructions
     op &= 0xF0;  // have to clean low bits
 
   cout << "IP: " << hex << setw(4) << ip
-       << ", cmd: " << cmd
-       << ", " << Op(op);
+       << ", cmd: " << cmd << ", " << Op(cmd);
 
   if (op == 0x60) {  // UNO
     UnaryCmd ucmd(cmd);
