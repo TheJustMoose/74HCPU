@@ -292,6 +292,11 @@ void CPU::PrintPorts() {
 
 void CPU::PrintStack() {
   cout << "Stack: ";
+  if (Stack.empty()) {
+    cout << "empty" << endl << endl;
+    return;
+  }
+
   stack<uint16_t> cpy = Stack;
   while (!cpy.empty()) {
     cout << hex << setw(4) << cpy.top() << " ";
