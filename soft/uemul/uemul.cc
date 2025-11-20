@@ -131,9 +131,9 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
        << ", cmd: " << cmd << ", " << Op(cmd);
 
   if (op == 0x60) {  // UNO
-    UnaryCmd ucmd(cmd);
+    UnaryCmd ucmd(cmd, this);
     cout << " " << ucmd.Params() << "  -->  ";
-    uint8_t rsrc = ActiveRegsBank()[ucmd.dst()];
+    uint8_t rsrc = ucmd.dst_val();
     uint8_t rdst = 0;
     bool cf = Flags[CF];
     switch (ucmd.type()) {
@@ -149,7 +149,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   } else if (op >= 0x00 && op <= 0x80) {  // ARITHM
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
-    uint8_t dst_val = ActiveRegsBank()[acmd.dst()];
+    uint8_t dst_val = acmd.dst_val();
     uint8_t src_val = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
     switch (op) {
       case 0x00: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val; break;  // ADD // TODO: add sub operation here
@@ -200,7 +200,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     // CMP implementation, CPMC has not implemented yet
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
-    uint8_t rdst = ActiveRegsBank()[acmd.dst()];
+    uint8_t rdst = acmd.dst_val();
     uint8_t rsrc = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
     if (rdst < rsrc) {
       Flags[LF] = true; Flags[EF] = false; Flags[GF] = false;

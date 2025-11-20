@@ -9,7 +9,7 @@ class CPU;
 
 class Cmd {
  public:
-  Cmd(uint16_t cmd): cmd_(cmd) {}
+  Cmd(uint16_t cmd, CPU* cpu = nullptr): cmd_(cmd), cpu_(cpu) {}
 
   uint16_t cmd() { return cmd_; }
   uint8_t op() { return (cmd_ >> 8) & 0xF0; }
@@ -18,13 +18,14 @@ class Cmd {
 
  protected:
   uint16_t cmd_ {0};
+  CPU* cpu_ {nullptr};
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
 //|   ADD |  DST |C| SRC |-|Z|z|I|i|
 class ArithmCmd: public Cmd {
  public:
-  ArithmCmd(uint16_t cmd, CPU* cpu): Cmd(cmd), cpu_(cpu) {}
+  ArithmCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
   uint8_t dst() { return (cmd_ >> 9) & 0x07; }
   bool is_cnst() { return (cmd_ >> 8) & 0x01; }
@@ -33,19 +34,18 @@ class ArithmCmd: public Cmd {
 
   uint8_t dst_val();
   std::string Params() override;
-
- private:
-  CPU* cpu_ { nullptr };
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
 //|   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*| унарные команды не используют операнд SRC, поэтому нельзя использовать инверторы и отдельные нибблы
 class UnaryCmd: public Cmd {
  public:
-  UnaryCmd(uint16_t cmd): Cmd(cmd) {}
+  UnaryCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
   uint8_t dst() { return (cmd_ >> 9) & 0x07; }
   uint8_t type() { return (cmd_ >> 5) & 0x03; }
+
+  uint8_t dst_val();
 
   std::string Params() override;
 };

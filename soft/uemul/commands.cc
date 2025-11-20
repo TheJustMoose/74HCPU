@@ -12,6 +12,10 @@ string ArithmCmd::Params() {
   return string(" ") + RegNames[dst()] + string(", ") + rsrc;
 }
 
+uint8_t UnaryCmd::dst_val() {
+  return cpu_->ActiveRegsBank()[dst()];
+}
+
 string UnaryCmd::Params() {
   string res = UnoNames[type()];
   res += " ";
