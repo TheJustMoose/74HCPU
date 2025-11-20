@@ -172,23 +172,23 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   } else if (op >= 0x00 && op <= 0x80) {  // ARITHM
     ArithmCmd acmd(cmd);
     cout << acmd.Params() << "  -->  ";
-    uint8_t rdst = ActiveRegsBank()[acmd.dst()];
-    uint8_t rsrc = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
+    uint8_t dst_val = ActiveRegsBank()[acmd.dst()];
+    uint8_t src_val = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
     switch (op) {
-      case 0x00: Flags[CF] = (rdst + rsrc > 255); rdst += rsrc; break;  // ADD // TODO: add sub operation here
-      case 0x10: Flags[CF] = (rdst + rsrc > 255); rdst += rsrc + Flags[CF]; break;  // ADDC
-      case 0x20: rdst &= rsrc; break;  // AND
-      case 0x30: rdst |= rsrc; break;  // OR
-      case 0x40: rdst ^= rsrc; break;  // XOR
-      case 0x50: rdst *= rsrc; break;  // MUL  // TODO: have to write into register pair
+      case 0x00: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val; break;  // ADD // TODO: add sub operation here
+      case 0x10: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val + Flags[CF]; break;  // ADDC
+      case 0x20: dst_val &= src_val; break;  // AND
+      case 0x30: dst_val |= src_val; break;  // OR
+      case 0x40: dst_val ^= src_val; break;  // XOR
+      case 0x50: dst_val *= src_val; break;  // MUL  // TODO: have to write into register pair
       // 0x60 is UNO op
-      case 0x70: rdst = rsrc; break;   // MOV
+      case 0x70: dst_val = src_val; break;   // MOV
       case 0x80: break;  // LPM operation must be here
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
     if (op != 0x70)
-      Flags[ZF] = (rdst == 0);
-    ActiveRegsBank()[acmd.dst()] = rdst;
+      Flags[ZF] = (dst_val == 0);
+    ActiveRegsBank()[acmd.dst()] = dst_val;
     PrintRegs();
     ip++;
   } else if (op == 0x90) {  // LD
