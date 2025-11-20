@@ -50,6 +50,8 @@
 #include <stack>
 #include <vector>
 
+#include "commands.h"
+#include "names.h"
 #include "offset2int.h"
 #include "read_hex.h"
 
@@ -67,10 +69,6 @@ const char* BranchNames[] {
   "CALL", "JMP", "RET", "RETI", "JL", "JE", "JNE", "JG",
   // 8     9     A      B      C       D         E      F
   "JZ", "JNZ", "JC", "JNC", "JHC", "JNHC", "AFCALL", "NOP"
-};
-
-const char* RegNames[] {
-  "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7"
 };
 
 const char* PtrNames[] {
@@ -143,36 +141,6 @@ class CPU {
 };
 
 CPU cpu;
-
-class Cmd {
- public:
-  Cmd(uint16_t cmd): cmd_(cmd) {}
-
-  uint16_t cmd() { return cmd_; }
-  uint8_t op() { return (cmd_ >> 8) & 0xF0; }
-
-  virtual string Params() { return ""; }
-
- protected:
-  uint16_t cmd_ {0};
-};
-
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
-//|   ADD |  DST |C| SRC |-|Z|z|I|i|
-class ArithmCmd: public Cmd {
- public:
-  ArithmCmd(uint16_t cmd): Cmd(cmd) {}
-
-  uint8_t dst() { return (cmd_ >> 9) & 0x07; }
-  bool is_cnst() { return (cmd_ >> 8) & 0x01; }
-  uint8_t src() { return (cmd_ >> 5) & 0x07; }
-  uint8_t cnst() { return (cmd_ & 0xFF); }
-
-  virtual string Params() {
-    string rsrc = is_cnst() ? to_string(cmd_ & 0xFF) : RegNames[src()];
-    return string(" ") + RegNames[dst()] + string(", ") + rsrc;
-  }
-};
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
 //|   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*| унарные команды не используют операнд SRC, поэтому нельзя использовать инверторы и отдельные нибблы
