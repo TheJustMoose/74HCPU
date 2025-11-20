@@ -8,6 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "../Release")
 project(asm CXX)
 add_executable(uemul
 	commands.cc
+	compare.cc
 	offset2int.cc
 	read_hex.cc
 	uemul.cc
@@ -17,6 +18,7 @@ include_directories("doctest/doctest")
 
 project(unit_tests CXX)
 add_executable(unit_tests
+	compare.cc
 	offset2int.cc
 	unit_tests.cc
 )

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "commands.h"
+#include "compare.h"
 #include "cpu.h"
 #include "flags.h"
 #include "names.h"
@@ -200,15 +201,10 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     // CMP implementation, CPMC has not implemented yet
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
-    uint8_t rdst = acmd.dst_val();
-    uint8_t rsrc = acmd.src_val();
-    if (rdst < rsrc) {
-      Flags[LF] = true; Flags[EF] = false; Flags[GF] = false;
-    } else if (rdst == rsrc) {
-      Flags[LF] = false; Flags[EF] = true; Flags[GF] = false;
-    } else if (rdst > rsrc) {
-      Flags[LF] = false; Flags[EF] = false; Flags[GF] = true;
-    }
+    auto [lf, ef, gf] = Compare(acmd.dst_val(), acmd.src_val());
+    Flags[LF] = lf;
+    Flags[EF] = ef;
+    Flags[GF] = gf;
     ip++;
   } else if (op >= 0xF0 && op <= 0xFF) {  // BRANCH
     int16_t offset = ByteOffsetToInt(cmd & 0xFF);
