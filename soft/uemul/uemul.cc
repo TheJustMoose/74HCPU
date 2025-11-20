@@ -57,32 +57,6 @@
 
 using namespace std;
 
-const char* OpNames[] {
-  // 0       1      2     3      4      5      6      7
-  "ADD", "ADDC", "AND", "OR", "XOR", "MUL", "UNO", "MOV",
-  // 8     9     A      B     C      D       E        F
-  "LPM", "LD", "IN", "OUT", "ST", "CMP", "CMPC", "BRNCH"
-};
-
-const char* BranchNames[] {
-  //  0      1      2       3     4     5      6     7
-  "CALL", "JMP", "RET", "RETI", "JL", "JE", "JNE", "JG",
-  // 8     9     A      B      C       D         E      F
-  "JZ", "JNZ", "JC", "JNC", "JHC", "JNHC", "AFCALL", "NOP"
-};
-
-const char* PtrNames[] {
-  "X", "Y", "Z", "SP"
-};
-
-const char* UnoNames[] {
-  "INV", "SWAP", "LSR", "LSRC"
-};
-
-const char* StopName {
-  "STOP"
-};
-
 const char* Op(uint16_t cmd) {
   uint8_t op = (cmd >> 8) & 0xFF;
   if (cmd == 0xFFFE)
@@ -102,14 +76,6 @@ vector<uint16_t> Cmds {
   0x7F33,  // MOV R7, 33h
   0xFFFE,
   0xFD00
-};
-
-enum FLAGS {
-  HCF = 0, CF = 1, ZF = 2, LF = 3, EF = 4, GF = 5, BF = 6, RSRV = 7, FLAGS_CNT = 8
-};
-
-const char* FlagNames[FLAGS_CNT] {
-  "HCF", "CF", "ZF", "LF", "EF", "GF", "BF", "R"
 };
 
 class CPU {
@@ -141,76 +107,6 @@ class CPU {
 };
 
 CPU cpu;
-
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
-//|   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*| унарные команды не используют операнд SRC, поэтому нельзя использовать инверторы и отдельные нибблы
-class UnaryCmd: public Cmd {
- public:
-  UnaryCmd(uint16_t cmd): Cmd(cmd) {}
-
-  uint8_t dst() { return (cmd_ >> 9) & 0x07; }
-  uint8_t type() { return (cmd_ >> 5) & 0x03; }
-
-  virtual string Params() {
-    string res = UnoNames[type()];
-    res += " ";
-    res += RegNames[dst()];
-    return res;
-  }
-};
-
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
-//|    LD |  DST |0|EXT|D|U|OFFSET4| 90 1001 0000| |
-//|    ST |  SRC |0|EXT|D|U|OFFSET4| C0 1100 0000| |
-class MemoryCmd: public Cmd {
- public:
-  MemoryCmd(uint16_t cmd): Cmd(cmd) {}
-
-  uint8_t reg() { return (cmd_ >> 9) & 0x07; }
-  uint8_t ptr() { return (cmd_ >> 6) & 0x03; }
-  uint8_t autodec() { return (cmd_ >> 5) & 0x01; }
-  uint8_t autoinc() { return (cmd_ >> 4) & 0x01; }
-  uint8_t offs() { return cmd_ & 0x0F; }
-
-  virtual string Params() {
-    string suffix;
-    if (autodec())
-      suffix += "D";
-    if (autoinc())
-      suffix += "I";
-    if (offs()) {
-      suffix += " + ";
-      suffix += to_string(offs());  // offs may have value from -8 to +7 so I have to convert it to "int"
-    }
-
-    if (op() == 0x90)  // LD
-      return string(" ") + RegNames[reg()] + string(", ") + PtrNames[ptr()] + suffix;
-    else if (op() == 0xC0)  // ST
-      return string(" ") + PtrNames[ptr()] + suffix + string(", ") + RegNames[reg()];
-    else
-      return "error";
-  }
-};
-
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
-//|    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
-//|   OUT |  SRC |  PORT   |O|o|X|x| B0 1011 0000| |
-class PortCmd: public Cmd {
- public:
-  PortCmd(uint16_t cmd): Cmd(cmd) {}
-
-  uint8_t port() { return (cmd_ >> 5) & 0x1F; }
-  uint8_t reg() { return (cmd_ >> 9) & 0x07; }
-
-  virtual string Params() {
-    if (op() == 0xA0)
-      return string(" ") + RegNames[reg()] + string(", PINS") + to_string(port());
-    else if (op() == 0xB0)
-      return " PORT" + to_string(port()) + ", " + RegNames[reg()];
-    else
-      return "error";
-  }
-};
 
 uint16_t CPU::GetPair(uint8_t idx) {
   uint16_t res = RegsBank1[idx*2 + 1];

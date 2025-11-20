@@ -2,6 +2,7 @@
 #include <doctest.h>
 
 #include "offset2int.h"
+#include "names.h"
 
 using namespace std;
 
@@ -23,4 +24,9 @@ TEST_CASE("test ByteOffsetToInt") {
   CHECK(ByteOffsetToInt(127) == 127);
   CHECK(ByteOffsetToInt(128) == -128);
   CHECK(ByteOffsetToInt(255) == -1);
+}
+
+TEST_CASE("test names") {
+  CHECK(std::size(RegNames) == 8);  // 8 registers
+  CHECK(std::size(OpNames) == 16);  // and 16 commands
 }
