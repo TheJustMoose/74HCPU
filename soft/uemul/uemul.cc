@@ -39,10 +39,6 @@ vector<uint16_t> Cmds {
 
 CPU cpu;
 
-uint8_t *CPU::ActiveRegsBank() { // current bank of registers
-  return Flags[BF] ? RegsBank1 : RegsBank0;
-}
-
 uint16_t CPU::GetPair(uint8_t idx) {
   uint16_t res = RegsBank1[idx*2 + 1];
   res <<= 8;
@@ -57,6 +53,10 @@ uint16_t CPU::GetPtr(uint8_t ptr) {
     cout << "Error pointer register number: " << ptr << endl;
     return 0;
   }
+}
+
+uint8_t *CPU::ActiveRegsBank() { // current bank of registers
+  return Flags[BF] ? RegsBank1 : RegsBank0;
 }
 
 void CPU::PrintFlags() {
@@ -134,24 +134,24 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   if (op == 0x60) {  // UNO
     UnaryCmd ucmd(cmd, this);
     cout << " " << ucmd.Params() << "  -->  ";
-    uint8_t rsrc = ucmd.dst_val();
+    uint8_t rsrc = ucmd.DstVal();
     uint8_t rdst = 0;
     bool cf = Flags[CF];
-    switch (ucmd.type()) {
+    switch (ucmd.Type()) {
       case 0: rdst = rsrc ^ 0xFF; break;  // INV
       case 1: rdst = ((rsrc & 0x0F) << 4) + ((rsrc & 0xF0) >> 4); break;  // SWAP
       case 2: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
       case 3: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
-    ActiveRegsBank()[ucmd.dst()] = rdst;
+    ActiveRegsBank()[ucmd.Dst()] = rdst;
     PrintRegs();
     ip++;
   } else if (op >= 0x00 && op <= 0x80) {  // ARITHM
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
-    uint8_t dst_val = acmd.dst_val();
-    uint8_t src_val = acmd.src_val();
+    uint8_t dst_val = acmd.DstVal();
+    uint8_t src_val = acmd.SrcVal();
     switch (op) {
       case 0x00: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val; break;  // ADD // TODO: add sub operation here
       case 0x10: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val + Flags[CF]; break;  // ADDC
@@ -166,42 +166,42 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     }
     if (op != 0x70)
       Flags[ZF] = (dst_val == 0);
-    ActiveRegsBank()[acmd.dst()] = dst_val;
+    ActiveRegsBank()[acmd.Dst()] = dst_val;
     PrintRegs();
     ip++;
   } else if (op == 0x90) {  // LD
     MemoryCmd mcmd(cmd);
     cout << mcmd.Params() << "  -->  ";
-    uint8_t val = RAM[GetPtr(mcmd.ptr()) + (op & 0x0F)];  // TODO: replace it to mcmd.offs()
-    ActiveRegsBank()[mcmd.reg()] = val;
+    uint8_t val = RAM[GetPtr(mcmd.Ptr()) + (op & 0x0F)];  // TODO: replace it to mcmd.offs()
+    ActiveRegsBank()[mcmd.Reg()] = val;
     PrintRegs();
     ip++;
   } else if (op == 0xA0) {  // IN
     PortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
     uint8_t rdst = PINS[(op >> 4) & 0x1F];
-    ActiveRegsBank()[pcmd.reg()] = rdst;
+    ActiveRegsBank()[pcmd.Reg()] = rdst;
     PrintRegs();
     ip++;
   } else if (op == 0xB0) {  // OUT
     PortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
-    PORTS[pcmd.port()] = ActiveRegsBank()[pcmd.reg()];
-    SyncFlags(pcmd.port());
+    PORTS[pcmd.Port()] = ActiveRegsBank()[pcmd.Reg()];
+    SyncFlags(pcmd.Port());
     PrintPorts();
     ip++;
   } else if (op == 0xC0) {  // ST
     MemoryCmd mcmd(cmd);
     cout << mcmd.Params() << "  -->  ";
-    uint8_t val = ActiveRegsBank()[mcmd.reg()];
-    RAM[GetPtr(mcmd.ptr()) + (op & 0x0F)] = val;
+    uint8_t val = ActiveRegsBank()[mcmd.Reg()];
+    RAM[GetPtr(mcmd.Ptr()) + (op & 0x0F)] = val;
     PrintRegs();
     ip++;
   } else if (op == 0xD0 || op == 0xE0) {  // CMP
     // CMP implementation, CPMC has not implemented yet
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
-    auto [lf, ef, gf] = Compare(acmd.dst_val(), acmd.src_val());
+    auto [lf, ef, gf] = Compare(acmd.DstVal(), acmd.SrcVal());
     Flags[LF] = lf;
     Flags[EF] = ef;
     Flags[GF] = gf;

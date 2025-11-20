@@ -11,8 +11,8 @@ class Cmd {
  public:
   Cmd(uint16_t cmd, CPU* cpu = nullptr): cmd_(cmd), cpu_(cpu) {}
 
-  uint16_t cmd() { return cmd_; }
-  uint8_t op() { return (cmd_ >> 8) & 0xF0; }
+  uint16_t CmdCode() { return cmd_; }
+  uint8_t OpCode() { return (cmd_ >> 8) & 0xF0; }
 
   virtual std::string Params() { return ""; }
 
@@ -27,13 +27,14 @@ class ArithmCmd: public Cmd {
  public:
   ArithmCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
-  uint8_t dst() { return (cmd_ >> 9) & 0x07; }
-  bool is_cnst() { return (cmd_ >> 8) & 0x01; }
-  uint8_t src() { return (cmd_ >> 5) & 0x07; }
-  uint8_t cnst() { return (cmd_ & 0xFF); }
+  uint8_t Dst() { return (cmd_ >> 9) & 0x07; }
+  bool IsConst() { return (cmd_ >> 8) & 0x01; }
+  uint8_t Src() { return (cmd_ >> 5) & 0x07; }
+  uint8_t Const() { return (cmd_ & 0xFF); }
 
-  uint8_t dst_val();
-  uint8_t src_val();
+  uint8_t DstVal();
+  uint8_t SrcVal();
+
   std::string Params() override;
 };
 
@@ -43,10 +44,10 @@ class UnaryCmd: public Cmd {
  public:
   UnaryCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
-  uint8_t dst() { return (cmd_ >> 9) & 0x07; }
-  uint8_t type() { return (cmd_ >> 5) & 0x03; }
+  uint8_t Dst() { return (cmd_ >> 9) & 0x07; }
+  uint8_t Type() { return (cmd_ >> 5) & 0x03; }
 
-  uint8_t dst_val();
+  uint8_t DstVal();
 
   std::string Params() override;
 };
@@ -58,11 +59,11 @@ class MemoryCmd: public Cmd {
  public:
   MemoryCmd(uint16_t cmd): Cmd(cmd) {}
 
-  uint8_t reg() { return (cmd_ >> 9) & 0x07; }
-  uint8_t ptr() { return (cmd_ >> 6) & 0x03; }
-  uint8_t autodec() { return (cmd_ >> 5) & 0x01; }
-  uint8_t autoinc() { return (cmd_ >> 4) & 0x01; }
-  uint8_t offs() { return cmd_ & 0x0F; }
+  uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
+  uint8_t Ptr() { return (cmd_ >> 6) & 0x03; }
+  uint8_t AutoDec() { return (cmd_ >> 5) & 0x01; }
+  uint8_t AutoInc() { return (cmd_ >> 4) & 0x01; }
+  uint8_t Offs() { return cmd_ & 0x0F; }
 
   std::string Params() override;
 };
@@ -74,8 +75,8 @@ class PortCmd: public Cmd {
  public:
   PortCmd(uint16_t cmd): Cmd(cmd) {}
 
-  uint8_t port() { return (cmd_ >> 5) & 0x1F; }
-  uint8_t reg() { return (cmd_ >> 9) & 0x07; }
+  uint8_t Port() { return (cmd_ >> 5) & 0x1F; }
+  uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
 
   std::string Params() override;
 };

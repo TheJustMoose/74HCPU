@@ -3,54 +3,54 @@
 
 using namespace std;
 
-uint8_t ArithmCmd::dst_val() {
-  return cpu_->ActiveRegsBank()[dst()];
+uint8_t ArithmCmd::DstVal() {
+  return cpu_->ActiveRegsBank()[Dst()];
 }
 
-uint8_t ArithmCmd::src_val() {
-  return is_cnst() ? cnst() : cpu_->ActiveRegsBank()[src()];
+uint8_t ArithmCmd::SrcVal() {
+  return IsConst() ? Const() : cpu_->ActiveRegsBank()[Src()];
 }
 
 string ArithmCmd::Params() {
-  string rsrc = is_cnst() ? to_string(cmd_ & 0xFF) : RegNames[src()];
-  return string(" ") + RegNames[dst()] + string(", ") + rsrc;
+  string rsrc = IsConst() ? to_string(cmd_ & 0xFF) : RegNames[Src()];
+  return string(" ") + RegNames[Dst()] + string(", ") + rsrc;
 }
 
-uint8_t UnaryCmd::dst_val() {
-  return cpu_->ActiveRegsBank()[dst()];
+uint8_t UnaryCmd::DstVal() {
+  return cpu_->ActiveRegsBank()[Dst()];
 }
 
 string UnaryCmd::Params() {
-  string res = UnoNames[type()];
+  string res = UnoNames[Type()];
   res += " ";
-  res += RegNames[dst()];
+  res += RegNames[Dst()];
   return res;
 }
 
 string MemoryCmd::Params() {
   string suffix;
-  if (autodec())
+  if (AutoDec())
     suffix += "D";
-  if (autoinc())
+  if (AutoInc())
     suffix += "I";
-  if (offs()) {
+  if (Offs()) {
     suffix += " + ";
-    suffix += to_string(offs());  // offs may have value from -8 to +7 so I have to convert it to "int"
+    suffix += to_string(Offs());  // offs may have value from -8 to +7 so I have to convert it to "int"
   }
 
-  if (op() == 0x90)  // LD
-    return string(" ") + RegNames[reg()] + string(", ") + PtrNames[ptr()] + suffix;
-  else if (op() == 0xC0)  // ST
-    return string(" ") + PtrNames[ptr()] + suffix + string(", ") + RegNames[reg()];
+  if (OpCode() == 0x90)  // LD
+    return string(" ") + RegNames[Reg()] + string(", ") + PtrNames[Ptr()] + suffix;
+  else if (OpCode() == 0xC0)  // ST
+    return string(" ") + PtrNames[Ptr()] + suffix + string(", ") + RegNames[Reg()];
   else
     return "error";
 }
 
 string PortCmd::Params() {
-  if (op() == 0xA0)
-    return string(" ") + RegNames[reg()] + string(", PINS") + to_string(port());
-  else if (op() == 0xB0)
-    return " PORT" + to_string(port()) + ", " + RegNames[reg()];
+  if (OpCode() == 0xA0)
+    return string(" ") + RegNames[Reg()] + string(", PINS") + to_string(Port());
+  else if (OpCode() == 0xB0)
+    return " PORT" + to_string(Port()) + ", " + RegNames[Reg()];
   else
     return "error";
 }
