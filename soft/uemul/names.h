@@ -1,5 +1,7 @@
 #pragma once
 
+#include "flags.h"
+
 inline const char* OpNames[] {
   // 0       1      2     3      4      5      6      7
   "ADD", "ADDC", "AND", "OR", "XOR", "MUL", "UNO", "MOV",
@@ -28,10 +30,6 @@ inline const char* UnoNames[] {
 
 inline const char* StopName {
   "STOP"
-};
-
-enum FLAGS {
-  HCF = 0, CF = 1, ZF = 2, LF = 3, EF = 4, GF = 5, BF = 6, RSRV = 7, FLAGS_CNT = 8
 };
 
 inline const char* FlagNames[FLAGS_CNT] {

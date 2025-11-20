@@ -4,10 +4,11 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <stack>
 #include <vector>
 
 #include "commands.h"
+#include "cpu.h"
+#include "flags.h"
 #include "names.h"
 #include "offset2int.h"
 #include "read_hex.h"
@@ -35,35 +36,11 @@ vector<uint16_t> Cmds {
   0xFD00
 };
 
-class CPU {
- public:
-  void Step(uint16_t cmd, uint16_t &ip);
-  void Run(bool dbg);
-
-  void PrintFlags();
-  void PrintRegs();
-  void PrintPorts();
-  void PrintStack();
-
-  uint16_t GetPair(uint8_t idx);
-  uint16_t GetPtr(uint8_t ptr);
-
-  uint8_t *ActiveRegsBank() { // current bank of registers
-    return Flags[BF] ? RegsBank1 : RegsBank0;
-  }
-
-  uint8_t RAM[65536];
-  uint8_t PORTS[32];
-  uint8_t PINS[32];
-  bool Flags[FLAGS_CNT];
-  uint8_t RegsBank0[8];
-  uint8_t RegsBank1[8];
-
-  bool Stop { false };
-  stack<uint16_t> Stack;
-};
-
 CPU cpu;
+
+uint8_t *CPU::ActiveRegsBank() { // current bank of registers
+  return Flags[BF] ? RegsBank1 : RegsBank0;
+}
 
 uint16_t CPU::GetPair(uint8_t idx) {
   uint16_t res = RegsBank1[idx*2 + 1];
@@ -170,7 +147,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op >= 0x00 && op <= 0x80) {  // ARITHM
-    ArithmCmd acmd(cmd);
+    ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     uint8_t dst_val = ActiveRegsBank()[acmd.dst()];
     uint8_t src_val = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
@@ -221,7 +198,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     ip++;
   } else if (op == 0xD0 || op == 0xE0) {  // CMP
     // CMP implementation, CPMC has not implemented yet
-    ArithmCmd acmd(cmd);
+    ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     uint8_t rdst = ActiveRegsBank()[acmd.dst()];
     uint8_t rsrc = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];

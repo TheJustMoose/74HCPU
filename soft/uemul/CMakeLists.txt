@@ -7,6 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "../Release")
 
 project(asm CXX)
 add_executable(uemul
+	commands.cc
 	offset2int.cc
 	read_hex.cc
 	uemul.cc

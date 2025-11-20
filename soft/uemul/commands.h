@@ -5,6 +5,8 @@
 
 #include "names.h"
 
+class CPU;
+
 class Cmd {
  public:
   Cmd(uint16_t cmd): cmd_(cmd) {}
@@ -22,17 +24,18 @@ class Cmd {
 //|   ADD |  DST |C| SRC |-|Z|z|I|i|
 class ArithmCmd: public Cmd {
  public:
-  ArithmCmd(uint16_t cmd): Cmd(cmd) {}
+  ArithmCmd(uint16_t cmd, CPU* cpu): Cmd(cmd), cpu_(cpu) {}
 
   uint8_t dst() { return (cmd_ >> 9) & 0x07; }
   bool is_cnst() { return (cmd_ >> 8) & 0x01; }
   uint8_t src() { return (cmd_ >> 5) & 0x07; }
   uint8_t cnst() { return (cmd_ & 0xFF); }
 
-  virtual std::string Params() {
-    std::string rsrc = is_cnst() ? std::to_string(cmd_ & 0xFF) : RegNames[src()];
-    return std::string(" ") + RegNames[dst()] + std::string(", ") + rsrc;
-  }
+  uint8_t dst_val();
+  virtual std::string Params();
+
+ private:
+  CPU* cpu_ { nullptr };
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
@@ -44,12 +47,7 @@ class UnaryCmd: public Cmd {
   uint8_t dst() { return (cmd_ >> 9) & 0x07; }
   uint8_t type() { return (cmd_ >> 5) & 0x03; }
 
-  virtual std::string Params() {
-    std::string res = UnoNames[type()];
-    res += " ";
-    res += RegNames[dst()];
-    return res;
-  }
+  virtual std::string Params();
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
@@ -65,24 +63,7 @@ class MemoryCmd: public Cmd {
   uint8_t autoinc() { return (cmd_ >> 4) & 0x01; }
   uint8_t offs() { return cmd_ & 0x0F; }
 
-  virtual std::string Params() {
-    std::string suffix;
-    if (autodec())
-      suffix += "D";
-    if (autoinc())
-      suffix += "I";
-    if (offs()) {
-      suffix += " + ";
-      suffix += std::to_string(offs());  // offs may have value from -8 to +7 so I have to convert it to "int"
-    }
-
-    if (op() == 0x90)  // LD
-      return std::string(" ") + RegNames[reg()] + std::string(", ") + PtrNames[ptr()] + suffix;
-    else if (op() == 0xC0)  // ST
-      return std::string(" ") + PtrNames[ptr()] + suffix + std::string(", ") + RegNames[reg()];
-    else
-      return "error";
-  }
+  virtual std::string Params();
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
@@ -95,12 +76,5 @@ class PortCmd: public Cmd {
   uint8_t port() { return (cmd_ >> 5) & 0x1F; }
   uint8_t reg() { return (cmd_ >> 9) & 0x07; }
 
-  virtual std::string Params() {
-    if (op() == 0xA0)
-      return std::string(" ") + RegNames[reg()] + std::string(", PINS") + std::to_string(port());
-    else if (op() == 0xB0)
-      return " PORT" + std::to_string(port()) + ", " + RegNames[reg()];
-    else
-      return "error";
-  }
+  virtual std::string Params();
 };
