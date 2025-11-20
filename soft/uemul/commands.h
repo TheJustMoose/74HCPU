@@ -32,7 +32,7 @@ class ArithmCmd: public Cmd {
   uint8_t cnst() { return (cmd_ & 0xFF); }
 
   uint8_t dst_val();
-  virtual std::string Params();
+  std::string Params() override;
 
  private:
   CPU* cpu_ { nullptr };
@@ -47,7 +47,7 @@ class UnaryCmd: public Cmd {
   uint8_t dst() { return (cmd_ >> 9) & 0x07; }
   uint8_t type() { return (cmd_ >> 5) & 0x03; }
 
-  virtual std::string Params();
+  std::string Params() override;
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
@@ -63,7 +63,7 @@ class MemoryCmd: public Cmd {
   uint8_t autoinc() { return (cmd_ >> 4) & 0x01; }
   uint8_t offs() { return cmd_ & 0x0F; }
 
-  virtual std::string Params();
+  std::string Params() override;
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
@@ -76,5 +76,5 @@ class PortCmd: public Cmd {
   uint8_t port() { return (cmd_ >> 5) & 0x1F; }
   uint8_t reg() { return (cmd_ >> 9) & 0x07; }
 
-  virtual std::string Params();
+  std::string Params() override;
 };
