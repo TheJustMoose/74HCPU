@@ -7,6 +7,10 @@ uint8_t ArithmCmd::dst_val() {
   return cpu_->ActiveRegsBank()[dst()];
 }
 
+uint8_t ArithmCmd::src_val() {
+  return is_cnst() ? cnst() : cpu_->ActiveRegsBank()[src()];
+}
+
 string ArithmCmd::Params() {
   string rsrc = is_cnst() ? to_string(cmd_ & 0xFF) : RegNames[src()];
   return string(" ") + RegNames[dst()] + string(", ") + rsrc;

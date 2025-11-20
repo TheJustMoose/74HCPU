@@ -150,7 +150,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     uint8_t dst_val = acmd.dst_val();
-    uint8_t src_val = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
+    uint8_t src_val = acmd.src_val();
     switch (op) {
       case 0x00: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val; break;  // ADD // TODO: add sub operation here
       case 0x10: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val + Flags[CF]; break;  // ADDC
@@ -201,7 +201,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     uint8_t rdst = acmd.dst_val();
-    uint8_t rsrc = acmd.is_cnst() ? acmd.cnst() : ActiveRegsBank()[acmd.src()];
+    uint8_t rsrc = acmd.src_val();
     if (rdst < rsrc) {
       Flags[LF] = true; Flags[EF] = false; Flags[GF] = false;
     } else if (rdst == rsrc) {

@@ -33,6 +33,7 @@ class ArithmCmd: public Cmd {
   uint8_t cnst() { return (cmd_ & 0xFF); }
 
   uint8_t dst_val();
+  uint8_t src_val();
   std::string Params() override;
 };
 
