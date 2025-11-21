@@ -1,8 +1,10 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 
-#include "offset2int.h"
+#include "commands.h"
+#include "cpu.h"
 #include "names.h"
+#include "offset2int.h"
 
 using namespace std;
 
@@ -29,4 +31,55 @@ TEST_CASE("test ByteOffsetToInt") {
 TEST_CASE("test names") {
   CHECK(std::size(RegNames) == 8);  // 8 registers
   CHECK(std::size(OpNames) == 16);  // and 16 commands
+}
+
+TEST_CASE("test Cmds") {
+  CPU cpu;
+  AddCmd ac(0x0164, &cpu);  // ADD R0, 100
+  // test AddCmd::Calculate
+  CHECK( ac.Calculate(0, 0) == 0 );
+  CHECK( !cpu.Flags[flags::CF] );
+  CHECK( cpu.Flags[flags::ZF] );
+
+  CHECK( ac.Calculate(100, 100) == 200 );
+  CHECK( !cpu.Flags[flags::CF] );
+  CHECK( !cpu.Flags[flags::ZF] );
+
+  CHECK( ac.Calculate(100, 200) == 44 );
+  CHECK( cpu.Flags[flags::CF] );
+  CHECK( !cpu.Flags[flags::ZF] );
+
+  CHECK( ac.Calculate(100, 156) == 0 );
+  CHECK( cpu.Flags[flags::CF] );
+  CHECK( cpu.Flags[flags::ZF] );
+
+  // test AddCmd::Execute
+  cpu.RegsBank0[0] = 100;   // MOV R0, 100
+  ac.Execute();             // ADD R0, 100
+  CHECK( cpu.RegsBank0[0] == 200 );
+
+  // test AddcCmd::Execute
+  cpu.RegsBank0[0] = 100;    // MOV R0, 100
+  cpu.Flags[flags::CF] = true;
+  AddcCmd acc(0x1164, &cpu); // ADDC R0, 100
+  acc.Execute();
+  CHECK( cpu.RegsBank0[0] == 201 );  // 100 + 100 + CF
+
+  // test AndCmd::Execute
+  cpu.RegsBank0[0] = 0x55;   // MOV R0, 0x55
+  AndCmd anc(0x21AA, &cpu);  // AND R0, 0xAA
+  anc.Execute();
+  CHECK( cpu.RegsBank0[0] == 0 );
+
+  // test OrCmd::Execute
+  cpu.RegsBank0[0] = 0x55;   // MOV R0, 0x55
+  OrCmd oc(0x31AA, &cpu);    // OR R0, 0xAA
+  oc.Execute();
+  CHECK( cpu.RegsBank0[0] == 0xFF );
+
+  // test OrCmd::Execute
+  cpu.RegsBank0[0] = 0x55;   // MOV R0, 0x55
+  XorCmd xoc(0x415A, &cpu);  // OR R0, 0x5A
+  xoc.Execute();
+  CHECK( cpu.RegsBank0[0] == 0x0F );
 }
