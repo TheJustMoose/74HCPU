@@ -104,3 +104,19 @@ TEST_CASE("test Cmds") {
   mc.Execute();
   CHECK( cpu.RegsBank0[0] == 0x5A );
 }
+
+TEST_CASE("test UnoCmds") {
+  //CPU cpu;
+  //InvCnd
+}
+
+TEST_CASE("test Memory Cmds") {
+  CPU cpu;
+  cpu.RegsBank0[0] = 10;         // MOV R0, 10
+  cpu.RegsBank1[0] = 100;        // MOV XL, 100
+  cpu.RegsBank1[1] = 0;          // MOV XH, 0
+  cpu.RAM[100] = 0;              // *100 = 0
+  MemoryCmd mcmd(0xC000, &cpu);  // ST X, R0
+  mcmd.Execute();
+  CHECK( cpu.RAM[100] == 10 );   // *100 == 10
+}
