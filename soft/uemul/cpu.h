@@ -27,6 +27,6 @@ class CPU {
   uint8_t RegsBank0[8];
   uint8_t RegsBank1[8];
 
-  bool Stop { false };
+  bool Stop {false};
   std::stack<uint16_t> Stack;
 };

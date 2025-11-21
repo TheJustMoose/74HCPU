@@ -147,27 +147,49 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     ActiveRegsBank()[ucmd.Dst()] = rdst;
     PrintRegs();
     ip++;
-  } else if (op >= 0x00 && op <= 0x80) {  // ARITHM
-    ArithmCmd acmd(cmd, this);
+  } else if (op == 0x00) {  // ADD
+    AddCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
-    uint8_t dst_val = acmd.DstVal();
-    uint8_t src_val = acmd.SrcVal();
-    switch (op) {
-      case 0x00: Flags[flags::CF] = (dst_val + src_val > 255); dst_val += src_val; break;  // ADD // TODO: add sub operation here
-      case 0x10: Flags[flags::CF] = (dst_val + src_val > 255); dst_val += src_val + Flags[flags::CF]; break;  // ADDC
-      case 0x20: dst_val &= src_val; break;  // AND
-      case 0x30: dst_val |= src_val; break;  // OR
-      case 0x40: dst_val ^= src_val; break;  // XOR
-      case 0x50: dst_val *= src_val; break;  // MUL  // TODO: have to write into register pair
-      // 0x60 is UNO op
-      case 0x70: dst_val = src_val; break;   // MOV
-      case 0x80: break;  // LPM operation must be here
-      default: cout << "Unknown op for this switch: " << op << endl; break;
-    }
-    if (op != 0x70)
-      Flags[flags::ZF] = (dst_val == 0);
-    ActiveRegsBank()[acmd.Dst()] = dst_val;
+    acmd.Execute();
     PrintRegs();
+    ip++;
+  } else if (op == 0x10) {  // ADDC
+    AddcCmd acmd(cmd, this);
+    cout << acmd.Params() << "  -->  ";
+    acmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0x20) {  // AND
+    AndCmd acmd(cmd, this);
+    cout << acmd.Params() << "  -->  ";
+    acmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0x30) {  // OR
+    OrCmd acmd(cmd, this);
+    cout << acmd.Params() << "  -->  ";
+    acmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0x40) {  // XOR
+    XorCmd acmd(cmd, this);
+    cout << acmd.Params() << "  -->  ";
+    acmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0x50) {  // MUL
+    MulCmd acmd(cmd, this);
+    cout << acmd.Params() << "  -->  ";
+    acmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0x70) {  // MOV
+    MovCmd acmd(cmd, this);
+    cout << acmd.Params() << "  -->  ";
+    acmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0x80) {  // LPM
     ip++;
   } else if (op == 0x90) {  // LD
     MemoryCmd mcmd(cmd);
