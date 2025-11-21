@@ -77,9 +77,30 @@ TEST_CASE("test Cmds") {
   oc.Execute();
   CHECK( cpu.RegsBank0[0] == 0xFF );
 
-  // test OrCmd::Execute
+  // test XorCmd::Execute
   cpu.RegsBank0[0] = 0x55;   // MOV R0, 0x55
-  XorCmd xoc(0x415A, &cpu);  // OR R0, 0x5A
+  XorCmd xoc(0x415A, &cpu);  // XOR R0, 0x5A
   xoc.Execute();
   CHECK( cpu.RegsBank0[0] == 0x0F );
+
+  // test MulCmd::Execute
+  MulCmd muc(0x715A, &cpu);  // MUL R0, 0x5A
+  cpu.RegsBank0[0] = 0;      // MOV R0, 0
+  muc.Execute();
+  CHECK( cpu.RegsBank0[0] == 0 );
+  CHECK( cpu.RegsBank0[1] == 0 );
+  cpu.RegsBank0[0] = 1;      // MOV R0, 1
+  muc.Execute();
+  CHECK( cpu.RegsBank0[0] == 0x5A );
+  CHECK( cpu.RegsBank0[1] == 0x00 );
+  cpu.RegsBank0[0] = 4;      // MOV R0, 4
+  muc.Execute();
+  CHECK( cpu.RegsBank0[0] == 0x68 );  // 5Ah * 4 == 168h
+  CHECK( cpu.RegsBank0[1] == 0x01 );
+
+  // test MovCmd::Execute
+  cpu.RegsBank0[0] = 0;      // MOV R0, 0
+  MovCmd mc(0x715A, &cpu);   // MOV R0, 0x5A
+  mc.Execute();
+  CHECK( cpu.RegsBank0[0] == 0x5A );
 }
