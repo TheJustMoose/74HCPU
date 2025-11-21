@@ -35,7 +35,9 @@ class ArithmCmd: public Cmd {
   uint8_t DstVal();
   uint8_t SrcVal();
 
-  virtual void Execute() {}
+  virtual void Execute();
+
+  virtual uint8_t Calculate(uint8_t d, uint8_t s) { return 0; }
 
   std::string Params() override;
 
@@ -53,35 +55,35 @@ class AddCmd: public ArithmCmd {
  public:
   AddCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
 
-  void Execute() override;
+  uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
 
 class AddcCmd: public ArithmCmd {
  public:
   AddcCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
 
-  void Execute() override;
+  uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
 
 class AndCmd: public ArithmCmd {
  public:
   AndCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
 
-  void Execute() override;
+  uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
 
 class OrCmd: public ArithmCmd {
  public:
   OrCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
 
-  void Execute() override;
+  uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
 
 class XorCmd: public ArithmCmd {
  public:
   XorCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
 
-  void Execute() override;
+  uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
 
 class MulCmd: public ArithmCmd {
@@ -95,7 +97,7 @@ class MovCmd: public ArithmCmd {
  public:
   MovCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
 
-  void Execute() override;
+  uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|

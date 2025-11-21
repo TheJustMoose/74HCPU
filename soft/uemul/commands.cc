@@ -11,60 +11,49 @@ uint8_t ArithmCmd::SrcVal() {
   return IsConst() ? Const() : cpu_->ActiveRegsBank()[Src()];
 }
 
+void ArithmCmd::Execute() {
+  cpu_->ActiveRegsBank()[Dst()] = Calculate(DstVal(), SrcVal());
+}
+
 string ArithmCmd::Params() {
   string rsrc = IsConst() ? to_string(cmd_ & 0xFF) : RegNames[Src()];
   return string(" ") + RegNames[Dst()] + string(", ") + rsrc;
 }
 
-void AddCmd::Execute() {
-  uint8_t d = DstVal();
-  uint8_t s = SrcVal();
-
+uint8_t AddCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d + s;
   cpu_->Flags[flags::CF] = (d + s) > 255;
   cpu_->Flags[flags::ZF] = res == 0;
-  cpu_->ActiveRegsBank()[Dst()] = res;
+  return res;
 }
 
-void AddcCmd::Execute() {
-  uint8_t d = DstVal();
-  uint8_t s = SrcVal();
-
+uint8_t AddcCmd::Calculate(uint8_t d, uint8_t s) {
   bool cf = cpu_->Flags[flags::CF];
   uint8_t res = d + s + cf;
   cpu_->Flags[flags::CF] = (d + s + cf) > 255;
   cpu_->Flags[flags::ZF] = res == 0;
-  cpu_->ActiveRegsBank()[Dst()] = res;
+  return res;
 }
 
-void AndCmd::Execute() {
-  uint8_t d = DstVal();
-  uint8_t s = SrcVal();
-
+uint8_t AndCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d & s;
   cpu_->Flags[flags::CF] = false;
   cpu_->Flags[flags::ZF] = res == 0;
-  cpu_->ActiveRegsBank()[Dst()] = res;
+  return res;
 }
 
-void OrCmd::Execute() {
-  uint8_t d = DstVal();
-  uint8_t s = SrcVal();
-
+uint8_t OrCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d | s;
   cpu_->Flags[flags::CF] = false;
   cpu_->Flags[flags::ZF] = res == 0;
-  cpu_->ActiveRegsBank()[Dst()] = res;
+  return res;
 }
 
-void XorCmd::Execute() {
-  uint8_t d = DstVal();
-  uint8_t s = SrcVal();
-
+uint8_t XorCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d ^ s;
   cpu_->Flags[flags::CF] = false;
   cpu_->Flags[flags::ZF] = res == 0;
-  cpu_->ActiveRegsBank()[Dst()] = res;
+  return res;
 }
 
 void MulCmd::Execute() {
@@ -80,8 +69,8 @@ void MulCmd::Execute() {
   cpu_->ActiveRegsBank()[rh] = (res >> 8) & 0xFF;
 }
 
-void MovCmd::Execute() {
-  cpu_->ActiveRegsBank()[Dst()] = SrcVal();
+uint8_t MovCmd::Calculate(uint8_t d, uint8_t s) {
+  return s;
 }
 
 uint8_t UnaryCmd::DstVal() {

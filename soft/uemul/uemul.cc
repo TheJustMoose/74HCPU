@@ -235,22 +235,22 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     else
       cout << " " << BranchAddr(cmd, ip) << ", offs: " << offset << endl;
     switch (op) {
-      case 0xF0: Stack.push(ip + 1); ip += offset; break;            // CALL
-      case 0xF1: ip += offset; break;                                // JMP
-      case 0xF2: ip = Stack.top(); Stack.pop(); break;               // RET
-      case 0xF3: ip = Stack.top(); Stack.pop(); break;               // RETI
-      case 0xF4: if (Flags[flags::LF]) ip += offset; else ip++; break;      // JL
-      case 0xF5: if (Flags[flags::EF]) ip += offset; else ip++; break;      // JE
-      case 0xF6: if (!Flags[flags::EF]) ip += offset; else ip++; break;     // JNE
-      case 0xF7: if (Flags[flags::ZF]) ip += offset; else ip++; break;      // JG
-      case 0xF8: if (Flags[flags::ZF]) ip += offset; else ip++; break;      // JZ
-      case 0xF9: if (!Flags[flags::ZF]) ip += offset; else ip++; break;     // JNZ
-      case 0xFA: if (Flags[flags::CF]) ip += offset; else ip++; break;      // JC
-      case 0xFB: if (!Flags[flags::CF]) ip += offset; else ip++; break;     // JNC
-      case 0xFC: if (Flags[flags::HCF]) ip += offset; else ip++; break;     // JHC
-      case 0xFD: if (!Flags[flags::HCF]) ip += offset; else ip++; break;    // JHNC
-      case 0xFE: Stack.push(ip + 1); ip = offset << 8; break;        // AFCALL
-      case 0xFF: ip++; if ((offset & 0x01) == 0) Stop = true; break; // NOP/STOP
+      case 0xF0: Stack.push(ip + 1); ip += offset; break;                 // CALL
+      case 0xF1: ip += offset; break;                                     // JMP
+      case 0xF2: ip = Stack.top(); Stack.pop(); break;                    // RET
+      case 0xF3: ip = Stack.top(); Stack.pop(); break;                    // RETI
+      case 0xF4: if (Flags[flags::LF]) ip += offset; else ip++; break;    // JL
+      case 0xF5: if (Flags[flags::EF]) ip += offset; else ip++; break;    // JE
+      case 0xF6: if (!Flags[flags::EF]) ip += offset; else ip++; break;   // JNE
+      case 0xF7: if (Flags[flags::ZF]) ip += offset; else ip++; break;    // JG
+      case 0xF8: if (Flags[flags::ZF]) ip += offset; else ip++; break;    // JZ
+      case 0xF9: if (!Flags[flags::ZF]) ip += offset; else ip++; break;   // JNZ
+      case 0xFA: if (Flags[flags::CF]) ip += offset; else ip++; break;    // JC
+      case 0xFB: if (!Flags[flags::CF]) ip += offset; else ip++; break;   // JNC
+      case 0xFC: if (Flags[flags::HCF]) ip += offset; else ip++; break;   // JHC
+      case 0xFD: if (!Flags[flags::HCF]) ip += offset; else ip++; break;  // JHNC
+      case 0xFE: Stack.push(ip + 1); ip = offset << 8; break;             // AFCALL
+      case 0xFF: ip++; if ((offset & 0x01) == 0) Stop = true; break;      // NOP/STOP
     }
     cout << "new ip: " << hex << setw(4) << ip << endl;
     PrintStack();
