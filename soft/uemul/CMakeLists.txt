@@ -9,6 +9,7 @@ project(asm CXX)
 add_executable(uemul
 	commands.cc
 	compare.cc
+	cpu.cc
 	offset2int.cc
 	read_hex.cc
 	uemul.cc
@@ -18,7 +19,9 @@ include_directories("doctest/doctest")
 
 project(unit_tests CXX)
 add_executable(unit_tests
+	commands.cc
 	compare.cc
+	cpu.cc
 	offset2int.cc
 	unit_tests.cc
 )
