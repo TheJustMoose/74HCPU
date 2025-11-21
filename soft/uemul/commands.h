@@ -119,13 +119,15 @@ class UnaryCmd: public Cmd {
 //|    ST |  SRC |0|EXT|D|U|OFFSET4| C0 1100 0000| |
 class MemoryCmd: public Cmd {
  public:
-  MemoryCmd(uint16_t cmd): Cmd(cmd) {}
+  MemoryCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
   uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
   uint8_t Ptr() { return (cmd_ >> 6) & 0x03; }
   uint8_t AutoDec() { return (cmd_ >> 5) & 0x01; }
   uint8_t AutoInc() { return (cmd_ >> 4) & 0x01; }
   uint8_t Offs() { return cmd_ & 0x0F; }
+
+  virtual void Execute();
 
   std::string Params() override;
 };

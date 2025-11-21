@@ -177,10 +177,9 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   } else if (op == 0x80) {  // LPM
     ip++;
   } else if (op == 0x90) {  // LD
-    MemoryCmd mcmd(cmd);
+    MemoryCmd mcmd(cmd, this);
     cout << mcmd.Params() << "  -->  ";
-    uint8_t val = RAM[GetPtr(mcmd.Ptr()) + (op & 0x0F)];  // TODO: replace it to mcmd.offs()
-    ActiveRegsBank()[mcmd.Reg()] = val;
+    mcmd.Execute();
     PrintRegs();
     ip++;
   } else if (op == 0xA0) {  // IN
@@ -198,10 +197,9 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintPorts();
     ip++;
   } else if (op == 0xC0) {  // ST
-    MemoryCmd mcmd(cmd);
+    MemoryCmd mcmd(cmd, this);
     cout << mcmd.Params() << "  -->  ";
-    uint8_t val = ActiveRegsBank()[mcmd.Reg()];
-    RAM[GetPtr(mcmd.Ptr()) + (op & 0x0F)] = val;
+    mcmd.Execute();
     PrintRegs();
     ip++;
   } else if (op == 0xD0 || op == 0xE0) {  // CMP
