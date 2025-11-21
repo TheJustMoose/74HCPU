@@ -131,23 +131,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   cout << "IP: " << hex << setw(4) << ip
        << ", cmd: " << cmd << ", " << Op(cmd);
 
-  if (op == 0x60) {  // UNO
-    UnaryCmd ucmd(cmd, this);
-    cout << " " << ucmd.Params() << "  -->  ";
-    uint8_t rsrc = ucmd.DstVal();
-    uint8_t rdst = 0;
-    bool cf = Flags[flags::CF];
-    switch (ucmd.Type()) {
-      case 0: rdst = rsrc ^ 0xFF; break;  // INV
-      case 1: rdst = ((rsrc & 0x0F) << 4) + ((rsrc & 0xF0) >> 4); break;  // SWAP
-      case 2: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
-      case 3: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
-      default: cout << "Unknown op for this switch: " << op << endl; break;
-    }
-    ActiveRegsBank()[ucmd.Dst()] = rdst;
-    PrintRegs();
-    ip++;
-  } else if (op == 0x00) {  // ADD
+  if (op == 0x00) {  // ADD
     AddCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     acmd.Execute();
@@ -181,6 +165,22 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     MulCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     acmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0x60) {  // UNO
+    UnaryCmd ucmd(cmd, this);
+    cout << " " << ucmd.Params() << "  -->  ";
+    uint8_t rsrc = ucmd.DstVal();
+    uint8_t rdst = 0;
+    bool cf = Flags[flags::CF];
+    switch (ucmd.Type()) {
+      case 0: rdst = rsrc ^ 0xFF; break;  // INV
+      case 1: rdst = ((rsrc & 0x0F) << 4) + ((rsrc & 0xF0) >> 4); break;  // SWAP
+      case 2: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
+      case 3: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
+      default: cout << "Unknown op for this switch: " << op << endl; break;
+    }
+    ActiveRegsBank()[ucmd.Dst()] = rdst;
     PrintRegs();
     ip++;
   } else if (op == 0x70) {  // MOV
