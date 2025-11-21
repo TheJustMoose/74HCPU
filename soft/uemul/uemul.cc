@@ -56,12 +56,12 @@ uint16_t CPU::GetPtr(uint8_t ptr) {
 }
 
 uint8_t *CPU::ActiveRegsBank() { // current bank of registers
-  return Flags[BF] ? RegsBank1 : RegsBank0;
+  return Flags[flags::BF] ? RegsBank1 : RegsBank0;
 }
 
 void CPU::PrintFlags() {
   cout << "Flags: ";
-  for (int i = 0; i < FLAGS_CNT; i++)
+  for (int i = 0; i < flags::CNT; i++)
     cout << (Flags[i] ? FlagNames[i] : "--") << " ";
 }
 
@@ -107,7 +107,7 @@ void CPU::PrintStack() {
 
 void SyncFlags(uint8_t port) {
   if (port == 10)
-    cpu.Flags[BF] = cpu.PORTS[10] & 0x40;
+    cpu.Flags[flags::BF] = cpu.PORTS[10] & 0x40;
 }
 
 string BranchAddr(uint16_t cmd, uint16_t ip) {
@@ -136,12 +136,12 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     cout << " " << ucmd.Params() << "  -->  ";
     uint8_t rsrc = ucmd.DstVal();
     uint8_t rdst = 0;
-    bool cf = Flags[CF];
+    bool cf = Flags[flags::CF];
     switch (ucmd.Type()) {
       case 0: rdst = rsrc ^ 0xFF; break;  // INV
       case 1: rdst = ((rsrc & 0x0F) << 4) + ((rsrc & 0xF0) >> 4); break;  // SWAP
-      case 2: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
-      case 3: Flags[CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
+      case 2: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
+      case 3: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
     ActiveRegsBank()[ucmd.Dst()] = rdst;
@@ -153,8 +153,8 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     uint8_t dst_val = acmd.DstVal();
     uint8_t src_val = acmd.SrcVal();
     switch (op) {
-      case 0x00: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val; break;  // ADD // TODO: add sub operation here
-      case 0x10: Flags[CF] = (dst_val + src_val > 255); dst_val += src_val + Flags[CF]; break;  // ADDC
+      case 0x00: Flags[flags::CF] = (dst_val + src_val > 255); dst_val += src_val; break;  // ADD // TODO: add sub operation here
+      case 0x10: Flags[flags::CF] = (dst_val + src_val > 255); dst_val += src_val + Flags[flags::CF]; break;  // ADDC
       case 0x20: dst_val &= src_val; break;  // AND
       case 0x30: dst_val |= src_val; break;  // OR
       case 0x40: dst_val ^= src_val; break;  // XOR
@@ -165,7 +165,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
     if (op != 0x70)
-      Flags[ZF] = (dst_val == 0);
+      Flags[flags::ZF] = (dst_val == 0);
     ActiveRegsBank()[acmd.Dst()] = dst_val;
     PrintRegs();
     ip++;
@@ -202,9 +202,9 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     auto [lf, ef, gf] = Compare(acmd.DstVal(), acmd.SrcVal());
-    Flags[LF] = lf;
-    Flags[EF] = ef;
-    Flags[GF] = gf;
+    Flags[flags::LF] = lf;
+    Flags[flags::EF] = ef;
+    Flags[flags::GF] = gf;
     ip++;
   } else if (op >= 0xF0 && op <= 0xFF) {  // BRANCH
     int16_t offset = ByteOffsetToInt(cmd & 0xFF);
@@ -217,16 +217,16 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
       case 0xF1: ip += offset; break;                                // JMP
       case 0xF2: ip = Stack.top(); Stack.pop(); break;               // RET
       case 0xF3: ip = Stack.top(); Stack.pop(); break;               // RETI
-      case 0xF4: if (Flags[LF]) ip += offset; else ip++; break;      // JL
-      case 0xF5: if (Flags[EF]) ip += offset; else ip++; break;      // JE
-      case 0xF6: if (!Flags[EF]) ip += offset; else ip++; break;     // JNE
-      case 0xF7: if (Flags[ZF]) ip += offset; else ip++; break;      // JG
-      case 0xF8: if (Flags[ZF]) ip += offset; else ip++; break;      // JZ
-      case 0xF9: if (!Flags[ZF]) ip += offset; else ip++; break;     // JNZ
-      case 0xFA: if (Flags[CF]) ip += offset; else ip++; break;      // JC
-      case 0xFB: if (!Flags[CF]) ip += offset; else ip++; break;     // JNC
-      case 0xFC: if (Flags[HCF]) ip += offset; else ip++; break;     // JHC
-      case 0xFD: if (!Flags[HCF]) ip += offset; else ip++; break;    // JHNC
+      case 0xF4: if (Flags[flags::LF]) ip += offset; else ip++; break;      // JL
+      case 0xF5: if (Flags[flags::EF]) ip += offset; else ip++; break;      // JE
+      case 0xF6: if (!Flags[flags::EF]) ip += offset; else ip++; break;     // JNE
+      case 0xF7: if (Flags[flags::ZF]) ip += offset; else ip++; break;      // JG
+      case 0xF8: if (Flags[flags::ZF]) ip += offset; else ip++; break;      // JZ
+      case 0xF9: if (!Flags[flags::ZF]) ip += offset; else ip++; break;     // JNZ
+      case 0xFA: if (Flags[flags::CF]) ip += offset; else ip++; break;      // JC
+      case 0xFB: if (!Flags[flags::CF]) ip += offset; else ip++; break;     // JNC
+      case 0xFC: if (Flags[flags::HCF]) ip += offset; else ip++; break;     // JHC
+      case 0xFD: if (!Flags[flags::HCF]) ip += offset; else ip++; break;    // JHNC
       case 0xFE: Stack.push(ip + 1); ip = offset << 8; break;        // AFCALL
       case 0xFF: ip++; if ((offset & 0x01) == 0) Stop = true; break; // NOP/STOP
     }

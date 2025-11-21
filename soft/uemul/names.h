@@ -32,6 +32,6 @@ inline const char* StopName {
   "STOP"
 };
 
-inline const char* FlagNames[FLAGS_CNT] {
+inline const char* FlagNames[flags::CNT] {
   "HCF", "CF", "ZF", "LF", "EF", "GF", "BF", "R"
 };

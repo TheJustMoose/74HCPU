@@ -23,7 +23,7 @@ class CPU {
   uint8_t RAM[65536];
   uint8_t PORTS[32];
   uint8_t PINS[32];
-  bool Flags[FLAGS_CNT];
+  bool Flags[flags::CNT];
   uint8_t RegsBank0[8];
   uint8_t RegsBank1[8];
 
