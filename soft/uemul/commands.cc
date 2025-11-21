@@ -63,8 +63,8 @@ void MulCmd::Execute() {
   uint16_t res = d * s;
   cpu_->Flags[flags::CF] = false;
   cpu_->Flags[flags::ZF] = res == 0;
-  uint8_t rl = Dst() & 0x06;
-  uint8_t rh = rl |= 0x01;
+  uint8_t rl = Dst() & 0x06;  // low byte register
+  uint8_t rh = rl | 0x01;     // high byte register
   cpu_->ActiveRegsBank()[rl] = res & 0xFF;
   cpu_->ActiveRegsBank()[rh] = (res >> 8) & 0xFF;
 }
