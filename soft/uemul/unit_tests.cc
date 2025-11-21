@@ -84,7 +84,7 @@ TEST_CASE("test Cmds") {
   CHECK( cpu.RegsBank0[0] == 0x0F );
 
   // test MulCmd::Execute
-  MulCmd muc(0x715A, &cpu);  // MUL R0, 0x5A
+  MulCmd muc(0x515A, &cpu);  // MUL R0, 0x5A
   cpu.RegsBank0[0] = 0;      // MOV R0, 0
   muc.Execute();
   CHECK( cpu.RegsBank0[0] == 0 );
