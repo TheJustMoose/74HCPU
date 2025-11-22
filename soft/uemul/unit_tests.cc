@@ -215,3 +215,15 @@ TEST_CASE("test LPM Cmd") {
   CHECK( cpu.RegsBank0[5] == 0x02 ); // R5 == 0x02  // high byte register
   // so LPMW R4, X and LPMW R5, X have different opcodes but equal result
 }
+
+TEST_CASE("test LPM autoincrement") {
+  CPU cpu;
+  cpu.ROM.push_back(0x0110);
+
+  cpu.RegsBank1[0] = 0;              // MOV XL, 0
+  cpu.RegsBank1[1] = 0;              // MOV XH, 0
+  LpmCmd lcmd(0x8810, &cpu);         // LPM R4, X+
+  lcmd.Execute();
+  CHECK( cpu.RegsBank0[4] == 0x10 ); // R4 == 0x20
+  CHECK( cpu.RegsBank1[0] == 1 );    // XL == 1
+}
