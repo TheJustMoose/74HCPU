@@ -128,7 +128,7 @@ void StoreToMemoryCmd::Execute() {
 
 void LpmCmd::Execute() {
   uint16_t ptr = cpu_->GetPair(Ptr());
-  uint16_t val = ptr < cpu_->Cmds.size() ? cpu_->Cmds[ptr] : 0xFFFF;
+  uint16_t val = ptr < cpu_->ROM.size() ? cpu_->ROM[ptr] : 0xFFFF;
   cpu_->ActiveRegsBank()[Dst()] = static_cast<uint8_t>(val & 0xFF);
 }
 

@@ -185,10 +185,10 @@ TEST_CASE("test Ports Cmds") {
 
 TEST_CASE("test LPM Cmd") {
   CPU cpu;
-  cpu.Cmds.push_back(10);
-  cpu.Cmds.push_back(20);
-  cpu.Cmds.push_back(30);
-  cpu.Cmds.push_back(40);
+  cpu.ROM.push_back(10);
+  cpu.ROM.push_back(20);
+  cpu.ROM.push_back(30);
+  cpu.ROM.push_back(40);
 
   cpu.RegsBank1[0] = 1;              // MOV XL, 1
   cpu.RegsBank1[1] = 0;              // MOV XH, 0

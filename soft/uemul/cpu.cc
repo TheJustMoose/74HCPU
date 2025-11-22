@@ -258,8 +258,8 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
 
 void CPU::Run(bool dbg) {
   PrintRegs();
-  for (uint16_t ip = 0; ip < Cmds.size() && !Stop;) {
-    Step(Cmds[ip], ip);
+  for (uint16_t ip = 0; ip < ROM.size() && !Stop;) {
+    Step(ROM[ip], ip);
     if (dbg)
       _getch();
   }

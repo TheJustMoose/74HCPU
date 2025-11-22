@@ -9,7 +9,7 @@
 class CPU {
  public:
   CPU() {}
-  CPU(std::vector<uint16_t> cmds): Cmds(cmds) {}
+  CPU(std::vector<uint16_t> cmds): ROM(cmds) {}
 
   void Step(uint16_t cmd, uint16_t &ip);
   void Run(bool dbg);
@@ -36,5 +36,5 @@ class CPU {
 
   bool Stop {false};
   std::stack<uint16_t> Stack;
-  std::vector<uint16_t> Cmds;
+  std::vector<uint16_t> ROM;
 };
