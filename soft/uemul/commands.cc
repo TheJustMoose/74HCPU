@@ -90,7 +90,6 @@ string UnaryCmd::Params() {
 void MemoryCmd::Execute() {
   if (OpCode() == 0x90) {  // LD
     uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
-    cout << "ptr: " << hex << ptr << endl;
     uint8_t val = cpu_->RAM[ptr];
     cpu_->ActiveRegsBank()[Reg()] = val;
     if (AutoInc())
@@ -98,7 +97,6 @@ void MemoryCmd::Execute() {
   } else if (OpCode() == 0xC0) {  // ST
     uint8_t val = cpu_->ActiveRegsBank()[Reg()];
     uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
-    cout << "ptr: " << hex << ptr << endl;
     cpu_->RAM[ptr] = val;
     if (AutoInc())
       cpu_->IncPair(Reg());

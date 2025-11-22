@@ -118,6 +118,24 @@ TEST_CASE("test Ptrs Arithm") {
   CHECK( cpu.GetPair(0) == 0x1234);
   cpu.IncPair(0);
   CHECK( cpu.GetPair(0) == 0x1235);
+
+  cpu.SetPair(1, 0x00FF);
+  cpu.IncPair(1);
+  CHECK( cpu.GetPair(1) == 0x0100);
+
+  cpu.SetPair(2, 0x0010);
+  cpu.IncPair(2);
+  CHECK( cpu.GetPair(2) == 0x0011);
+
+  cpu.SetPair(3, 0xFFFF);
+  cpu.IncPair(3);
+  CHECK( cpu.GetPair(3) == 0x0000);
+
+  // ptr are stored in different places
+  CHECK( cpu.GetPair(0) != cpu.GetPair(1) );
+  CHECK( cpu.GetPair(1) != cpu.GetPair(2) );
+  CHECK( cpu.GetPair(2) != cpu.GetPair(3) );
+  CHECK( cpu.GetPair(3) != cpu.GetPair(0) );
 }
 
 TEST_CASE("test Memory Cmds") {
