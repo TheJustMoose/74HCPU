@@ -153,7 +153,7 @@ class StoreToMemoryCmd: public MemoryCmd {
 //|   OUT |  SRC |  PORT   |O|o|X|x| B0 1011 0000| |
 class PortCmd: public Cmd {
  public:
-  PortCmd(uint16_t cmd): Cmd(cmd) {}
+  PortCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
   uint8_t Port() { return (cmd_ >> 4) & 0x1F; }
   uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
@@ -163,7 +163,7 @@ class PortCmd: public Cmd {
 
 class InputPortCmd: public PortCmd {
  public:
-  InputPortCmd(uint16_t cmd): PortCmd(cmd) {}
+  InputPortCmd(uint16_t cmd, CPU* cpu): PortCmd(cmd, cpu) {}
 
   std::string Params() override;
   void Execute() override;
@@ -171,7 +171,7 @@ class InputPortCmd: public PortCmd {
 
 class OutputPortCmd: public PortCmd {
  public:
-  OutputPortCmd(uint16_t cmd): PortCmd(cmd) {}
+  OutputPortCmd(uint16_t cmd, CPU* cpu): PortCmd(cmd, cpu) {}
 
   std::string Params() override;
   void Execute() override;

@@ -195,13 +195,13 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op == 0xA0) {  // IN
-    InputPortCmd pcmd(cmd);
+    InputPortCmd pcmd(cmd, this);
     cout << pcmd.Params() << "  -->  ";
     pcmd.Execute();
     PrintRegs();
     ip++;
   } else if (op == 0xB0) {  // OUT
-    OutputPortCmd pcmd(cmd);
+    OutputPortCmd pcmd(cmd, this);
     cout << pcmd.Params() << "  -->  ";
     pcmd.Execute();
     SyncFlags(pcmd.Port());
