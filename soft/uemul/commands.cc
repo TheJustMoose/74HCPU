@@ -87,23 +87,6 @@ string UnaryCmd::Params() {
   return res;
 }
 
-void MemoryCmd::Execute() {
-  if (OpCode() == 0x90) {  // LD
-    uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
-    uint8_t val = cpu_->RAM[ptr];
-    cpu_->ActiveRegsBank()[Reg()] = val;
-    if (AutoInc())
-      cpu_->IncPair(Reg());
-  } else if (OpCode() == 0xC0) {  // ST
-    uint8_t val = cpu_->ActiveRegsBank()[Reg()];
-    uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
-    cpu_->RAM[ptr] = val;
-    if (AutoInc())
-      cpu_->IncPair(Reg());
-  } else
-    cout << "MemoryCmd error";
-}
-
 string MemoryCmd::Params() {
   string suffix;
   if (AutoDec())
@@ -121,6 +104,22 @@ string MemoryCmd::Params() {
     return string(" ") + PtrNames[Ptr()] + suffix + string(", ") + RegNames[Reg()];
   else
     return "error";
+}
+
+void LoadFromMemoryCmd::Execute() {
+  uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
+  uint8_t val = cpu_->RAM[ptr];
+  cpu_->ActiveRegsBank()[Reg()] = val;
+  if (AutoInc())
+    cpu_->IncPair(Reg());
+}
+
+void StoreToMemoryCmd::Execute() {
+  uint8_t val = cpu_->ActiveRegsBank()[Reg()];
+  uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
+  cpu_->RAM[ptr] = val;
+  if (AutoInc())
+    cpu_->IncPair(Reg());
 }
 
 string PortCmd::Params() {

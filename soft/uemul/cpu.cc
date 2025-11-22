@@ -188,7 +188,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   } else if (op == 0x80) {  // LPM
     ip++;
   } else if (op == 0x90) {  // LD
-    MemoryCmd mcmd(cmd, this);
+    LoadFromMemoryCmd mcmd(cmd, this);
     cout << mcmd.Params() << "  -->  ";
     mcmd.Execute();
     PrintRegs();
@@ -208,7 +208,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintPorts();
     ip++;
   } else if (op == 0xC0) {  // ST
-    MemoryCmd mcmd(cmd, this);
+    StoreToMemoryCmd mcmd(cmd, this);
     cout << mcmd.Params() << "  -->  ";
     mcmd.Execute();
     PrintRegs();

@@ -145,7 +145,7 @@ TEST_CASE("test Memory Cmds") {
   cpu.RegsBank1[0] = 100;            // MOV XL, 100
   cpu.RegsBank1[1] = 0;              // MOV XH, 0
   cpu.RAM[100] = 0;                  // *100 = 0
-  MemoryCmd mcmd(0xC000, &cpu);      // ST X, R0
+  StoreToMemoryCmd mcmd(0xC000, &cpu);  // ST X, R0
   mcmd.Execute();
   CHECK( cpu.RAM[100] == 10 );       // *100 == 10
 
@@ -153,7 +153,7 @@ TEST_CASE("test Memory Cmds") {
   cpu.RegsBank1[0] = 100;            // MOV XL, 100
   cpu.RegsBank1[1] = 0;              // MOV XH, 0
   cpu.RAM[100] = 0;                  // *100 = 0
-  MemoryCmd mcmd2(0xC010, &cpu);     // ST X+, R0 (with autoinc)
+  StoreToMemoryCmd mcmd2(0xC010, &cpu);  // ST X+, R0 (with autoinc)
   mcmd2.Execute();
   CHECK( cpu.RAM[100] == 20 );       // *100 == 20
   CHECK( cpu.RegsBank1[0] == 101 );  // autoinc work!

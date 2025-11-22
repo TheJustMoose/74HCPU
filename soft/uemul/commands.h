@@ -127,9 +127,23 @@ class MemoryCmd: public Cmd {
   uint8_t AutoInc() { return (cmd_ >> 4) & 0x01; }
   uint8_t Offs() { return cmd_ & 0x0F; }
 
-  virtual void Execute();
+  virtual void Execute() {}
 
   std::string Params() override;
+};
+
+class LoadFromMemoryCmd: public MemoryCmd {
+ public:
+  LoadFromMemoryCmd(uint16_t cmd, CPU* cpu): MemoryCmd(cmd, cpu) {}
+
+  void Execute() override;
+};
+
+class StoreToMemoryCmd: public MemoryCmd {
+ public:
+  StoreToMemoryCmd(uint16_t cmd, CPU* cpu): MemoryCmd(cmd, cpu) {}
+
+  void Execute() override;
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
