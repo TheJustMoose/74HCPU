@@ -155,7 +155,7 @@ class PortCmd: public Cmd {
  public:
   PortCmd(uint16_t cmd): Cmd(cmd) {}
 
-  uint8_t Port() { return (cmd_ >> 5) & 0x1F; }
+  uint8_t Port() { return (cmd_ >> 4) & 0x1F; }
   uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
 
   virtual void Execute() {}
