@@ -158,3 +158,16 @@ TEST_CASE("test Memory Cmds") {
   CHECK( cpu.RAM[100] == 20 );       // *100 == 20
   CHECK( cpu.RegsBank1[0] == 101 );  // autoinc work!
 }
+
+TEST_CASE("test Ports Cmds") {
+  CPU cpu;
+  cpu.RegsBank0[0] = 0x55;           // MOV R0, 0x55
+  OutputPortCmd ocmd(0xB010, &cpu);  // OUT PORT1, R0
+  ocmd.Execute();
+  CHECK( cpu.PORTS[1] == 0x55 );     // *1 == 0x55
+
+  cpu.PINS[1] = 0x66;
+  InputPortCmd icmd(0xA210, &cpu);   // IN R1, PIN1
+  icmd.Execute();
+  CHECK( cpu.RegsBank0[1] == 0x66 ); // R1 == 0x66
+}
