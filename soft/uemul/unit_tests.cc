@@ -116,7 +116,8 @@ TEST_CASE("test Ptrs Arithm") {
   CHECK( cpu.RegsBank1[0] == 0x34 );
   CHECK( cpu.RegsBank1[1] == 0x12 );
   CHECK( cpu.GetPair(0) == 0x1234);
-  CHECK( cpu.GetPair(-1) == 0x1234);
+  cpu.IncPair(0);
+  CHECK( cpu.GetPair(0) == 0x1235);
 }
 
 TEST_CASE("test Memory Cmds") {
