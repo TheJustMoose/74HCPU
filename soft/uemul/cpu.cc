@@ -186,6 +186,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op == 0x80) {  // LPM
+    // TODO
     ip++;
   } else if (op == 0x90) {  // LD
     LoadFromMemoryCmd mcmd(cmd, this);
@@ -194,14 +195,14 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op == 0xA0) {  // IN
-    PortCmd pcmd(cmd);
+    InputPortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
     uint8_t rdst = PINS[(op >> 4) & 0x1F];
     ActiveRegsBank()[pcmd.Reg()] = rdst;
     PrintRegs();
     ip++;
   } else if (op == 0xB0) {  // OUT
-    PortCmd pcmd(cmd);
+    OutputPortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
     PORTS[pcmd.Port()] = ActiveRegsBank()[pcmd.Reg()];
     SyncFlags(pcmd.Port());
@@ -214,7 +215,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op == 0xD0 || op == 0xE0) {  // CMP
-    // CMP implementation, CPMC has not implemented yet
+    // TODO: CMP implementation, CPMC has not implemented yet
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     auto [lf, ef, gf] = Compare(acmd.DstVal(), acmd.SrcVal());

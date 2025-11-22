@@ -110,6 +110,7 @@ void LoadFromMemoryCmd::Execute() {
   cpu_->ActiveRegsBank()[Reg()] = val;
   if (AutoInc())
     cpu_->IncPair(Reg());
+  // TODO: add AutoDec
 }
 
 string StoreToMemoryCmd::Params() {
@@ -122,13 +123,13 @@ void StoreToMemoryCmd::Execute() {
   cpu_->RAM[ptr] = val;
   if (AutoInc())
     cpu_->IncPair(Reg());
+  // TODO: add AutoDec
 }
 
-string PortCmd::Params() {
-  if (OpCode() == 0xA0)
-    return string(" ") + RegNames[Reg()] + string(", PINS") + to_string(Port());
-  else if (OpCode() == 0xB0)
-    return " PORT" + to_string(Port()) + ", " + RegNames[Reg()];
-  else
-    return "error";
+string InputPortCmd::Params() {
+  return string(" ") + RegNames[Reg()] + string(", PINS") + to_string(Port());
+}
+
+string OutputPortCmd::Params() {
+  return " PORT" + to_string(Port()) + ", " + RegNames[Reg()];
 }

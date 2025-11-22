@@ -158,5 +158,19 @@ class PortCmd: public Cmd {
   uint8_t Port() { return (cmd_ >> 5) & 0x1F; }
   uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
 
+  virtual void Execute() {}
+};
+
+class InputPortCmd: public PortCmd {
+ public:
+  InputPortCmd(uint16_t cmd): PortCmd(cmd) {}
+
+  std::string Params() override;
+};
+
+class OutputPortCmd: public PortCmd {
+ public:
+  OutputPortCmd(uint16_t cmd): PortCmd(cmd) {}
+
   std::string Params() override;
 };
