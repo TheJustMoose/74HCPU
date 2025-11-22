@@ -87,7 +87,7 @@ string UnaryCmd::Params() {
   return res;
 }
 
-string MemoryCmd::Params() {
+string MemoryCmd::Suffix() {
   string suffix;
   if (AutoDec())
     suffix += "D";
@@ -97,13 +97,11 @@ string MemoryCmd::Params() {
     suffix += " + ";
     suffix += to_string(Offs());  // offs may have value from -8 to +7 so I have to convert it to "int"
   }
+  return suffix;
+}
 
-  if (OpCode() == 0x90)  // LD
-    return string(" ") + RegNames[Reg()] + string(", ") + PtrNames[Ptr()] + suffix;
-  else if (OpCode() == 0xC0)  // ST
-    return string(" ") + PtrNames[Ptr()] + suffix + string(", ") + RegNames[Reg()];
-  else
-    return "error";
+string LoadFromMemoryCmd::Params() {
+  return string(" ") + RegNames[Reg()] + string(", ") + PtrNames[Ptr()] + Suffix();
 }
 
 void LoadFromMemoryCmd::Execute() {
@@ -112,6 +110,10 @@ void LoadFromMemoryCmd::Execute() {
   cpu_->ActiveRegsBank()[Reg()] = val;
   if (AutoInc())
     cpu_->IncPair(Reg());
+}
+
+string StoreToMemoryCmd::Params() {
+  return string(" ") + PtrNames[Ptr()] + Suffix() + string(", ") + RegNames[Reg()];
 }
 
 void StoreToMemoryCmd::Execute() {

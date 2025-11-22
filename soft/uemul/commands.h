@@ -129,13 +129,14 @@ class MemoryCmd: public Cmd {
 
   virtual void Execute() {}
 
-  std::string Params() override;
+  std::string Suffix();
 };
 
 class LoadFromMemoryCmd: public MemoryCmd {
  public:
   LoadFromMemoryCmd(uint16_t cmd, CPU* cpu): MemoryCmd(cmd, cpu) {}
 
+  std::string Params() override;
   void Execute() override;
 };
 
@@ -143,6 +144,7 @@ class StoreToMemoryCmd: public MemoryCmd {
  public:
   StoreToMemoryCmd(uint16_t cmd, CPU* cpu): MemoryCmd(cmd, cpu) {}
 
+  std::string Params() override;
   void Execute() override;
 };
 
