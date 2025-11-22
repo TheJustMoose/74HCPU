@@ -79,7 +79,7 @@ void CPU::PrintRegs() {
 
 void CPU::PrintPorts() {
   cout << "Ports: ";
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < 16; i++)
     cout << hex << setw(2) << (uint16_t)PORTS[i] << " ";
 
   cout << endl << endl;
@@ -224,6 +224,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     Flags[flags::LF] = lf;
     Flags[flags::EF] = ef;
     Flags[flags::GF] = gf;
+    PrintRegs();
     ip++;
   } else if (op >= 0xF0 && op <= 0xFF) {  // BRANCH
     int16_t offset = ByteOffsetToInt(cmd & 0xFF);
