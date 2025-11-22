@@ -110,13 +110,32 @@ TEST_CASE("test UnoCmds") {
   //InvCnd
 }
 
+TEST_CASE("test Ptrs Arithm") {
+  CPU cpu;
+  cpu.SetPair(0, 0x1234);
+  CHECK( cpu.RegsBank1[0] == 0x34 );
+  CHECK( cpu.RegsBank1[1] == 0x12 );
+  CHECK( cpu.GetPair(0) == 0x1234);
+  CHECK( cpu.GetPair(-1) == 0x1234);
+}
+
 TEST_CASE("test Memory Cmds") {
   CPU cpu;
-  cpu.RegsBank0[0] = 10;         // MOV R0, 10
-  cpu.RegsBank1[0] = 100;        // MOV XL, 100
-  cpu.RegsBank1[1] = 0;          // MOV XH, 0
-  cpu.RAM[100] = 0;              // *100 = 0
-  MemoryCmd mcmd(0xC000, &cpu);  // ST X, R0
+
+  cpu.RegsBank0[0] = 10;             // MOV R0, 10
+  cpu.RegsBank1[0] = 100;            // MOV XL, 100
+  cpu.RegsBank1[1] = 0;              // MOV XH, 0
+  cpu.RAM[100] = 0;                  // *100 = 0
+  MemoryCmd mcmd(0xC000, &cpu);      // ST X, R0
   mcmd.Execute();
-  CHECK( cpu.RAM[100] == 10 );   // *100 == 10
+  CHECK( cpu.RAM[100] == 10 );       // *100 == 10
+
+  cpu.RegsBank0[0] = 20;             // MOV R0, 20
+  cpu.RegsBank1[0] = 100;            // MOV XL, 100
+  cpu.RegsBank1[1] = 0;              // MOV XH, 0
+  cpu.RAM[100] = 0;                  // *100 = 0
+  MemoryCmd mcmd2(0xC010, &cpu);     // ST X+, R0 (with autoinc)
+  mcmd2.Execute();
+  CHECK( cpu.RAM[100] == 20 );       // *100 == 20
+  CHECK( cpu.RegsBank1[0] == 101 );  // autoinc work!
 }

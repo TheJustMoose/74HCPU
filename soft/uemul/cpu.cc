@@ -25,19 +25,30 @@ const char* Op(uint16_t cmd) {
 }
 
 uint16_t CPU::GetPair(uint8_t idx) {
+  if (idx > 3) {
+    cout << "Error pointer register number: " << static_cast<int>(idx) << endl;
+    return 0;
+  }
   uint16_t res = RegsBank1[idx*2 + 1];
   res <<= 8;
   res += RegsBank1[idx*2];
   return res;
 }
 
-uint16_t CPU::GetPtr(uint8_t ptr) {
-  if (ptr >= 0 && ptr <= 3)
-    return GetPair(ptr);
-  else {
-    cout << "Error pointer register number: " << ptr << endl;
-    return 0;
+void CPU::SetPair(uint8_t idx, uint16_t val) {
+  if (idx > 3) {
+    cout << "Error pointer register number: " << static_cast<int>(idx) << endl;
+    return;
   }
+  RegsBank1[idx*2 + 1] = (val >> 8);
+  RegsBank1[idx*2] = val & 0xFF;
+}
+
+uint16_t CPU::IncPair(uint8_t idx) {
+  uint16_t res = GetPair(idx);
+  res++;
+  SetPair(idx, res);
+  return res;
 }
 
 uint8_t *CPU::ActiveRegsBank() { // current bank of registers
@@ -56,10 +67,10 @@ void CPU::PrintRegs() {
     cout << hex << setw(2) << (uint16_t)RegsBank0[i] << " ";
 
   cout << " Ptrs: " << setfill('0');
-  cout << hex << setw(4) << GetPtr(3) << " ";
-  cout << hex << setw(4) << GetPtr(2) << " ";
-  cout << hex << setw(4) << GetPtr(1) << " ";
-  cout << hex << setw(4) << GetPtr(0) << " ";
+  cout << hex << setw(4) << GetPair(3) << " ";
+  cout << hex << setw(4) << GetPair(2) << " ";
+  cout << hex << setw(4) << GetPair(1) << " ";
+  cout << hex << setw(4) << GetPair(0) << " ";
 
   PrintFlags();
 

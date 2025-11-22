@@ -22,7 +22,8 @@ class CPU {
   void SyncFlags(uint8_t port);
 
   uint16_t GetPair(uint8_t idx);
-  uint16_t GetPtr(uint8_t ptr);
+  void SetPair(uint8_t idx, uint16_t val);
+  uint16_t IncPair(uint8_t idx);
 
   uint8_t *ActiveRegsBank();  // current bank of registers
 
@@ -30,8 +31,8 @@ class CPU {
   uint8_t PORTS[32];
   uint8_t PINS[32];
   bool Flags[flags::CNT] {};
-  uint8_t RegsBank0[8];
-  uint8_t RegsBank1[8];
+  uint8_t RegsBank0[8] {};
+  uint8_t RegsBank1[8] {};
 
   bool Stop {false};
   std::stack<uint16_t> Stack;
