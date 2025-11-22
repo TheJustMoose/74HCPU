@@ -32,6 +32,9 @@ class ArithmCmd: public Cmd {
   uint8_t Src() { return (cmd_ >> 5) & 0x07; }
   uint8_t Const() { return (cmd_ & 0xFF); }
 
+  uint8_t DstLowReg() { return Dst() & 0x06; }     // low byte register
+  uint8_t DstHighReg() { return DstLowReg() | 1; } // high byte register
+
   uint8_t DstVal();
   uint8_t SrcVal();
 
@@ -150,6 +153,9 @@ class LpmCmd: public Cmd {
   uint8_t AutoDec() { return (cmd_ >> 5) & 0x01; }
   uint8_t AutoInc() { return (cmd_ >> 4) & 0x01; }
   // I'm not sure about offset cause ADDER logic is on the RAM pcb only
+
+  uint8_t DstLowReg() { return Dst() & 0x06; }     // low byte register
+  uint8_t DstHighReg() { return DstLowReg() | 1; } // high byte register
 
   void Execute();
 };

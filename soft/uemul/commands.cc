@@ -66,10 +66,9 @@ void MulCmd::Execute() {
   uint16_t res = d * s;
   cpu_->Flags[flags::CF] = false;
   cpu_->Flags[flags::ZF] = res == 0;
-  uint8_t rl = Dst() & 0x06;  // low byte register
-  uint8_t rh = rl | 0x01;     // high byte register
-  cpu_->ActiveRegsBank()[rl] = res & 0xFF;
-  cpu_->ActiveRegsBank()[rh] = (res >> 8) & 0xFF;
+
+  cpu_->ActiveRegsBank()[DstLowReg()] = res & 0xFF;
+  cpu_->ActiveRegsBank()[DstHighReg()] = (res >> 8) & 0xFF;
 }
 
 uint8_t MovCmd::Calculate(uint8_t d, uint8_t s) {
@@ -129,7 +128,12 @@ void StoreToMemoryCmd::Execute() {
 void LpmCmd::Execute() {
   uint16_t ptr = cpu_->GetPair(Ptr());
   uint16_t val = ptr < cpu_->ROM.size() ? cpu_->ROM[ptr] : 0xFFFF;
-  cpu_->ActiveRegsBank()[Dst()] = static_cast<uint8_t>(val & 0xFF);
+  if (W()) {
+    cpu_->ActiveRegsBank()[DstLowReg()] = static_cast<uint8_t>(val & 0xFF);
+    cpu_->ActiveRegsBank()[DstHighReg()] = static_cast<uint8_t>((val >> 8) & 0xFF);
+  } else {
+    cpu_->ActiveRegsBank()[Dst()] = static_cast<uint8_t>(val & 0xFF);
+  }
 }
 
 string InputPortCmd::Params() {

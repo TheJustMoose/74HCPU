@@ -185,14 +185,33 @@ TEST_CASE("test Ports Cmds") {
 
 TEST_CASE("test LPM Cmd") {
   CPU cpu;
-  cpu.ROM.push_back(10);
-  cpu.ROM.push_back(20);
-  cpu.ROM.push_back(30);
-  cpu.ROM.push_back(40);
+  cpu.ROM.push_back(0x0110);
+  cpu.ROM.push_back(0x0220);
+  cpu.ROM.push_back(0x0330);
+  cpu.ROM.push_back(0x0440);
 
+  // read 1 byte from ROM into "low" register R4
   cpu.RegsBank1[0] = 1;              // MOV XL, 1
   cpu.RegsBank1[1] = 0;              // MOV XH, 0
   LpmCmd lcmd(0x8800, &cpu);         // LPM R4, X
   lcmd.Execute();
-  CHECK( cpu.RegsBank0[4] == 20 );   // R4 == 20
+  CHECK( cpu.RegsBank0[4] == 0x20 ); // R4 == 0x20
+
+  // read 1 byte from ROM into "high" register R5
+  LpmCmd lcmd2(0x8A00, &cpu);        // LPM R5, X
+  lcmd2.Execute();
+  CHECK( cpu.RegsBank0[5] == 0x20 ); // R5 == 0x20
+
+  // read 2 bytes from ROM into register pair R5:R4
+  LpmCmd lcmd3(0x8B00, &cpu);        // LPMW R5, X
+  lcmd3.Execute();
+  CHECK( cpu.RegsBank0[4] == 0x20 ); // R4 == 0x20  // low byte register
+  CHECK( cpu.RegsBank0[5] == 0x02 ); // R5 == 0x02  // high byte register
+
+  // read 2 bytes from ROM into register pair R5:R4
+  LpmCmd lcmd4(0x8900, &cpu);        // LPMW R4, X
+  lcmd4.Execute();
+  CHECK( cpu.RegsBank0[4] == 0x20 ); // R4 == 0x20  // low byte register
+  CHECK( cpu.RegsBank0[5] == 0x02 ); // R5 == 0x02  // high byte register
+  // so LPMW R4, X and LPMW R5, X have different opcodes but equal result
 }
