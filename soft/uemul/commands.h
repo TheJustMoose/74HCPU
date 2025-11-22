@@ -148,6 +148,21 @@ class StoreToMemoryCmd: public MemoryCmd {
   void Execute() override;
 };
 
+//|   LPM |  DST |W|EXT|D|U|OFFSET4| 80 1000 0000| |
+class LpmCmd: public Cmd {
+ public:
+  LpmCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
+
+  uint8_t Dst() { return (cmd_ >> 9) & 0x07; }
+  uint8_t W() { return (cmd_ >> 8) & 0x01; }
+  uint8_t Ptr() { return (cmd_ >> 6) & 0x03; }
+  uint8_t AutoDec() { return (cmd_ >> 5) & 0x01; }
+  uint8_t AutoInc() { return (cmd_ >> 4) & 0x01; }
+  // I'm not sure about offset cause ADDER logic is on the RAM pcb only
+
+  void Execute();
+};
+
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
 //|    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
 //|   OUT |  SRC |  PORT   |O|o|X|x| B0 1011 0000| |

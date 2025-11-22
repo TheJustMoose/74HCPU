@@ -186,7 +186,10 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op == 0x80) {  // LPM
-    // TODO
+    LpmCmd lcmd(cmd, this);
+    cout << lcmd.Params() << "  -->  ";
+    lcmd.Execute();
+    PrintRegs();
     ip++;
   } else if (op == 0x90) {  // LD
     LoadFromMemoryCmd mcmd(cmd, this);
@@ -214,7 +217,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op == 0xD0 || op == 0xE0) {  // CMP
-    // TODO: CMP implementation, CPMC has not implemented yet
+    // TODO: CMP implementation, CMPC has not implemented yet
     ArithmCmd acmd(cmd, this);
     cout << acmd.Params() << "  -->  ";
     auto [lf, ef, gf] = Compare(acmd.DstVal(), acmd.SrcVal());

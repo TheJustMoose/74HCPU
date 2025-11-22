@@ -140,7 +140,7 @@ TEST_CASE("test Ptrs Arithm") {
 
 TEST_CASE("test Memory Cmds") {
   CPU cpu;
-
+  // ST cmd
   cpu.RegsBank0[0] = 10;             // MOV R0, 10
   cpu.RegsBank1[0] = 100;            // MOV XL, 100
   cpu.RegsBank1[1] = 0;              // MOV XH, 0
@@ -149,13 +149,24 @@ TEST_CASE("test Memory Cmds") {
   mcmd.Execute();
   CHECK( cpu.RAM[100] == 10 );       // *100 == 10
 
+  // ST cmd with pointer autoincrement
   cpu.RegsBank0[0] = 20;             // MOV R0, 20
   cpu.RegsBank1[0] = 100;            // MOV XL, 100
   cpu.RegsBank1[1] = 0;              // MOV XH, 0
   cpu.RAM[100] = 0;                  // *100 = 0
-  StoreToMemoryCmd mcmd2(0xC010, &cpu);  // ST X+, R0 (with autoinc)
+  StoreToMemoryCmd mcmd2(0xC010, &cpu);  // ST XI, R0 (with autoinc)
   mcmd2.Execute();
   CHECK( cpu.RAM[100] == 20 );       // *100 == 20
+  CHECK( cpu.RegsBank1[0] == 101 );  // autoinc work!
+
+  // ST cmd with pointer autoincrement and displacement
+  cpu.RegsBank0[0] = 30;             // MOV R0, 30
+  cpu.RegsBank1[0] = 100;            // MOV XL, 100
+  cpu.RegsBank1[1] = 0;              // MOV XH, 0
+  cpu.RAM[105] = 0;                  // *105 = 0
+  StoreToMemoryCmd mcmd3(0xC015, &cpu);  // ST XI + 5, R0 (with autoinc)
+  mcmd3.Execute();
+  CHECK( cpu.RAM[105] == 30 );       // *105 == 30
   CHECK( cpu.RegsBank1[0] == 101 );  // autoinc work!
 }
 
@@ -170,4 +181,18 @@ TEST_CASE("test Ports Cmds") {
   InputPortCmd icmd(0xA210, &cpu);   // IN R1, PIN1
   icmd.Execute();
   CHECK( cpu.RegsBank0[1] == 0x66 ); // R1 == 0x66
+}
+
+TEST_CASE("test LPM Cmd") {
+  CPU cpu;
+  cpu.Cmds.push_back(10);
+  cpu.Cmds.push_back(20);
+  cpu.Cmds.push_back(30);
+  cpu.Cmds.push_back(40);
+
+  cpu.RegsBank1[0] = 1;              // MOV XL, 1
+  cpu.RegsBank1[1] = 0;              // MOV XH, 0
+  LpmCmd lcmd(0x8800, &cpu);         // LPM R4, X
+  lcmd.Execute();
+  CHECK( cpu.RegsBank0[4] == 20 );   // R4 == 20
 }
