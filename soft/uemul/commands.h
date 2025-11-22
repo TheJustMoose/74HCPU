@@ -166,6 +166,7 @@ class InputPortCmd: public PortCmd {
   InputPortCmd(uint16_t cmd): PortCmd(cmd) {}
 
   std::string Params() override;
+  void Execute() override;
 };
 
 class OutputPortCmd: public PortCmd {
@@ -173,4 +174,5 @@ class OutputPortCmd: public PortCmd {
   OutputPortCmd(uint16_t cmd): PortCmd(cmd) {}
 
   std::string Params() override;
+  void Execute() override;
 };

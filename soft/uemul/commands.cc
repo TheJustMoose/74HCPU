@@ -130,6 +130,15 @@ string InputPortCmd::Params() {
   return string(" ") + RegNames[Reg()] + string(", PINS") + to_string(Port());
 }
 
+void InputPortCmd::Execute() {
+  uint8_t rdst = cpu_->PINS[Port()];
+  cpu_->ActiveRegsBank()[Reg()] = rdst;
+}
+
 string OutputPortCmd::Params() {
   return " PORT" + to_string(Port()) + ", " + RegNames[Reg()];
+}
+
+void OutputPortCmd::Execute() {
+  cpu_->PORTS[Port()] = cpu_->ActiveRegsBank()[Reg()];
 }

@@ -197,14 +197,13 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   } else if (op == 0xA0) {  // IN
     InputPortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
-    uint8_t rdst = PINS[(op >> 4) & 0x1F];
-    ActiveRegsBank()[pcmd.Reg()] = rdst;
+    pcmd.Execute();
     PrintRegs();
     ip++;
   } else if (op == 0xB0) {  // OUT
     OutputPortCmd pcmd(cmd);
     cout << pcmd.Params() << "  -->  ";
-    PORTS[pcmd.Port()] = ActiveRegsBank()[pcmd.Reg()];
+    pcmd.Execute();
     SyncFlags(pcmd.Port());
     PrintPorts();
     ip++;
