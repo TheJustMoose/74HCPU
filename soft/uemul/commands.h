@@ -40,15 +40,6 @@ class ArithmCmd: public Cmd {
   virtual uint8_t Calculate(uint8_t d, uint8_t s) { return 0; }
 
   std::string Params() override;
-
-  uint8_t res() { return res_; }
-  bool CF() { return CF_; };
-  bool ZF() { return ZF_; };
-
- protected:
-  uint8_t res_ {0};
-  bool CF_ {false};
-  bool ZF_ {false};
 };
 
 class AddCmd: public ArithmCmd {
