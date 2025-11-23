@@ -19,8 +19,9 @@ void ArithmCmd::Execute() {
 }
 
 string ArithmCmd::Params() {
-  string rsrc = IsConst() ? to_string(cmd_ & 0xFF) : RegNames[Src()];
-  return string(" ") + RegNames[Dst()] + string(", ") + rsrc;
+  const char** names = cpu_->ActiveRegsNames();
+  string rsrc = IsConst() ? to_string(cmd_ & 0xFF) : names[Src()];
+  return string(" ") + names[Dst()] + string(", ") + rsrc;
 }
 
 uint8_t AddCmd::Calculate(uint8_t d, uint8_t s) {
@@ -82,7 +83,7 @@ uint8_t UnaryCmd::DstVal() {
 string UnaryCmd::Params() {
   string res = UnoNames[Type()];
   res += " ";
-  res += RegNames[Dst()];
+  res += cpu_->ActiveRegsNames()[Dst()];
   return res;
 }
 
@@ -100,7 +101,7 @@ string MemoryCmd::Suffix() {
 }
 
 string LoadFromMemoryCmd::Params() {
-  return string(" ") + RegNames[Reg()] + string(", ") + PtrNames[Ptr()] + Suffix();
+  return string(" ") + cpu_->ActiveRegsNames()[Reg()] + string(", ") + PtrNames[Ptr()] + Suffix();
 }
 
 void LoadFromMemoryCmd::Execute() {
@@ -113,7 +114,7 @@ void LoadFromMemoryCmd::Execute() {
 }
 
 string StoreToMemoryCmd::Params() {
-  return string(" ") + PtrNames[Ptr()] + Suffix() + string(", ") + RegNames[Reg()];
+  return string(" ") + PtrNames[Ptr()] + Suffix() + string(", ") + cpu_->ActiveRegsNames()[Reg()];
 }
 
 void StoreToMemoryCmd::Execute() {
@@ -139,7 +140,7 @@ void LpmCmd::Execute() {
 }
 
 string InputPortCmd::Params() {
-  return string(" ") + RegNames[Reg()] + string(", PINS") + to_string(Port());
+  return string(" ") + cpu_->ActiveRegsNames()[Reg()] + string(", PINS") + to_string(Port());
 }
 
 void InputPortCmd::Execute() {
@@ -148,7 +149,7 @@ void InputPortCmd::Execute() {
 }
 
 string OutputPortCmd::Params() {
-  return " PORT" + to_string(Port()) + ", " + RegNames[Reg()];
+  return " PORT" + to_string(Port()) + ", " + cpu_->ActiveRegsNames()[Reg()];
 }
 
 void OutputPortCmd::Execute() {

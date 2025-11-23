@@ -26,6 +26,8 @@ class CPU {
   uint16_t IncPair(uint8_t idx);
 
   uint8_t *ActiveRegsBank();  // current bank of registers
+  const char** ActiveRegsNames();
+  bool IsBank1Active();
 
   uint8_t RAM[65536];
   uint8_t PORTS[32];

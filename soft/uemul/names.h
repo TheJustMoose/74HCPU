@@ -20,6 +20,10 @@ inline const char* RegNames[] {
   "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7"
 };
 
+inline const char* PtrRegNames[] {
+  "XL", "XH", "YL", "YH", "ZL", "ZH", "SPL", "SPH"
+};
+
 inline const char* PtrNames[] {
   "X", "Y", "Z", "SP"
 };

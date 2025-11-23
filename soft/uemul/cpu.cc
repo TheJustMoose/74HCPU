@@ -52,7 +52,15 @@ uint16_t CPU::IncPair(uint8_t idx) {
 }
 
 uint8_t *CPU::ActiveRegsBank() { // current bank of registers
-  return Flags[flags::BF] ? RegsBank1 : RegsBank0;
+  return IsBank1Active() ? RegsBank1 : RegsBank0;
+}
+
+const char** CPU::ActiveRegsNames() {
+  return IsBank1Active() ? PtrRegNames : RegNames;
+}
+
+bool CPU::IsBank1Active() {
+  return Flags[flags::BF];
 }
 
 void CPU::PrintFlags() {
@@ -67,10 +75,10 @@ void CPU::PrintRegs() {
     cout << hex << setw(2) << (uint16_t)RegsBank0[i] << " ";
 
   cout << " Ptrs: " << setfill('0');
-  cout << hex << setw(4) << GetPair(3) << " ";
-  cout << hex << setw(4) << GetPair(2) << " ";
-  cout << hex << setw(4) << GetPair(1) << " ";
   cout << hex << setw(4) << GetPair(0) << " ";
+  cout << hex << setw(4) << GetPair(1) << " ";
+  cout << hex << setw(4) << GetPair(2) << " ";
+  cout << hex << setw(4) << GetPair(3) << " ";
 
   PrintFlags();
 

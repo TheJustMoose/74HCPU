@@ -29,6 +29,7 @@ TEST_CASE("test ByteOffsetToInt") {
 }
 
 TEST_CASE("test names") {
+  CHECK(std::size(PtrNames) == 4);  // 4 pointers
   CHECK(std::size(RegNames) == 8);  // 8 registers
   CHECK(std::size(OpNames) == 16);  // and 16 commands
 }
