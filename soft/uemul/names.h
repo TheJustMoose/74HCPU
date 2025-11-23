@@ -4,7 +4,7 @@
 
 inline const char* OpNames[] {
   // 0       1      2     3      4      5      6      7
-  "ADD", "ADDC", "AND", "OR", "XOR", "MUL", "UNO", "MOV",
+  "ADD", "ADDC", "AND", "OR", "XOR", "MUL", "", "MOV",
   // 8     9     A      B     C      D       E        F
   "LPM", "LD", "IN", "OUT", "ST", "CMP", "CMPC", "BRNCH"
 };

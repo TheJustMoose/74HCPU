@@ -105,7 +105,36 @@ class UnaryCmd: public Cmd {
 
   uint8_t DstVal();
 
+  virtual void Execute() {}
   std::string Params() override;
+};
+
+class InvCmd: public UnaryCmd {
+ public:
+  InvCmd(uint16_t cmd, CPU* cpu): UnaryCmd(cmd, cpu) {}
+
+  void Execute() override;
+};
+
+class SwapCmd: public UnaryCmd {
+ public:
+  SwapCmd(uint16_t cmd, CPU* cpu): UnaryCmd(cmd, cpu) {}
+
+  void Execute() override;
+};
+
+class LsrCmd: public UnaryCmd {
+ public:
+  LsrCmd(uint16_t cmd, CPU* cpu): UnaryCmd(cmd, cpu) {}
+
+  void Execute() override;
+};
+
+class LsrcCmd: public UnaryCmd {
+ public:
+  LsrcCmd(uint16_t cmd, CPU* cpu): UnaryCmd(cmd, cpu) {}
+
+  void Execute() override;
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|

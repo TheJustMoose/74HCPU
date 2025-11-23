@@ -87,6 +87,31 @@ string UnaryCmd::Params() {
   return res;
 }
 
+void InvCmd::Execute() {
+  cpu_->ActiveRegsBank()[Dst()] = DstVal() ^ 0xFF;
+}
+
+void SwapCmd::Execute() {
+  cpu_->ActiveRegsBank()[Dst()] =
+      ((DstVal() & 0x0F) << 4) + ((DstVal() & 0xF0) >> 4);
+}
+
+void LsrCmd::Execute() {
+  uint8_t val = DstVal();
+  cpu_->Flags[flags::CF] = val & 0x01;
+  val >>= 1;
+  cpu_->ActiveRegsBank()[Dst()] = val;
+}
+
+void LsrcCmd::Execute() {
+  uint8_t val = DstVal();
+  bool cf = cpu_->Flags[flags::CF];
+  cpu_->Flags[flags::CF] = val & 0x01;
+  val >>= 1;
+  val |= (cf ? 0x80 : 0x00);
+  cpu_->ActiveRegsBank()[Dst()] = val;
+}
+
 string MemoryCmd::Suffix() {
   string suffix;
   if (AutoDec())

@@ -179,19 +179,15 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     PrintRegs();
     ip++;
   } else if (op == 0x60) {  // UNO
-    UnaryCmd ucmd(cmd, this);
-    cout << " " << ucmd.Params() << "  -->  ";
-    uint8_t rsrc = ucmd.DstVal();
-    uint8_t rdst = 0;
-    bool cf = Flags[flags::CF];
-    switch (ucmd.Type()) {
-      case 0: rdst = rsrc ^ 0xFF; break;  // INV
-      case 1: rdst = ((rsrc & 0x0F) << 4) + ((rsrc & 0xF0) >> 4); break;  // SWAP
-      case 2: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; break;  // LSR
-      case 3: Flags[flags::CF] = rsrc & 0x01; rdst = rsrc >> 1; rdst |= (cf ? 0x80 : 0x00); break;  // LSRC
+    string params;
+    switch ((cmd >> 5) & 0x03) {
+      case 0: { InvCmd icmd(cmd, this); params = icmd.Params(); icmd.Execute(); } break;
+      case 1: { SwapCmd scmd(cmd, this); params = scmd.Params(); scmd.Execute(); } break;
+      case 2: { LsrCmd lcmd(cmd, this); params = lcmd.Params(); lcmd.Execute(); } break;
+      case 3: { LsrcCmd lcmd(cmd, this); params = lcmd.Params(); lcmd.Execute(); } break;
       default: cout << "Unknown op for this switch: " << op << endl; break;
     }
-    ActiveRegsBank()[ucmd.Dst()] = rdst;
+    cout << params << "  -->  ";
     PrintRegs();
     ip++;
   } else if (op == 0x70) {  // MOV
