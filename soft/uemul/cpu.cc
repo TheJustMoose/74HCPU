@@ -51,6 +51,13 @@ uint16_t CPU::IncPair(uint8_t idx) {
   return res;
 }
 
+uint16_t CPU::DecPair(uint8_t idx) {
+  uint16_t res = GetPair(idx);
+  res--;
+  SetPair(idx, res);
+  return res;
+}
+
 uint8_t *CPU::ActiveRegsBank() { // current bank of registers
   return IsBank1Active() ? RegsBank1 : RegsBank0;
 }

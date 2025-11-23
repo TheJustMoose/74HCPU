@@ -110,7 +110,8 @@ void LoadFromMemoryCmd::Execute() {
   cpu_->ActiveRegsBank()[Reg()] = val;
   if (AutoInc())
     cpu_->IncPair(Ptr());
-  // TODO: add AutoDec
+  if (AutoDec())
+    cpu_->DecPair(Ptr());
 }
 
 string StoreToMemoryCmd::Params() {
@@ -123,7 +124,8 @@ void StoreToMemoryCmd::Execute() {
   cpu_->RAM[ptr] = val;
   if (AutoInc())
     cpu_->IncPair(Ptr());
-  // TODO: add AutoDec
+  if (AutoDec())
+    cpu_->DecPair(Ptr());
 }
 
 void LpmCmd::Execute() {
@@ -137,6 +139,8 @@ void LpmCmd::Execute() {
   }
   if (AutoInc())
     cpu_->IncPair(Ptr());
+  if (AutoDec())
+    cpu_->DecPair(Ptr());
 }
 
 string InputPortCmd::Params() {

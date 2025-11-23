@@ -24,6 +24,7 @@ class CPU {
   uint16_t GetPair(uint8_t idx);
   void SetPair(uint8_t idx, uint16_t val);
   uint16_t IncPair(uint8_t idx);
+  uint16_t DecPair(uint8_t idx);
 
   uint8_t *ActiveRegsBank();  // current bank of registers
   const char** ActiveRegsNames();
