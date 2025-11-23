@@ -107,8 +107,30 @@ TEST_CASE("test Cmds") {
 }
 
 TEST_CASE("test UnoCmds") {
-  //CPU cpu;
-  //InvCnd
+  CPU cpu;
+
+  cpu.RegsBank0[0] = 0x81;   // MOV R0, 0x81
+  InvCmd ic(0x6000, &cpu);
+  ic.Execute();              // INV R0
+  CHECK( cpu.RegsBank0[0] == 0x7E );
+
+  cpu.RegsBank0[0] = 0x81;   // MOV R0, 0x81
+  SwapCmd sc(0x6020, &cpu);
+  sc.Execute();              // SWAP R0
+  CHECK( cpu.RegsBank0[0] == 0x18 );
+
+  cpu.RegsBank0[0] = 0x55;   // MOV R0, 0x55
+  LsrCmd lc(0x6040, &cpu);
+  lc.Execute();              // LSR R0
+  CHECK( cpu.RegsBank0[0] == 0x2A );
+  CHECK( cpu.Flags[flags::CF] );
+
+  cpu.Flags[flags::CF] = true;
+  cpu.RegsBank0[0] = 0x55;   // MOV R0, 0x55
+  LsrcCmd lcc(0x6060, &cpu);
+  lcc.Execute();             // LSRC R0
+  CHECK( cpu.RegsBank0[0] == 0xAA );
+  CHECK( cpu.Flags[flags::CF] );
 }
 
 TEST_CASE("test Ptrs Arithm") {
