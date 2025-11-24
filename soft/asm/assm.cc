@@ -23,19 +23,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct ARITHM {
- public:
-  uint16_t cop : 4;
-  uint16_t dst : 3;
-  uint16_t C : 1;
-  uint16_t src : 3;
-  uint16_t F : 1;
-  uint16_t Z : 1;
-  uint16_t z : 1;
-  uint16_t I : 1;
-  uint16_t i : 1;
-};
-
 OP_TYPE CopToType(COP cop) {
   if (cop == cNO_OP)
     return tNO_OP;
