@@ -1,5 +1,8 @@
 #include <iostream>
+
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 #include "assm.h"
 
@@ -38,7 +41,9 @@ void help() {
 }
 
 int main(int argc, char* argv[]) {
+#ifdef _WIN32
   SetConsoleOutputCP(CP_UTF8);
+#endif
 
   if (argc < 2) {
     help();
