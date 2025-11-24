@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include <stdint.h>
+#include <cstdint>
 
 #include "read_hex.h"
 

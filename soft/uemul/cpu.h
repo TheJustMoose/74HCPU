@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stack>
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 #include "flags.h"

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdint.h>
+#include <cstdint>
 #include <iostream>
 #include <vector>
 

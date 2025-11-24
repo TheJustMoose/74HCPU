@@ -1,9 +1,9 @@
 #include "cpu.h"
 
-#include <conio.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <cstdio>
 
 #include "commands.h"
 #include "compare.h"
@@ -273,6 +273,6 @@ void CPU::Run(bool dbg) {
   for (uint16_t ip = 0; ip < ROM.size() && !Stop;) {
     Step(ROM[ip], ip);
     if (dbg)
-      _getch();
+      getchar();
   }
 }
