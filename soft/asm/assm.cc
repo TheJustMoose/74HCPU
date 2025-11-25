@@ -487,12 +487,10 @@ CodeLine::CodeLine(int line_number, string line_text)
     string label = line_text_.substr(0, pos);
     if (!label.empty()) {
       labels_.push_back(label);
-      //cout << "label: " << label << endl;
     }
     line_text_.erase(0, pos + 1);
     pos = line_text_.find(":");
   }
-  //cout << "code line w/o label: " << line_text_ << endl;
 
   vector<string> cmd_parts = SplitToCmdParts(line_text_);
   if (cmd_parts.size() != 3) {
@@ -512,7 +510,6 @@ CodeLine::CodeLine(int line_number, string line_text)
   }
 
   OP_TYPE opt = CopToType(op);
-  //cout << "Operation type: " << opt << endl;
 
   CodeGen* cg {nullptr};
   switch (opt) {
@@ -535,8 +532,7 @@ uint16_t CodeLine::generate_machine_code() {
   if (!code_gen_)
     return bNOP | 0xFF;
 
-  uint16_t cop = code_gen_->Emit();
-  return cop;
+  return code_gen_->Emit();
 }
 
 void CodeLine::update_machine_code(const map<string, uint16_t>& name_to_address) {
@@ -555,6 +551,7 @@ string CodeLine::FormattedCOP() {
 
 StringConst& StringConst::operator=(const StringConst& rval) {
   this->str_ = rval.str_;
+  this->line_ = rval.line_;
   this->addr_ = rval.addr_;
   return *this;
 }
@@ -685,7 +682,6 @@ void Assembler::extract_string() {
     string str = NormalizeLine(it->second);
     if (str.find(".str") == 0) {
       str.erase(0, sizeof(".str"));
-
       size_t pos = str.find(" ");
       if (pos == string::npos) {
         cout << "Error in string const: '" << it->second << "'" << endl;
@@ -693,7 +689,7 @@ void Assembler::extract_string() {
       } else if (pos < str.size()) {
         string str_name = Trim(str.substr(0, pos));
         string str_val = RemoveQuotes(Trim(str.substr(pos + 1)));
-        string_consts_[str_name] = StringConst(str_val);
+        string_consts_[str_name] = StringConst(str_val, it->first);
         cout << "STR '" << str_name << "' = '" << str_val << "'" << endl;
       }
       it = lines_.erase(it);  // now remove this directive from asm
@@ -719,19 +715,19 @@ void Assembler::pass2() {
   uint16_t addr = 0;
   vector<CodeLine>::iterator it;
   map<int, uint16_t>::iterator oit = line_to_org_.begin();
+  // for each line of code
   for (it = code_.begin(); it != code_.end(); it++, addr++) {
     if (oit != line_to_org_.end() &&
-        it->line_number() > oit->first) {
-      cout << "***** org placed here *****" << endl;
+        it->line_number() > oit->first) {  // if line placed after .org
       if (oit->second > addr) {
-        addr = oit->second;
+        addr = oit->second;                // change line address to .org value
         cout << "move address to: " << addr << endl;
       }
-      oit++;
+      oit++;  // this .org was used, we need new .org
     }
 
-    it->set_address(addr);
-
+    it->set_address(addr);  // change address of every line
+    // and every label of this line
     vector<string> labels = it->get_labels();
     vector<string>::iterator lit;
     for (lit = labels.begin(); lit != labels.end(); lit++)
@@ -741,8 +737,14 @@ void Assembler::pass2() {
   uint16_t max_addr = get_max_address();
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
 
+  // now place strings after binary code
   addr = max_addr + 1;
   for (auto& s : string_consts_) {
+    if (oit != line_to_org_.end() &&
+        s.second.line() > oit->first) {  // if string is placed after .org
+      addr = oit->second;                // we have to change its addresses
+      oit++;  // probably we have more .orgs!
+    }
     s.second.set_addr(addr);
     name_to_address_[s.first] = addr;
     cout << "add to name_to_address_: " << s.first << " = " << to_string(addr) << endl;
@@ -793,7 +795,7 @@ void Assembler::out_code() {
   if (string_consts_.empty())
     cout << " empty" << endl;
   for (auto& s : string_consts_) {
-    cout << s.first << ":" << endl;
+    cout << s.first << endl;
     s.second.addr();
     s.second.out_code();
   }

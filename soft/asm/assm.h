@@ -177,10 +177,11 @@ class CodeLine {
 class StringConst {
  public:
   StringConst() = default;
-  StringConst(const std::string& str): str_(str) {}
+  StringConst(const std::string& str, int line): str_(str), line_(line) {}
   StringConst& operator=(const StringConst& rval);
 
   uint16_t get_size() const;
+  int line() const { return line_; }
   uint16_t addr() const { return addr_; }
   void set_addr(uint16_t);
   void out_code() const;
@@ -189,6 +190,7 @@ class StringConst {
 
  private:
   std::string str_ {};
+  int line_ {0};
   uint16_t addr_ {0};
 };
 
