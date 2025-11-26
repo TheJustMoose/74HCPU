@@ -269,10 +269,59 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
 }
 
 void CPU::Run(bool dbg) {
+  FindDebugInfo();
   PrintRegs();
   for (uint16_t ip = 0; ip < ROM.size() && !Stop;) {
     Step(ROM[ip], ip);
     if (dbg)
       getchar();
+  }
+}
+
+void CPU::FindDebugInfo() {
+  // Debug Info should have at least 8 words mark:
+  // "\0\0\0\0DBGI"
+  cout << "Try to search debug info..." << endl;
+  if (ROM.size() < 8)
+    return;
+
+  cout << "ROM size: " << ROM.size() << endl;
+
+  bool found {false};
+  size_t start {0};
+  for (size_t i = 0; i < ROM.size() - 8; i++) {
+    if (ROM[i] == 0 && ROM[i + 1] == 0 && ROM[i + 2] == 0 && ROM[i + 3] == 0 &&
+        ROM[i + 4] == 'D' && ROM[i + 5] == 'B' && ROM[i + 6] == 'G' && ROM[i + 7] == 'I') {
+      start = i + 8;
+      found = true;
+      cout << "***** HOORAY!!! *****" << endl;
+      break;
+    }
+  }
+
+  if (!found)
+    return;
+
+  while (true) {
+    uint16_t addr{0};
+    if (start < ROM.size())
+      addr = ROM[start++];
+    else
+      break;
+
+    string lbl;
+    while (start < ROM.size()) {
+      if (!ROM[start]) {
+        start++;
+        break;
+      }
+      lbl += static_cast<char>(ROM[start]);
+      start++;
+    }
+    if (!lbl.size())
+      break;
+    // label was found
+    name_to_address_[lbl] = addr;
+    cout << hex << addr << " " << lbl << endl;
   }
 }

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <stack>
+#include <string>
 #include <cstdint>
 #include <vector>
 
@@ -30,6 +32,8 @@ class CPU {
   const char** ActiveRegsNames();
   bool IsBank1Active();
 
+  void FindDebugInfo();
+
   uint8_t RAM[65536];
   uint8_t PORTS[32];
   uint8_t PINS[32];
@@ -40,4 +44,6 @@ class CPU {
   bool Stop {false};
   std::stack<uint16_t> Stack;
   std::vector<uint16_t> ROM;
+  // Debug info from source asm file
+  std::map<std::string, uint16_t> name_to_address_ {};
 };
