@@ -820,6 +820,26 @@ void Assembler::out_code(vector<uint16_t>& code) {
   // StringConst::out_code will resize 'code' if required
   for (auto& s : string_consts_)
     s.second.out_code(code);
+
+  if (name_to_address_.empty())
+    return;
+
+  // try to add some 'debug' info into the end of file
+  code.push_back(0);
+  code.push_back(0);
+  code.push_back(0);
+  code.push_back(0);
+  code.push_back('D');  // just label to identify this block
+  code.push_back('B');
+  code.push_back('G');
+  code.push_back('I');
+  for (auto v : name_to_address_) {
+    code.push_back(v.second);  // label address
+    string lbl = v.first;  // label name
+    for (size_t i = 0; i < lbl.size(); i++)
+      code.push_back(lbl[i]);
+    code.push_back(0);  // ASCIIZ string
+  }
 }
 
 void Assembler::write_binary(string fname) {
@@ -845,7 +865,7 @@ void Assembler::out_labels() {
   if (name_to_address_.empty())
     cout << " empty" << endl;
   for (auto v : name_to_address_)
-    //    line number        line code
+    //       label             address
     cout << v.first << " " << v.second << endl;
 }
 
