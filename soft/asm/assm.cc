@@ -597,7 +597,7 @@ void StringConst::out_code(vector<uint16_t>& code) const {
   uint16_t max_str_addr = addr_ + static_cast<uint16_t>(str_.size());
 
   if (max_str_addr + 1 > code.size())
-    code.resize(max_str_addr + 1, 0U);
+    code.resize(max_str_addr + 1, 0xFFFFU);
 
   for (size_t i = 0; i < str_.size(); i++)
     code[addr_ + i] = str_[i];
@@ -811,7 +811,7 @@ void Assembler::out_code(vector<uint16_t>& code) {
   }
 
   // numbers from 0 to 5 have 6 pcs (max + 1)
-  code.resize(max_addr + 1, 0U);
+  code.resize(max_addr + 1, 0xFFFFU);
 
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
@@ -857,4 +857,6 @@ void Assembler::out_orgs() {
     cout << v.first << " " << v.second << endl;
 }
 
+// TODO: добавить вывод в .hex имён меток, чтобы хоть как-то сохранить "отладочную инфу" ;)
+//       добавить юнит тестов
 ///////////////////////////////////////////////////////////////////////////////
