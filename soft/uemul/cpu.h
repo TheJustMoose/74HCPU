@@ -20,6 +20,7 @@ class CPU {
   void PrintRegs();
   void PrintPorts();
   void PrintStack();
+  void PrintLabels(uint16_t ip);
 
   void SyncFlags(uint8_t port);
 

@@ -116,6 +116,21 @@ void CPU::PrintStack() {
   cout << endl << endl;
 }
 
+void CPU::PrintLabels(uint16_t ip) {
+  auto it = name_to_address_.begin();
+  bool found {false};
+  while (it != name_to_address_.end()) {
+    if (it->second == ip) {
+      cout << it->first << ":";
+      found = true;
+    }
+    it++;
+  }
+
+  if (found)
+    cout << endl;
+}
+
 void CPU::SyncFlags(uint8_t port) {
   if (port == 10)
     Flags[flags::BF] = PORTS[10] & 0x40;
@@ -139,6 +154,7 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
   else           // arithm instructions
     op &= 0xF0;  // have to clean low bits
 
+  PrintLabels(ip);
   cout << "IP: " << hex << setw(4) << ip
        << ", cmd: " << cmd << ", " << Op(cmd);
 
