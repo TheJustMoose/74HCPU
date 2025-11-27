@@ -33,7 +33,8 @@ class CPU {
   const char** ActiveRegsNames();
   bool IsBank1Active();
 
-  void FindDebugInfo();
+  bool FindDebugInfo(size_t& start);
+  void ReadDebugInfo(size_t start);
 
   uint8_t RAM[65536];
   uint8_t PORTS[32];

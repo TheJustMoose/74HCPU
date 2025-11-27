@@ -285,7 +285,10 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
 }
 
 void CPU::Run(bool dbg) {
-  FindDebugInfo();
+  size_t start {0};
+  if (FindDebugInfo(start))
+    ReadDebugInfo(start);
+
   PrintRegs();
   for (uint16_t ip = 0; ip < ROM.size() && !Stop;) {
     Step(ROM[ip], ip);
@@ -294,17 +297,17 @@ void CPU::Run(bool dbg) {
   }
 }
 
-void CPU::FindDebugInfo() {
+bool CPU::FindDebugInfo(size_t& start) {
   // Debug Info should have at least 8 words mark:
   // "\0\0\0\0DBGI"
   cout << "Try to search debug info..." << endl;
   if (ROM.size() < 8)
-    return;
+    return false;
 
   cout << "ROM size: " << ROM.size() << endl;
 
   bool found {false};
-  size_t start {0};
+  start = 0;
   for (size_t i = 0; i < ROM.size() - 8; i++) {
     if (ROM[i] == 0 && ROM[i + 1] == 0 && ROM[i + 2] == 0 && ROM[i + 3] == 0 &&
         ROM[i + 4] == 'D' && ROM[i + 5] == 'B' && ROM[i + 6] == 'G' && ROM[i + 7] == 'I') {
@@ -315,9 +318,10 @@ void CPU::FindDebugInfo() {
     }
   }
 
-  if (!found)
-    return;
+  return found;
+}
 
+void CPU::ReadDebugInfo(size_t start) {
   while (true) {
     uint16_t addr{0};
     if (start < ROM.size())
