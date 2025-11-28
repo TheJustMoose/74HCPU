@@ -1,6 +1,8 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 
+#include <cstdint>
+
 #include "commands.h"
 #include "cpu.h"
 #include "names.h"
@@ -257,4 +259,26 @@ TEST_CASE("test LPM autoincrement") {
   lcmd.Execute();
   CHECK( cpu.RegsBank0[4] == 0x10 ); // R4 == 0x20
   CHECK( cpu.RegsBank1[0] == 1 );    // XL == 1
+}
+
+TEST_CASE("test Find Debug Info") {
+  CPU cpu;
+  size_t data_start {0};
+  CHECK( !cpu.FindDebugInfo(data_start) );
+
+  // signature have size == 8, also we need at least one byte of data
+  std::vector<uint16_t> ROM {0, 0, 0, 0, 'D', 'B', 'G', 'I', 0};
+  cpu.ROM = ROM;
+  CHECK( cpu.FindDebugInfo(data_start) );
+  CHECK( data_start == 8 );  // index of first byte of data
+}
+
+TEST_CASE("test Read Debug Info") {
+  CPU cpu;
+  std::vector<uint16_t> ROM {0, 0, 0, 0, 'D', 'B', 'G', 'I', 0x1234, 'L', 'a', 'b', 'e', 'l', 0};
+  cpu.ROM = ROM;
+  cpu.ReadDebugInfo(8);  // yes, I know index of data
+  CHECK( cpu.name_to_address.size() );
+  CHECK( cpu.name_to_address.find("Label") != cpu.name_to_address.end() );
+  CHECK( cpu.name_to_address["Label"] == 0x1234 );
 }

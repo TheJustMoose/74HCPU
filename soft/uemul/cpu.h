@@ -33,8 +33,8 @@ class CPU {
   const char** ActiveRegsNames();
   bool IsBank1Active();
 
-  bool FindDebugInfo(size_t& start);
-  void ReadDebugInfo(size_t start);
+  bool FindDebugInfo(size_t& data_start);
+  void ReadDebugInfo(size_t data_start);
 
   uint8_t RAM[65536];
   uint8_t PORTS[32];
@@ -47,5 +47,5 @@ class CPU {
   std::stack<uint16_t> Stack;
   std::vector<uint16_t> ROM;
   // Debug info from source asm file
-  std::map<std::string, uint16_t> name_to_address_ {};
+  std::map<std::string, uint16_t> name_to_address {};
 };

@@ -117,9 +117,9 @@ void CPU::PrintStack() {
 }
 
 void CPU::PrintLabels(uint16_t ip) {
-  auto it = name_to_address_.begin();
+  auto it = name_to_address.begin();
   bool found {false};
-  while (it != name_to_address_.end()) {
+  while (it != name_to_address.end()) {
     if (it->second == ip) {
       cout << it->first << ":";
       found = true;
@@ -297,51 +297,50 @@ void CPU::Run(bool dbg) {
   }
 }
 
-bool CPU::FindDebugInfo(size_t& start) {
+bool CPU::FindDebugInfo(size_t& data_start) {
   // Debug Info should have at least 8 words mark:
   // "\0\0\0\0DBGI"
-  cout << "Try to search debug info..." << endl;
   if (ROM.size() < 8)
     return false;
 
   cout << "ROM size: " << ROM.size() << endl;
 
   bool found {false};
-  start = 0;
+  data_start = 0;
   for (size_t i = 0; i < ROM.size() - 8; i++) {
     if (ROM[i] == 0 && ROM[i + 1] == 0 && ROM[i + 2] == 0 && ROM[i + 3] == 0 &&
         ROM[i + 4] == 'D' && ROM[i + 5] == 'B' && ROM[i + 6] == 'G' && ROM[i + 7] == 'I') {
-      start = i + 8;
+      data_start = i + 8;
       found = true;
-      cout << "***** HOORAY!!! *****" << endl;
       break;
     }
   }
 
+  cout << "Debug Info start: " << (found ? static_cast<int>(data_start) : -1) << endl;
   return found;
 }
 
-void CPU::ReadDebugInfo(size_t start) {
+void CPU::ReadDebugInfo(size_t data_start) {
   while (true) {
     uint16_t addr{0};
-    if (start < ROM.size())
-      addr = ROM[start++];
+    if (data_start < ROM.size())
+      addr = ROM[data_start++];
     else
       break;
 
     string lbl;
-    while (start < ROM.size()) {
-      if (!ROM[start]) {
-        start++;
+    while (data_start < ROM.size()) {
+      if (!ROM[data_start]) {
+        data_start++;
         break;
       }
-      lbl += static_cast<char>(ROM[start]);
-      start++;
+      lbl += static_cast<char>(ROM[data_start]);
+      data_start++;
     }
     if (!lbl.size())
       break;
     // label was found
-    name_to_address_[lbl] = addr;
+    name_to_address[lbl] = addr;
     cout << hex << addr << " " << lbl << endl;
   }
 }
