@@ -242,9 +242,14 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     mcmd.Execute();
     PrintRegs();
     ip++;
-  } else if (op == 0xD0 || op == 0xE0) {  // CMP
-    // TODO: CMP implementation, CMPC has not implemented yet
+  } else if (op == 0xD0) {  // CMP
     CmpCmd ccmd(cmd, this);
+    cout << ccmd.Params() << "  -->  ";
+    ccmd.Execute();
+    PrintRegs();
+    ip++;
+  } else if (op == 0xE0) {  // CMPC
+    CmpcCmd ccmd(cmd, this);
     cout << ccmd.Params() << "  -->  ";
     ccmd.Execute();
     PrintRegs();

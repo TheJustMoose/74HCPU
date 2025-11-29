@@ -237,3 +237,10 @@ class CmpCmd: public Cmd {
 
   std::string Params() override;
 };
+
+class CmpcCmd: public CmpCmd {
+ public:
+  CmpcCmd(uint16_t cmd, CPU* cpu): CmpCmd(cmd, cpu) {}
+
+  virtual void Execute();
+};

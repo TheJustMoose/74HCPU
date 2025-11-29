@@ -206,3 +206,15 @@ string CmpCmd::Params() {
   string rsrc = IsConst() ? to_string(cmd_ & 0xFF) : names[Src()];
   return string(" ") + names[Dst()] + string(", ") + rsrc;
 }
+
+void CmpcCmd::Execute() {
+  // check previous command
+  if (!cpu_->Flags[flags::EF])  // ok, high byte is different
+    return;  // nothing to do here
+
+  // lets compare this (low) byte
+  auto [lf, ef, gf] = Compare(DstVal(), SrcVal());
+  cpu_->Flags[flags::LF] = lf;
+  cpu_->Flags[flags::EF] = ef;
+  cpu_->Flags[flags::GF] = gf;
+}
