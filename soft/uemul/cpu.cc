@@ -6,7 +6,6 @@
 #include <cstdio>
 
 #include "commands.h"
-#include "compare.h"
 #include "cpu.h"
 #include "flags.h"
 #include "names.h"
@@ -245,12 +244,9 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     ip++;
   } else if (op == 0xD0 || op == 0xE0) {  // CMP
     // TODO: CMP implementation, CMPC has not implemented yet
-    ArithmCmd acmd(cmd, this);
-    cout << acmd.Params() << "  -->  ";
-    auto [lf, ef, gf] = Compare(acmd.DstVal(), acmd.SrcVal());
-    Flags[flags::LF] = lf;
-    Flags[flags::EF] = ef;
-    Flags[flags::GF] = gf;
+    CmpCmd ccmd(cmd, this);
+    cout << ccmd.Params() << "  -->  ";
+    ccmd.Execute();
     PrintRegs();
     ip++;
   } else if (op >= 0xF0 && op <= 0xFF) {  // BRANCH

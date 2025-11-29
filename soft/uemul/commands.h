@@ -217,3 +217,23 @@ class OutputPortCmd: public PortCmd {
   std::string Params() override;
   void Execute() override;
 };
+
+//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
+//|   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
+//|  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+|
+class CmpCmd: public Cmd {
+ public:
+  CmpCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
+
+  uint8_t Dst() { return (cmd_ >> 9) & 0x07; }
+  bool IsConst() { return (cmd_ >> 8) & 0x01; }
+  uint8_t Src() { return (cmd_ >> 5) & 0x07; }
+  uint8_t Const() { return (cmd_ & 0xFF); }
+
+  uint8_t DstVal();
+  uint8_t SrcVal();
+
+  virtual void Execute();
+
+  std::string Params() override;
+};

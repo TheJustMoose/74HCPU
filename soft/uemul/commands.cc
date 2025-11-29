@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "compare.h"
 #include "cpu.h"
 
 using namespace std;
@@ -183,4 +184,25 @@ string OutputPortCmd::Params() {
 
 void OutputPortCmd::Execute() {
   cpu_->PORTS[Port()] = cpu_->ActiveRegsBank()[Reg()];
+}
+
+uint8_t CmpCmd::DstVal() {
+  return cpu_->ActiveRegsBank()[Dst()];
+}
+
+uint8_t CmpCmd::SrcVal() {
+  return IsConst() ? Const() : cpu_->ActiveRegsBank()[Src()];
+}
+
+void CmpCmd::Execute() {
+  auto [lf, ef, gf] = Compare(DstVal(), SrcVal());
+  cpu_->Flags[flags::LF] = lf;
+  cpu_->Flags[flags::EF] = ef;
+  cpu_->Flags[flags::GF] = gf;
+}
+
+string CmpCmd::Params() {
+  const char** names = cpu_->ActiveRegsNames();
+  string rsrc = IsConst() ? to_string(cmd_ & 0xFF) : names[Src()];
+  return string(" ") + names[Dst()] + string(", ") + rsrc;
 }
