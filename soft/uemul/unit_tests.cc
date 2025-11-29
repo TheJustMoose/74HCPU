@@ -282,3 +282,26 @@ TEST_CASE("test Read Debug Info") {
   CHECK( cpu.name_to_address.find("Label") != cpu.name_to_address.end() );
   CHECK( cpu.name_to_address["Label"] == 0x1234 );
 }
+
+//|   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
+TEST_CASE("test Cmp command") {
+  CPU cpu;
+  cpu.RegsBank0[0] = 100;   // MOV R0, 100
+  CmpCmd cc(0xD164, &cpu);  // CMP R0, 100  // D 1 6 4
+  cc.Execute();
+  CHECK( !cpu.Flags[flags::LF] );
+  CHECK( cpu.Flags[flags::EF] );
+  CHECK( !cpu.Flags[flags::GF] );
+
+  cpu.RegsBank0[0] = 99;   // MOV R0, 99
+  cc.Execute();
+  CHECK( cpu.Flags[flags::LF] );
+  CHECK( !cpu.Flags[flags::EF] );
+  CHECK( !cpu.Flags[flags::GF] );
+
+  cpu.RegsBank0[0] = 101;   // MOV R0, 101
+  cc.Execute();
+  CHECK( !cpu.Flags[flags::LF] );
+  CHECK( !cpu.Flags[flags::EF] );
+  CHECK( cpu.Flags[flags::GF] );
+}
