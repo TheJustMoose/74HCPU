@@ -21,7 +21,7 @@ void ArithmCmd::Execute() {
 
 string ArithmCmd::Params() {
   const char** names = cpu_->ActiveRegsNames();
-  string rsrc = IsConst() ? to_string(cmd_ & 0xFF) : names[Src()];
+  string rsrc = IsConst() ? to_string(Const()) : names[Src()];
   return string(" ") + names[Dst()] + string(", ") + rsrc;
 }
 
@@ -178,12 +178,21 @@ void InputPortCmd::Execute() {
   cpu_->ActiveRegsBank()[Reg()] = rdst;
 }
 
+uint8_t OutputPortCmd::SrcVal() {
+  return IsConst() ? Const() : cpu_->ActiveRegsBank()[Reg()];
+}
+
 string OutputPortCmd::Params() {
-  return " PORT" + to_string(Port()) + ", " + cpu_->ActiveRegsNames()[Reg()];
+  const char** names = cpu_->ActiveRegsNames();
+  string rsrc = IsConst() ? to_string(Const()) : names[Reg()];
+  return string(" PORT") + to_string(Port()) + string(", ") + rsrc;
 }
 
 void OutputPortCmd::Execute() {
-  cpu_->PORTS[Port()] = cpu_->ActiveRegsBank()[Reg()];
+  if (IsConst())
+    cpu_->PORTS[Port()] = Const();
+  else
+    cpu_->PORTS[Port()] = cpu_->ActiveRegsBank()[Reg()];
 }
 
 uint8_t CmpCmd::DstVal() {

@@ -189,33 +189,37 @@ class LpmCmd: public Cmd {
   void Execute();
 };
 
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
-//|    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
-//|   OUT |  SRC |  PORT   |O|o|X|x| B0 1011 0000| |
-class PortCmd: public Cmd {
+//     |F E D C  B A 9 8 7 6 5 4 3 2 1 0|
+//| A0 |    IN |  DST |  PORT   |Z|z|I|i| |
+class InputPortCmd: public Cmd {
  public:
-  PortCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
+  InputPortCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
   uint8_t Port() { return (cmd_ >> 4) & 0x1F; }
   uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
 
-  virtual void Execute() {}
+  std::string Params() override;
+  void Execute();
 };
 
-class InputPortCmd: public PortCmd {
+//     |F E D C  B A 9 8 7 6 5 4 3 2 1 0|
+//|              2 1 0         4 3
+//| B0 |   OUT | PORT |C| SRC |PRT|X|O|o| |
+class OutputPortCmd: public Cmd {
  public:
-  InputPortCmd(uint16_t cmd, CPU* cpu): PortCmd(cmd, cpu) {}
+  OutputPortCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
+
+  uint8_t PortLo() { return (cmd_ >> 9) & 0x07; }
+  bool IsConst() { return (cmd_ >> 8) & 0x01; }
+  uint8_t Reg() { return (cmd_ >> 5) & 0x07; }
+  uint8_t PortHi() { return (cmd_ >> 3) & 0x03; }
+  uint8_t Const() { return (cmd_ & 0xFF); }
+
+  uint8_t Port() { return PortLo() | (IsConst() ? 0 : (PortHi() << 3)); }
+  uint8_t SrcVal();
 
   std::string Params() override;
-  void Execute() override;
-};
-
-class OutputPortCmd: public PortCmd {
- public:
-  OutputPortCmd(uint16_t cmd, CPU* cpu): PortCmd(cmd, cpu) {}
-
-  std::string Params() override;
-  void Execute() override;
+  void Execute();
 };
 
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|

@@ -206,7 +206,12 @@ TEST_CASE("test Memory Cmds") {
 TEST_CASE("test Ports Cmds") {
   CPU cpu;
   cpu.RegsBank0[0] = 0x55;           // MOV R0, 0x55
-  OutputPortCmd ocmd(0xB010, &cpu);  // OUT PORT1, R0
+  OutputPortCmd ocmd(0xB200, &cpu);  // OUT PORT1, R0
+  CHECK( ocmd.PortLo() == 1 );
+  CHECK( ocmd.PortHi() == 0 );
+  CHECK( ocmd.Reg() == 0 );
+  CHECK( ocmd.IsConst() == false );
+
   ocmd.Execute();
   CHECK( cpu.PORTS[1] == 0x55 );     // *1 == 0x55
 
