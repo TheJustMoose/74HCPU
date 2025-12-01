@@ -7,6 +7,10 @@
 #include "names.h"
 #include "read_hex.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 using namespace std;
 
 vector<uint16_t> Cmds {
@@ -21,6 +25,10 @@ vector<uint16_t> Cmds {
 };
 
 int main(int argc, char* argv[]) {
+#ifdef _WIN32
+  SetConsoleOutputCP(CP_UTF8);
+#endif
+
   // TODO: fix flags storing
 
   if (sizeof(uint16_t) != 2) {
