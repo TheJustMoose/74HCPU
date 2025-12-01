@@ -92,16 +92,16 @@ map<string, PTR> ptr_names {
 map<string, uint16_t> port_names {
   { "PORT0", 0 }, { "PINS0", 0 },
   { "OMASK0", 1 },
-  { "PORT1", 2 }, { "PINS1", 2 },
+  { "PORT1", 2 }, { "PINS1", 2 }, { "LCD_CTRL", 2 },
   { "OMASK0", 3 },
-  { "PORT2", 4 },
-  { "PORT3", 5 }, { "PINS3", 5 },
-  { "PORT4", 6 }, { "PINS4", 6 },
-  { "PORT5", 7 }, { "PINS5", 7 },
-  { "PORT6", 8 }, { "PINS6", 8 }, { "RAMP", 8 },
-  { "PORT7", 9 }, { "PINS7", 9 }, { "MSW", 9 },
-  { "PORT8", 10 }, { "PINS8", 10 }, { "FLAGS", 10 },
-  { "PORT9", 11 }, { "PINS9", 11 }, { "DAC", 11 },
+  { "PORT2", 4 }, { "LCD_DATA", 4 },
+  { "PORT3", 5 }, { "PINS3", 5 }, { "RAMP", 5 },
+  { "PORT4", 6 }, { "PINS4", 6 }, {"CPU_FLAGS", 6},
+  { "PORT5", 7 }, { "PINS5", 7 }, { "MSW", 7 },
+  { "PORT6", 8 }, { "PINS6", 8 }, { "DAC", 8 },
+  { "PORT7", 9 }, { "PINS7", 9 },
+  { "PORT8", 10 }, { "PINS8", 10 },
+  { "PORT9", 11 }, { "PINS9", 11 },
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -160,6 +160,46 @@ int Names::PortFromName(string name, string prefix) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+class RightVal {
+ public:
+  RightVal(int line_number, string right)
+    : line_number_(line_number), right_(right) {
+    Parse();
+  }
+
+  void Parse() {
+    int t = 0;
+    immediate_ = StrToInt(right_, &t);  // MOV R1, 10
+    if (immediate_) {
+      if (t < 0)
+        right_val_ = t & 0x00FF;
+      else
+        right_val_ = t;
+
+      if (right_val_> 0xFF)
+        ErrorCollector::GetInstance().err("Error. Immediate value should have 8 bit only (0 - 255). Got: " + right_, line_number_);
+    } else {  // not val, try to check register name
+      right_reg_ = Names::RegFromName(right_);  // MOV R0, R1
+      if (right_reg_ == rUnkReg) {
+        ErrorCollector::GetInstance().err("Unknown register: " + right_, line_number_);
+        ErrorCollector::GetInstance().err("You have to use Register name or immediate value as rval.", line_number_);
+      }
+    }
+  }
+
+  bool immediate() { return immediate_; }
+  uint16_t right_val() { return right_val_; }
+  REG right_reg() { return right_reg_; }
+  int line_number() { return line_number_; }
+
+ private:
+  bool immediate_ {false};
+  uint16_t right_val_ {0};
+  REG right_reg_ {rUnkReg};
+  int line_number_ {0};
+  string right_;
+};
+///////////////////////////////////////////////////////////////////////////////
 
 // ADD R0, R1
 // ADD R2, 10
@@ -170,30 +210,11 @@ class BinaryCodeGen: public CodeGen {
     left_op_ = Names::RegFromName(left);
     if (left_op_ == rUnkReg)
       ErrorCollector::GetInstance().err("Unknown register: " + left, line_number);
-    TryImmediate(right);
-  }
 
-  void TryImmediate(string right) {
-    int t = 0;
-    immediate_ = StrToInt(right, &t);  // MOV R1, 10
-    if (immediate_) {
-      if (t < 0)
-        right_val_ = t & 0x00FF;
-      else
-        right_val_ = t;
-
-      if (right_val_> 0xFF)
-        ErrorCollector::GetInstance().err("Error. Immediate value should have 8 bit only (0 - 255). Got: " + right, line_number());
-    }
-
-    if (!immediate_) {  // not val, try to check register name
-      right_op_ = Names::RegFromName(right);  // MOV R0, R1
-      if (right_op_ == rUnkReg) {
-        ErrorCollector::GetInstance().err("Unknown register: " + right_str_, line_number());
-        ErrorCollector::GetInstance().err("You have to use Register name or immediate value as rval.", line_number());
-      } else
-        right_str_ = "";
-    }
+    RightVal rv(line_number, right);
+    immediate_ = rv.immediate();
+    right_op_ = rv.right_reg();
+    right_val_ = rv.right_val();
   }
 
   uint16_t Emit() {
@@ -375,7 +396,9 @@ class MemoryCodeGen: public CodeGen {
   uint16_t offset_ {0};
 };
 
-// IN R0, PORT1
+// IN R0, PINS1
+// OUT PORT2, R7
+// OUT PORT3, 10
 class IOCodeGen: public CodeGen {
  public:
   IOCodeGen(int line_number, COP cop, string left, string right)
@@ -405,15 +428,35 @@ class IOCodeGen: public CodeGen {
       if (reg_ == rUnkReg)
         ErrorCollector::GetInstance().err("Unknown register: " + right, line_number);
     } else {
-      ErrorCollector::GetInstance().err("Unknown IO operation. Should be IN or OUT.", line_number);
+      ErrorCollector::GetInstance().err("Unknown IO operation. Should be IN or OUT/TOGL.", line_number);
     }
   }
 
   uint16_t Emit() {
     uint16_t cop = operation_;
-    cop |= reg_ << 9;
-    cop |= port_ << 4;
-    return cop;
+    if (cop == cIN) {
+      //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
+      //| A0 |    IN |  DST |  PORT   |Z|z|I|i|
+      cop |= reg_ << 9;
+      cop |= port_ << 4;
+      return cop;
+    } else if (cop == cOUT || cop == cTOGL) {
+      //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
+      //|              2 1 0         4 3
+      //| B0 |   OUT | PORT |0| SRC |PRT|X|O|o|
+      //| B0 |   OUT | PORT |1|     CONST     |
+      cop |= port_ << 9;
+      if (is_const_) {
+        cop |= 0x0100;  // set C bit to 1
+        cop |= const_;
+      } else {
+        cop |= reg_ << 5;
+        if (cop == cTOGL)
+          cop |= 4;  // set X bit to 1
+      }
+      return cop;
+    }
+    return 0;
   }
 
   vector<int> get_blocks() {
@@ -425,6 +468,8 @@ class IOCodeGen: public CodeGen {
  private:
   REG reg_ {rUnkReg};
   uint16_t port_ {0};
+  bool is_const_ {false};
+  uint8_t const_ {0};
 };
 
 class BranchCodeGen: public CodeGen {

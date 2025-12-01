@@ -151,10 +151,10 @@ TEST_CASE("check I/O COPs") {
   CodeLine cl1(1, "IN R3, PINS1");
   CHECK(cl1.generate_machine_code() == 0xA620);
 
-  // OUT  SRC  PORT OoXx
-  // 1011 111 01011 0000  // PORT9 have number 11, see port_names
+  // OUT | PORT |0| SRC |PRT|X|O|o|
+  // 1011   011  0  111  01  0000  // PORT9 have number 11 (01011), see port_names
   CodeLine cl2(1, "OUT PORT9, R7");
-  CHECK(cl2.generate_machine_code() == 0xBEB0);
+  CHECK(cl2.generate_machine_code() == 0xB6E0);
 }
 
 TEST_CASE("check branches COPs") {
