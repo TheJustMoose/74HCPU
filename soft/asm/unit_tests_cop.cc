@@ -152,9 +152,14 @@ TEST_CASE("check I/O COPs") {
   CHECK(cl1.generate_machine_code() == 0xA620);
 
   // OUT | PORT |0| SRC |PRT|X|O|o|
-  // 1011   011  0  111  01  0000  // PORT9 have number 11 (01011), see port_names
-  CodeLine cl2(1, "OUT PORT9, R7");
-  CHECK(cl2.generate_machine_code() == 0xB6E0);
+  // 1011   110  0  111  00   000  // PORT4 has number 6 (00110), see port_names
+  CodeLine cl2(1, "OUT PORT4, R7");
+  CHECK(cl2.generate_machine_code() == 0xBCE0);
+
+  // OUT | PORT |1|     CONST     |
+  // 1011   110  1   0000 1010     // CPU_FLAGS == PORT4 has number 6 (00110), see port_names
+  CodeLine cl3(1, "OUT CPU_FLAGS, 10");
+  CHECK(cl3.generate_machine_code() == 0xBD0A);
 }
 
 TEST_CASE("check branches COPs") {

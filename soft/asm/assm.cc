@@ -424,9 +424,10 @@ class IOCodeGen: public CodeGen {
       else
         port_ = p;
 
-      reg_ = Names::RegFromName(right);
-      if (reg_ == rUnkReg)
-        ErrorCollector::GetInstance().err("Unknown register: " + right, line_number);
+      RightVal rv(line_number, right);
+      immediate_ = rv.immediate();
+      reg_ = rv.right_reg();
+      right_val_ = rv.right_val();
     } else {
       ErrorCollector::GetInstance().err("Unknown IO operation. Should be IN or OUT/TOGL.", line_number);
     }
@@ -445,14 +446,15 @@ class IOCodeGen: public CodeGen {
       //|              2 1 0         4 3
       //| B0 |   OUT | PORT |0| SRC |PRT|X|O|o|
       //| B0 |   OUT | PORT |1|     CONST     |
-      cop |= port_ << 9;
-      if (is_const_) {
+      cop |= (port_ & 0x07) << 9;
+      if (immediate_) {
         cop |= 0x0100;  // set C bit to 1
-        cop |= const_;
+        cop |= (right_val_ & 0x0FF);
       } else {
         cop |= reg_ << 5;
+        cop |= ((port_ >> 3) & 0x03) << 3;  // 2 high bits of port
         if (cop == cTOGL)
-          cop |= 4;  // set X bit to 1
+          cop |= 0x0004;  // set X bit to 1
       }
       return cop;
     }
@@ -461,15 +463,18 @@ class IOCodeGen: public CodeGen {
 
   vector<int> get_blocks() {
     //   COP dst port -- Ii
-    //   COP src port Oo Xx
-    return {4, 3, 5, 2, 2};
+    if (operation_ == cIN)
+      return {4, 3, 5, 2, 2};
+    //   COP port src prt XOo
+    else
+      return {4, 3, 1, 3, 2, 3};
   }
 
  private:
-  REG reg_ {rUnkReg};
   uint16_t port_ {0};
-  bool is_const_ {false};
-  uint8_t const_ {0};
+  REG reg_ {rUnkReg};
+  uint16_t right_val_ {0};
+  bool immediate_ {false};
 };
 
 class BranchCodeGen: public CodeGen {
