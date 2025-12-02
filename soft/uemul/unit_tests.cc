@@ -206,17 +206,17 @@ TEST_CASE("test Memory Cmds") {
 TEST_CASE("test Ports Cmds") {
   CPU cpu;
   cpu.RegsBank0[0] = 0x55;           // MOV R0, 0x55
-  OutputPortCmd ocmd(0xB200, &cpu);  // OUT PORT1, R0
-  CHECK( ocmd.PortLo() == 1 );
+  OutputPortCmd ocmd(0xB400, &cpu);  // OUT PORT1, R0
+  CHECK( ocmd.PortLo() == 2 );
   CHECK( ocmd.PortHi() == 0 );
   CHECK( ocmd.Reg() == 0 );
   CHECK( ocmd.IsConst() == false );
 
   ocmd.Execute();
-  CHECK( cpu.PORTS[1] == 0x55 );     // *1 == 0x55
+  CHECK( cpu.PORTS[2] == 0x55 );     // *1 == 0x55
 
-  cpu.PINS[1] = 0x66;
-  InputPortCmd icmd(0xA210, &cpu);   // IN R1, PIN1
+  cpu.PINS[2] = 0x66;                // PINS1 has binary number 2
+  InputPortCmd icmd(0xA220, &cpu);   // IN R1, PINS1
   icmd.Execute();
   CHECK( cpu.RegsBank0[1] == 0x66 ); // R1 == 0x66
 }
