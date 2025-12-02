@@ -15,12 +15,12 @@ using namespace std;
 
 vector<uint16_t> Cmds {
   0x7140,  // MOV R0, 0x40  ; BF = 1
-  0xB0A0,  // out FLAGS, R0 ; FLAGS = 10; 1011 000 01010 0000 ; B0A0
+  0xBC00,  // out CPU_FLAGS, R0
   0x7DFF,  // MOV SPL, 0xFF
   0x7F7F,  // MOV SPH, 0x7F
   0x7122,  // MOV R0, 22h
   0x7F33,  // MOV R7, 33h
-  0xFFFE,
+  0xFFFE,  // STOP
   0xFD00
 };
 

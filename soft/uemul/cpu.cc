@@ -131,8 +131,9 @@ void CPU::PrintLabels(uint16_t ip) {
 }
 
 void CPU::SyncFlags(uint8_t port) {
-  if (port == 10)
-    Flags[flags::BF] = PORTS[10] & 0x40;
+  const uint8_t CPU_FLAGS = 6;
+  if (port == CPU_FLAGS)
+    Flags[flags::BF] = PORTS[CPU_FLAGS] & 0x40;
 }
 
 string BranchAddr(uint16_t cmd, uint16_t ip) {
