@@ -431,8 +431,6 @@ class InputCodeGen: public CodeGen {
  private:
   uint16_t port_ {0};
   REG reg_ {rUnkReg};
-  uint16_t right_val_ {0};
-  bool immediate_ {false};
 };
 
 // OUT PORT2, R7
@@ -441,41 +439,37 @@ class OutputCodeGen: public CodeGen {
  public:
   OutputCodeGen(int line_number, COP cop, string left, string right)
     : CodeGen(line_number, cop) {
-    //} else if (cop == cOUT || cop == cTOGL) {
-      int p = Names::PortFromName(left, "PORT");
-      if (p == -1)
-        ErrorCollector::GetInstance().err("Unknown port name: " + left, line_number);
-      else if (p >= 32)
-        ErrorCollector::GetInstance().err("Port number should be in range 0-31", line_number);
-      else
-        port_ = p;
+    int p = Names::PortFromName(left, "PORT");
+    if (p == -1)
+      ErrorCollector::GetInstance().err("Unknown port name: " + left, line_number);
+    else if (p >= 32)
+      ErrorCollector::GetInstance().err("Port number should be in range 0-31", line_number);
+    else
+      port_ = p;
 
-      RightVal rv(line_number, right);
-      immediate_ = rv.immediate();
-      reg_ = rv.right_reg();
-      right_val_ = rv.right_val();
+    RightVal rv(line_number, right);
+    immediate_ = rv.immediate();
+    reg_ = rv.right_reg();
+    right_val_ = rv.right_val();
   }
 
   uint16_t Emit() {
     uint16_t cop = operation_;
-    //} else if (cop == cOUT || cop == cTOGL) {
-      //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
-      //|              2 1 0         4 3
-      //| B0 |   OUT | PORT |0| SRC |PRT|X|O|o|
-      //| B0 |   OUT | PORT |1|     CONST     |
-      cop |= (port_ & 0x07) << 9;
-      if (immediate_) {
-        cop |= 0x0100;  // set C bit to 1
-        cop |= (right_val_ & 0x0FF);
-      } else {
-        cop |= reg_ << 5;
-        cop |= ((port_ >> 3) & 0x03) << 3;  // 2 high bits of port
-        if (cop == cTOGL)
-          cop |= 0x0004;  // set X bit to 1
-      }
-      return cop;
-    //}
-    return 0;
+    //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
+    //|              2 1 0         4 3
+    //| B0 |   OUT | PORT |0| SRC |PRT|X|O|o|
+    //| B0 |   OUT | PORT |1|     CONST     |
+    cop |= (port_ & 0x07) << 9;
+    if (immediate_) {
+      cop |= 0x0100;  // set C bit to 1
+      cop |= (right_val_ & 0x0FF);
+    } else {
+      cop |= reg_ << 5;
+      cop |= ((port_ >> 3) & 0x03) << 3;  // 2 high bits of port
+      if (cop == cTOGL)
+        cop |= 0x0004;  // set X bit to 1
+    }
+    return cop;
   }
 
   vector<int> get_blocks() {
