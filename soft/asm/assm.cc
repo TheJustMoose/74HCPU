@@ -460,7 +460,7 @@ class OutputCodeGen: public CodeGen {
   }
 
   uint16_t Emit() {
-    uint16_t cop = operation_;
+    uint16_t cop = operation_;  // cTOGL already has low bits
     //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
     //|              2 1 0         4 3
     //| B0 |   OUT | PORT |0| SRC |PRT|X|O|o|
@@ -471,9 +471,7 @@ class OutputCodeGen: public CodeGen {
       cop |= (right_val_ & 0x0FF);
     } else {
       cop |= reg_ << 5;
-      cop |= ((port_ >> 3) & 0x03) << 3;  // 2 high bits of port
-      if (cop == cTOGL)
-        cop |= 0x0004;  // set X bit to 1
+      cop |= (port_ & 0x18) << 3;  // 2 high bits of port
     }
     return cop;
   }

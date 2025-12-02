@@ -160,6 +160,11 @@ TEST_CASE("check I/O COPs") {
   // 1011   110  1   0000 1010     // CPU_FLAGS == PORT4 has number 6 (00110), see port_names
   CodeLine cl3(1, "OUT CPU_FLAGS, 10");
   CHECK(cl3.generate_machine_code() == 0xBD0A);
+
+  // OUT | PORT |0| SRC |PRT|X|O|o|
+  // 1011   110  0  000  00   100  // PORT4 has number 6 (00110), see port_names
+  CodeLine cl4(1, "TOGL PORT4, R0");
+  CHECK(cl4.generate_machine_code() == 0xBC04);
 }
 
 TEST_CASE("check branches COPs") {
