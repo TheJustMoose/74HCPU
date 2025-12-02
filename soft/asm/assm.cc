@@ -439,18 +439,24 @@ class OutputCodeGen: public CodeGen {
  public:
   OutputCodeGen(int line_number, COP cop, string left, string right)
     : CodeGen(line_number, cop) {
-    int p = Names::PortFromName(left, "PORT");
-    if (p == -1)
-      ErrorCollector::GetInstance().err("Unknown port name: " + left, line_number);
-    else if (p >= 32)
-      ErrorCollector::GetInstance().err("Port number should be in range 0-31", line_number);
-    else
-      port_ = p;
 
     RightVal rv(line_number, right);
     immediate_ = rv.immediate();
     reg_ = rv.right_reg();
     right_val_ = rv.right_val();
+
+    if (immediate_ && cop == cTOGL)
+      ErrorCollector::GetInstance().err("Sorry. You can't use TOGL with immediate value", line_number);
+
+    int p = Names::PortFromName(left, "PORT");
+    if (p == -1)
+      ErrorCollector::GetInstance().err("Unknown port name: " + left, line_number);
+    else if (immediate_ && p >= 8)
+      ErrorCollector::GetInstance().err("Port number with immediate value should be in range 0-7", line_number);
+    else if (p >= 32)
+      ErrorCollector::GetInstance().err("Port number should be in range 0-31", line_number);
+    else
+      port_ = p;
   }
 
   uint16_t Emit() {
@@ -473,8 +479,12 @@ class OutputCodeGen: public CodeGen {
   }
 
   vector<int> get_blocks() {
-    //    COP port src prt XOo
-    return {4, 3, 1, 3, 2, 3};
+    if (immediate_)
+      //   COP port C const
+      return {4, 3, 1, 8};
+    else
+      //   COP port C src prt XOo
+      return {4, 3, 1, 3, 2, 3};
   }
 
  private:
