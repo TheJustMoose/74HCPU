@@ -397,25 +397,51 @@ class MemoryCodeGen: public CodeGen {
 };
 
 // IN R0, PINS1
+class InputCodeGen: public CodeGen {
+ public:
+  InputCodeGen(int line_number, COP cop, string left, string right)
+    : CodeGen(line_number, cop) {
+    reg_ = Names::RegFromName(left);
+    if (reg_ == rUnkReg)
+      ErrorCollector::GetInstance().err("Unknown register: " + left, line_number);
+
+    int p = Names::PortFromName(right, "PIN");
+    if (p == -1)
+      ErrorCollector::GetInstance().err("Unknown port name: " + right, line_number);
+    else if (p >= 32)
+      ErrorCollector::GetInstance().err("Port number should be in range 0-31", line_number);
+    else
+      port_ = p;
+  }
+
+  uint16_t Emit() {
+    uint16_t cop = operation_;
+    //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
+    //| A0 |    IN |  DST |  PORT   |Z|z|I|i|
+    cop |= reg_ << 9;
+    cop |= port_ << 4;
+    return cop;
+  }
+
+  vector<int> get_blocks() {
+    //   COP dst port -- Ii
+    return {4, 3, 5, 2, 2};
+  }
+
+ private:
+  uint16_t port_ {0};
+  REG reg_ {rUnkReg};
+  uint16_t right_val_ {0};
+  bool immediate_ {false};
+};
+
 // OUT PORT2, R7
 // OUT PORT3, 10
-class IOCodeGen: public CodeGen {
+class OutputCodeGen: public CodeGen {
  public:
-  IOCodeGen(int line_number, COP cop, string left, string right)
+  OutputCodeGen(int line_number, COP cop, string left, string right)
     : CodeGen(line_number, cop) {
-    if (cop == cIN) {
-      reg_ = Names::RegFromName(left);
-      if (reg_ == rUnkReg)
-        ErrorCollector::GetInstance().err("Unknown register: " + left, line_number);
-
-      int p = Names::PortFromName(right, "PIN");
-      if (p == -1)
-        ErrorCollector::GetInstance().err("Unknown port name: " + right, line_number);
-      else if (p >= 32)
-        ErrorCollector::GetInstance().err("Port number should be in range 0-31", line_number);
-      else
-        port_ = p;
-    } else if (cop == cOUT || cop == cTOGL) {
+    //} else if (cop == cOUT || cop == cTOGL) {
       int p = Names::PortFromName(left, "PORT");
       if (p == -1)
         ErrorCollector::GetInstance().err("Unknown port name: " + left, line_number);
@@ -428,20 +454,11 @@ class IOCodeGen: public CodeGen {
       immediate_ = rv.immediate();
       reg_ = rv.right_reg();
       right_val_ = rv.right_val();
-    } else {
-      ErrorCollector::GetInstance().err("Unknown IO operation. Should be IN or OUT/TOGL.", line_number);
-    }
   }
 
   uint16_t Emit() {
     uint16_t cop = operation_;
-    if (cop == cIN) {
-      //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
-      //| A0 |    IN |  DST |  PORT   |Z|z|I|i|
-      cop |= reg_ << 9;
-      cop |= port_ << 4;
-      return cop;
-    } else if (cop == cOUT || cop == cTOGL) {
+    //} else if (cop == cOUT || cop == cTOGL) {
       //      F E D C  B A 9 8 7 6 5 4 3 2 1 0
       //|              2 1 0         4 3
       //| B0 |   OUT | PORT |0| SRC |PRT|X|O|o|
@@ -457,17 +474,13 @@ class IOCodeGen: public CodeGen {
           cop |= 0x0004;  // set X bit to 1
       }
       return cop;
-    }
+    //}
     return 0;
   }
 
   vector<int> get_blocks() {
-    //   COP dst port -- Ii
-    if (operation_ == cIN)
-      return {4, 3, 5, 2, 2};
-    //   COP port src prt XOo
-    else
-      return {4, 3, 1, 3, 2, 3};
+    //    COP port src prt XOo
+    return {4, 3, 1, 3, 2, 3};
   }
 
  private:
@@ -566,7 +579,12 @@ CodeLine::CodeLine(int line_number, string line_text)
     case tBINARY: cg = new BinaryCodeGen(line_number_, op, left, right); break;
     case tUNARY: cg = new UnaryCodeGen(line_number_, op_name, left); break;
     case tMEMORY: cg = new MemoryCodeGen(line_number_, op, left, right); break;
-    case tIO: cg = new IOCodeGen(line_number_, op, left, right); break;
+    case tIO: {
+      if (op == cIN)
+        cg = new InputCodeGen(line_number_, op, left, right);
+      else
+        cg = new OutputCodeGen(line_number_, op, left, right);
+    } break;
     case tBRANCH: cg = new BranchCodeGen(line_number_, op, left); break;
     case tNO_OP:
     default:
