@@ -10,7 +10,7 @@
 
 // Code Of Operation
 enum COP {
-  cADD = 0x0000, cADDC = 0x1000,
+  cADD = 0x0000, cADDL = 0x0008, cADDH = 0x0004, cADDC = 0x1000,
   cAND = 0x2000, cOR = 0x3000, cXOR = 0x4000,
   cMUL = 0x5000, cUNO = 0x6000, cMOV = 0x7000,
   cLPM = 0x8000, cLPMW = 0x8100, cLD = 0x9000,
@@ -33,9 +33,9 @@ enum COP {
   bJNHC = 0xFD00,
   bAFCALL = 0xFE00,
   bNOP = 0xFFFF,
-  bSTOP = 0xFFFE,  // processor operation
+  bSTOP = 0xFFFE,    // processor operation
   bERROR = 0x10000,  // we get some unknown name of operation
-  cNO_OP = 0x20000  // just constant for "there is no operation here", for example for labels or error op names
+  cNO_OP = 0x20000   // just constant for "there is no operation here", for example for labels or error op names
 };
 
 enum OP_TYPE {

@@ -65,6 +65,16 @@ TEST_CASE("check arithm COPs") {
   CHECK(clE.generate_machine_code() == 0x70E0);
 }
 
+TEST_CASE("check Nibble (4 bit) COPs") {
+  // |   ADD |  DST |C| SRC |-|Z|z|I|i|
+  //    0000    000  0  000  0   1000
+  CodeLine cl1(1, "ADDL R0, R0");  // ADD low nibble of [right] register -> zero high nibble
+  CHECK(cl1.generate_machine_code() == 0x0008);
+
+  CodeLine cl2(1, "ADDH R0, R0");  // ADD high nibble of [right] register -> zero low nibble
+  CHECK(cl2.generate_machine_code() == 0x0004);
+}
+
 TEST_CASE("check ROM COPs") {
   // LPM  DST W SR DU OFST
   // 1000 000 0 00 00 0000
