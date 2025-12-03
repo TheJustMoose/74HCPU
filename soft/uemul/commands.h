@@ -32,6 +32,9 @@ class ArithmCmd: public Cmd {
   uint8_t Src() const { return (cmd_ >> 5) & 0x07; }
   uint8_t Const() const { return (cmd_ & 0xFF); }
 
+  bool NeedToZeroHighNibble() const { return cmd_ & 0x08; }
+  bool NeedToZeroLowNibble() const { return cmd_ & 0x04; }
+
   uint8_t DstLowReg() const { return Dst() & 0x06; }     // low byte register
   uint8_t DstHighReg() const { return DstLowReg() | 1; } // high byte register
 

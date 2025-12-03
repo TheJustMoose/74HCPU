@@ -12,7 +12,15 @@ uint8_t ArithmCmd::DstVal() {
 }
 
 uint8_t ArithmCmd::SrcVal() {
-  return IsConst() ? Const() : cpu_->ActiveRegsBank()[Src()];
+  if (IsConst())
+    return Const();
+
+  uint8_t res = cpu_->ActiveRegsBank()[Src()];
+  if (NeedToZeroHighNibble())
+    res &= 0x0F;
+  if (NeedToZeroLowNibble())
+    res &= 0xF0;
+  return res;
 }
 
 void ArithmCmd::Execute() {
