@@ -27,13 +27,13 @@ class ArithmCmd: public Cmd {
  public:
   ArithmCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
-  uint8_t Dst() { return (cmd_ >> 9) & 0x07; }
-  bool IsConst() { return (cmd_ >> 8) & 0x01; }
-  uint8_t Src() { return (cmd_ >> 5) & 0x07; }
-  uint8_t Const() { return (cmd_ & 0xFF); }
+  uint8_t Dst() const { return (cmd_ >> 9) & 0x07; }
+  bool IsConst() const { return (cmd_ >> 8) & 0x01; }
+  uint8_t Src() const { return (cmd_ >> 5) & 0x07; }
+  uint8_t Const() const { return (cmd_ & 0xFF); }
 
-  uint8_t DstLowReg() { return Dst() & 0x06; }     // low byte register
-  uint8_t DstHighReg() { return DstLowReg() | 1; } // high byte register
+  uint8_t DstLowReg() const { return Dst() & 0x06; }     // low byte register
+  uint8_t DstHighReg() const { return DstLowReg() | 1; } // high byte register
 
   uint8_t DstVal();
   uint8_t SrcVal();
