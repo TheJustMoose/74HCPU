@@ -49,7 +49,7 @@ map<string, uint16_t> unary_codes {
 };
 
 map<string, COP> cop_names {
-  { "ADD", cADD}, { "ADDL", cADDL}, { "ADDH", cADDH}, { "ADDC", cADDC},
+  { "ADD", cADD}, { "ADDC", cADDC},
   { "AND", cAND}, { "OR", cOR}, { "XOR", cXOR},
   { "MUL", cMUL},
   { "INV", cUNO}, { "SWAP", cUNO}, { "LSR", cUNO}, { "LSRC", cUNO},
