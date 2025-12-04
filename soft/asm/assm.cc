@@ -179,12 +179,27 @@ class RightVal {
       if (right_val_> 0xFF)
         ErrorCollector::GetInstance().err("Error. Immediate value should have 8 bit only (0 - 255). Got: " + right_, line_number_);
     } else {  // not val, try to check register name
-      right_reg_ = Names::RegFromName(right_);  // MOV R0, R1
+      string rest = StripPrefix(right_);
+      right_reg_ = Names::RegFromName(rest);  // MOV R0, R1
       if (right_reg_ == rUnkReg) {
-        ErrorCollector::GetInstance().err("Unknown register: " + right_, line_number_);
+        ErrorCollector::GetInstance().err("Unknown register: " + rest, line_number_);
         ErrorCollector::GetInstance().err("You have to use Register name or immediate value as rval.", line_number_);
       }
     }
+  }
+
+  string StripPrefix(string val) {
+    if (val.size() <= 2)
+      return val;
+    if (val.find("L(") == 0 && *val.rbegin() == ')') {
+      zero_hi_ = true;
+      return val.substr(2, val.size() - 3);
+    }
+    if (val.find("H(") == 0 && *val.rbegin() == ')') {
+      zero_lo_ = true;
+      return val.substr(2, val.size() - 3);
+    }
+    return val;
   }
 
   bool immediate() { return immediate_; }
@@ -192,11 +207,16 @@ class RightVal {
   REG right_reg() { return right_reg_; }
   int line_number() { return line_number_; }
 
+  bool zero_lo() { return zero_lo_; }
+  bool zero_hi() { return zero_hi_; }
+
  private:
   bool immediate_ {false};
   uint16_t right_val_ {0};
   REG right_reg_ {rUnkReg};
   int line_number_ {0};
+  bool zero_lo_ {false};
+  bool zero_hi_ {false};
   string right_;
 };
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,6 +235,8 @@ class BinaryCodeGen: public CodeGen {
     immediate_ = rv.immediate();
     right_op_ = rv.right_reg();
     right_val_ = rv.right_val();
+    zero_lo_ = rv.zero_lo();
+    zero_hi_ = rv.zero_hi();
   }
 
   uint16_t Emit() {
@@ -224,8 +246,13 @@ class BinaryCodeGen: public CodeGen {
       cop |= right_val_;
       cop |= 0x0100;  // set C bit to 1
     }
-    else
+    else {
       cop |= right_op_ << 5;
+      if (zero_lo_)
+        cop |= cZERO_LO;
+      if (zero_hi_)
+        cop |= cZERO_HI;
+    }
     return cop;
   }
 
@@ -277,6 +304,8 @@ class BinaryCodeGen: public CodeGen {
   uint16_t right_val_ {0};
   bool immediate_ {false};
   string right_str_ {};  // TODO: try to remove it later
+  bool zero_lo_ {false};
+  bool zero_hi_ {false};
 };
 
 // LSR R7

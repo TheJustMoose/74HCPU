@@ -38,6 +38,9 @@ enum COP {
   cNO_OP = 0x20000   // just constant for "there is no operation here", for example for labels or error op names
 };
 
+const uint16_t cZERO_LO = 0x0004;
+const uint16_t cZERO_HI = 0x0008;
+
 enum OP_TYPE {
   tBINARY, tUNARY, tMEMORY, tIO, tBRANCH, tNO_OP
 };
