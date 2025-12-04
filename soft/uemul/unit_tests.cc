@@ -109,19 +109,18 @@ TEST_CASE("test Cmds") {
 }
 
 TEST_CASE("test Nibble Cmds") {
-  // ADDL R0, R0
+  // ADD R0, L(R0) == ADD low nibble of register -> zero high nibble
   // |   ADD |  DST |C| SRC |-|Z|z|I|i|
   //    0000    000  0  000  0   1000
-  // ADDL == ADD low nibble of [right] register -> zero high nibble
   CPU cpu;
-  AddCmd ac(0x0008, &cpu);  // ADDL R0, R0
+  AddCmd ac(0x0008, &cpu);  // ADD R0, L(R0)
   CHECK( ac.NeedToZeroHighNibble() );
 
-  AddCmd acl(0x0028, &cpu);  // ADDL R0, R1
+  AddCmd acl(0x0028, &cpu);  // ADD R0, L(R1)
   CHECK( acl.NeedToZeroHighNibble() );
   cpu.RegsBank0[0] = 0x01;   // MOV R0, 0x01
   cpu.RegsBank0[1] = 0x77;   // MOV R1, 0x77
-  acl.Execute();             // ADDL R0, R1
+  acl.Execute();             // ADD R0, L(R1)
   CHECK( cpu.RegsBank0[0] == 0x08 );  // high nibble is zero!
 }
 

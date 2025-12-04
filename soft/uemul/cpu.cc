@@ -300,7 +300,7 @@ void CPU::Run(bool dbg) {
 }
 
 bool CPU::FindDebugInfo(size_t& data_start) {
-  // Debug Info should have at least 8 words mark:
+  // Debug Info should have at least 8 chars mark:
   // "\0\0\0\0DBGI"
   if (ROM.size() < 8)
     return false;
