@@ -155,6 +155,19 @@ TEST_CASE("check RAM COPs") {
   CHECK(cl4.generate_machine_code() == 0xCE40);
 }
 
+TEST_CASE("check stack COPs") {
+  //.def push(r) ST SPD, r
+  // ST   SRC - DS DU OFST
+  // 1100 001 0 11 10 0000
+  CodeLine cl1(1, "ST SPD, R1");
+  CHECK(cl1.generate_machine_code() == 0xC2E0);
+  //.def pop(r)  LD r, SPI-1
+  // LD   DST - SR DU OFST
+  // 1001 001 0 11 01 1111
+  CodeLine cl2(2, "LD R1, SPI-1");
+  CHECK(cl2.generate_machine_code() == 0x92DF);
+}
+
 TEST_CASE("check I/O COPs") {
   // IN   DST  PORT ZzIi
   // 1010 011 00010 0000
