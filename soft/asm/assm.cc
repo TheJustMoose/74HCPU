@@ -79,7 +79,6 @@ map<string, COP> cop_names {
 
 map<string, REG> reg_names {
   { "R0", rR0 }, { "R1", rR1 }, { "R2", rR2 }, { "R3", rR3 }, { "R4", rR4 }, { "R5", rR5 }, { "R6", rR6 }, { "R7", rR7 },
-// R0.L R0.H R1.L R1.H....
   { "XL", rXL}, { "XH", rXH}, { "YL", rYL}, { "YH", rYH}, { "ZL", rZL}, { "ZH", rZH}, { "SPL", rSPL}, { "SPH", rSPH},
 };
 
@@ -189,8 +188,17 @@ class RightVal {
   }
 
   string StripPrefix(string val) {
-    if (val.size() <= 2)
+    if (val.size() <= 2)  // strlen("R0") == 2
       return val;
+
+    if (val[0] == '`' || val[1] == '`')
+      inv_hi_ = true;
+    if (val[0] == '\'' || val[1] == '\'')
+      inv_lo_ = true;
+    int cnt = inv_lo_ + inv_hi_;
+    if (cnt)
+      val = val.substr(cnt, val.size() - cnt);
+
     if (val.find("L(") == 0 && *val.rbegin() == ')') {
       zero_hi_ = true;
       return val.substr(2, val.size() - 3);
@@ -209,6 +217,8 @@ class RightVal {
 
   bool zero_lo() { return zero_lo_; }
   bool zero_hi() { return zero_hi_; }
+  bool inv_lo() { return inv_lo_; }
+  bool inv_hi() { return inv_hi_; }
 
  private:
   bool immediate_ {false};
@@ -217,6 +227,8 @@ class RightVal {
   int line_number_ {0};
   bool zero_lo_ {false};
   bool zero_hi_ {false};
+  bool inv_lo_ {false};
+  bool inv_hi_ {false};
   string right_;
 };
 ///////////////////////////////////////////////////////////////////////////////
@@ -237,6 +249,8 @@ class BinaryCodeGen: public CodeGen {
     right_val_ = rv.right_val();
     zero_lo_ = rv.zero_lo();
     zero_hi_ = rv.zero_hi();
+    inv_lo_ = rv.inv_lo();
+    inv_hi_ = rv.inv_hi();
   }
 
   uint16_t Emit() {
@@ -248,6 +262,10 @@ class BinaryCodeGen: public CodeGen {
     }
     else {
       cop |= right_op_ << 5;
+      if (inv_lo_)
+        cop |= cINV_LO;
+      if (inv_hi_)
+        cop |= cINV_HI;
       if (zero_lo_)
         cop |= cZERO_LO;
       if (zero_hi_)
@@ -306,6 +324,8 @@ class BinaryCodeGen: public CodeGen {
   string right_str_ {};  // TODO: try to remove it later
   bool zero_lo_ {false};
   bool zero_hi_ {false};
+  bool inv_lo_ {false};
+  bool inv_hi_ {false};
 };
 
 // LSR R7
