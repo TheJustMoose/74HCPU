@@ -219,6 +219,20 @@ TEST_CASE("test Memory Cmds") {
   CHECK( cpu.RegsBank1[0] == 101 );  // autoinc work!
 }
 
+TEST_CASE("test Stack Cmds") {
+  CPU cpu;
+  cpu.RegsBank1[6] = 0xFF;           // MOV SPL, 0xFF
+  cpu.RegsBank1[7] = 0xFF;           // MOV SPH, 0xFF
+
+  cpu.RegsBank0[1] = 0x55;           // MOV R1, 0x55
+  //.def push(r) ST SPD, r
+  // ST   SRC - DS DU OFST
+  // 1100 001 0 11 10 0000
+  StoreToMemoryCmd cmd1(0xC2E0, &cpu);  // ST SPD, R1
+  cmd1.Execute();
+  CHECK( cpu.RAM[0xFFFF] == 0x55 );  // *0xFFFF == 0x55
+}
+
 TEST_CASE("test Ports Cmds") {
   CPU cpu;
   cpu.RegsBank0[0] = 0x55;           // MOV R0, 0x55
