@@ -599,7 +599,6 @@ class BranchCodeGen: public CodeGen {
           else
             target_addr_ = offset & 0xFF;
         }
-        //cout << "new target address: " << hex << target_addr_ << endl;
       }
     }
   }
@@ -639,10 +638,25 @@ CodeLine::CodeLine(int line_number, string line_text)
   string left( cmd_parts[1] );
   string right( cmd_parts[2] );
 
+  //cout << "GOT: |" << op_name << "|" << left << "|" << right << "|" << endl;
+
+  // Try to convert SUB to ADDC cmd:
+  if (op_name == "SUB") {
+    REG r = Names::RegFromName(right);
+    if (r == rUnkReg) {
+      ErrorCollector::GetInstance().err(
+          "Sorry. You can use register only in right part of SUB cmd: " + right +
+          ". Try to replace SUB to ADD", line_number);
+      return;
+    }
+
+    op_name = "ADDC";
+    right = "~" + right + "+1";
+  }
+
   COP op = Names::CopFromName(op_name);
   if (op == bERROR) {
     ErrorCollector::GetInstance().err("Unknown operation: " + op_name, line_number);
-    cout << "Error. Unknown operation: |" << op_name << "|" << endl;
     return;
   }
 
@@ -666,8 +680,6 @@ CodeLine::CodeLine(int line_number, string line_text)
   }
 
   code_gen_.reset(cg);
-
-  //cout << "GOT: |" << op_name << "|" << left << "|" << right << "|" << endl;
 }
 
 uint16_t CodeLine::generate_machine_code() {
@@ -700,7 +712,7 @@ StringConst& StringConst::operator=(const StringConst& rval) {
 
 uint16_t StringConst::get_size() const {
   if (str_.size() >= numeric_limits<uint16_t>::max()) {
-    //ErrorCollector::GetInstance().err("String const is too long.");
+    ErrorCollector::GetInstance().err("String const is too long.", line_);
     return 0;
   }
 
@@ -846,7 +858,6 @@ void Assembler::pass1() {
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end(); it++) {
     string nl = NormalizeLine(it->second);
-    cout << "nrmlzd: " << nl << endl;
     if (nl.size() == 0)
       continue;
     code_.push_back(CodeLine(it->first, nl));
