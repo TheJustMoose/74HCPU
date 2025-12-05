@@ -167,6 +167,11 @@ class RightVal {
   }
 
   void Parse() {
+    if (right_.find("+1") != string::npos) {
+      force_cf_ = true;
+      right_.resize(right_.size() - 2);
+    }
+
     int t = 0;
     immediate_ = StrToInt(right_, &t);  // MOV R1, 10
     if (immediate_) {
@@ -195,9 +200,21 @@ class RightVal {
       inv_hi_ = true;
     if (val[0] == '\'' || val[1] == '\'')
       inv_lo_ = true;
-    int cnt = inv_lo_ + inv_hi_;
+
+    bool inv_all {false};
+    if (val[0] == '~' || val[1] == '~')
+      inv_all = true;
+
+    int cnt = inv_lo_ + inv_hi_ + inv_all;
+    if (cnt > 2)
+      cnt = 2;
     if (cnt)
       val = val.substr(cnt, val.size() - cnt);
+
+    if (inv_all) {
+      inv_hi_ = true;
+      inv_lo_ = true;
+    }
 
     if (val.find("L(") == 0 && *val.rbegin() == ')') {
       zero_hi_ = true;
@@ -219,6 +236,7 @@ class RightVal {
   bool zero_hi() { return zero_hi_; }
   bool inv_lo() { return inv_lo_; }
   bool inv_hi() { return inv_hi_; }
+  bool force_cf() { return force_cf_; }
 
  private:
   bool immediate_ {false};
@@ -229,6 +247,7 @@ class RightVal {
   bool zero_hi_ {false};
   bool inv_lo_ {false};
   bool inv_hi_ {false};
+  bool force_cf_ {false};
   string right_;
 };
 ///////////////////////////////////////////////////////////////////////////////
@@ -251,6 +270,7 @@ class BinaryCodeGen: public CodeGen {
     zero_hi_ = rv.zero_hi();
     inv_lo_ = rv.inv_lo();
     inv_hi_ = rv.inv_hi();
+    force_cf_ = rv.force_cf();
   }
 
   uint16_t Emit() {
@@ -270,6 +290,8 @@ class BinaryCodeGen: public CodeGen {
         cop |= cZERO_LO;
       if (zero_hi_)
         cop |= cZERO_HI;
+      if (force_cf_)
+        cop |= cFORCE_CF;
     }
     return cop;
   }
@@ -326,6 +348,7 @@ class BinaryCodeGen: public CodeGen {
   bool zero_hi_ {false};
   bool inv_lo_ {false};
   bool inv_hi_ {false};
+  bool force_cf_ {false};
 };
 
 // LSR R7
@@ -823,6 +846,7 @@ void Assembler::pass1() {
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end(); it++) {
     string nl = NormalizeLine(it->second);
+    cout << "nrmlzd: " << nl << endl;
     if (nl.size() == 0)
       continue;
     code_.push_back(CodeLine(it->first, nl));
@@ -996,6 +1020,4 @@ void Assembler::out_orgs() {
     cout << v.first << " " << v.second << endl;
 }
 
-// TODO: добавить вывод в .hex имён меток, чтобы хоть как-то сохранить "отладочную инфу" ;)
-//       добавить юнит тестов
 ///////////////////////////////////////////////////////////////////////////////

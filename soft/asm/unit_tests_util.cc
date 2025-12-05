@@ -75,6 +75,18 @@ TEST_CASE("check split command parts") {
   CHECK(t4[0] == "STOP");
   CHECK(t4[1] == "");
   CHECK(t4[2] == "");
+
+  vector<string> t5 = SplitToCmdParts("MOV R0, L(R1)");
+  CHECK(t5.size() == 3);
+  CHECK(t5[0] == "MOV");
+  CHECK(t5[1] == "R0");
+  CHECK(t5[2] == "L(R1)");
+
+  vector<string> t6 = SplitToCmdParts("MOV R0, `'L(R1) + 1");
+  CHECK(t6.size() == 3);
+  CHECK(t6[0] == "MOV");
+  CHECK(t6[1] == "R0");
+  CHECK(t6[2] == "`'L(R1)+1");
 }
 
 TEST_CASE("check str_util") {

@@ -42,6 +42,7 @@ const uint16_t cINV_LO = 0x0001;
 const uint16_t cINV_HI = 0x0002;
 const uint16_t cZERO_LO = 0x0004;
 const uint16_t cZERO_HI = 0x0008;
+const uint16_t cFORCE_CF = 0x0010;
 
 enum OP_TYPE {
   tBINARY, tUNARY, tMEMORY, tIO, tBRANCH, tNO_OP

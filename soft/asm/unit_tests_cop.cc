@@ -65,14 +65,39 @@ TEST_CASE("check arithm COPs") {
   CHECK(clE.generate_machine_code() == 0x70E0);
 }
 
+TEST_CASE("check Inversion COPs") {
+  // |SUB/ADDC|  DST |C| SRC |F|Z|z|I|i|
+  //     0001    001  0  010  1   0011
+  // SUB A, B == ADD A, ~B + 1
+  CodeLine cl1(1, "SUB R1, R2");
+  //CHECK(cl1.generate_machine_code() == 0x1253);
+}
+
 TEST_CASE("check Nibble (4 bit) COPs") {
   // |   ADD |  DST |C| SRC |-|Z|z|I|i|
   //    0000    000  0  000  0   1000
   CodeLine cl1(1, "ADD R0, L(R0)");  // ADD low nibble of [right] register -> zero high nibble
   CHECK(cl1.generate_machine_code() == 0x0008);
 
+  //    0000    000  0  000  0   0100
   CodeLine cl2(1, "ADD R0, H(R0)");  // ADD high nibble of [right] register -> zero low nibble
   CHECK(cl2.generate_machine_code() == 0x0004);
+
+  //    0000    000  0  001  0   0011
+  CodeLine cl3(1, "ADD R0, ~R1");  // ADD inverted register R1 to R0
+  CHECK(cl3.generate_machine_code() == 0x0023);
+
+  //    0000    000  0  001  0   0010
+  CodeLine cl4(1, "ADD R0, `R1");  // invert high nibble and ADD register R1 to R0
+  CHECK(cl4.generate_machine_code() == 0x0022);
+
+  //    0000    000  0  001  0   0001
+  CodeLine cl5(1, "ADD R0, 'R1");  // invert low nibble and ADD register R1 to R0
+  CHECK(cl5.generate_machine_code() == 0x0021);
+
+  //    0001    000  0  001  1   0011
+  CodeLine cl6(1, "ADDC R0, ~R1 + 1");  // ADDC inverted register R1 to R0 with CF==1
+  CHECK(cl6.generate_machine_code() == 0x1033);
 }
 
 TEST_CASE("check ROM COPs") {
