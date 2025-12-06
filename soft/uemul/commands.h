@@ -35,6 +35,9 @@ class ArithmCmd: public Cmd {
   bool NeedToZeroHighNibble() const { return cmd_ & 0x08; }
   bool NeedToZeroLowNibble() const { return cmd_ & 0x04; }
 
+  bool InvLo() { return cmd_ & 0x01; }
+  bool InvHi() { return cmd_ & 0x02; }
+
   uint8_t DstLowReg() const { return Dst() & 0x06; }     // low byte register
   uint8_t DstHighReg() const { return DstLowReg() | 1; } // high byte register
 
@@ -58,6 +61,8 @@ class AddCmd: public ArithmCmd {
 class AddcCmd: public ArithmCmd {
  public:
   AddcCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
+
+  bool ForceCF() { return cmd_ & 0x10; }
 
   uint8_t Calculate(uint8_t d, uint8_t s) override;
 };

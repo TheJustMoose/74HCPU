@@ -126,10 +126,10 @@ TEST_CASE("test Nibble Cmds") {
 
 TEST_CASE("test SUB cmd") {
   CPU cpu;
-  cpu.RegsBank0[0] = 10;    // MOV R0, 10
-  cpu.RegsBank0[1] = 5;     // MOV R1, 5
+  cpu.RegsBank0[0] = 10;     // MOV R0, 10
+  cpu.RegsBank0[1] = 5;      // MOV R1, 5
 
-  AddCmd ac(0x1033, &cpu);  // SUB R0, R1
+  AddcCmd ac(0x1033, &cpu);  // SUB R0, R1
   ac.Execute();
 
   CHECK( cpu.RegsBank0[0] == 5 );  // 10 - 5 == 5

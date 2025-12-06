@@ -20,6 +20,12 @@ uint8_t ArithmCmd::SrcVal() {
     res &= 0x0F;
   if (NeedToZeroLowNibble())
     res &= 0xF0;
+
+  if (InvHi())
+    res ^= 0xF0;
+  if (InvLo())
+    res ^= 0x0F;
+
   return res;
 }
 
@@ -42,6 +48,7 @@ uint8_t AddCmd::Calculate(uint8_t d, uint8_t s) {
 
 uint8_t AddcCmd::Calculate(uint8_t d, uint8_t s) {
   bool cf = cpu_->Flags[flags::CF];
+  cf |= ForceCF();
   uint8_t res = d + s + cf;
   cpu_->Flags[flags::CF] = (d + s + cf) > 255;
   cpu_->Flags[flags::ZF] = res == 0;
