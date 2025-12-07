@@ -230,6 +230,13 @@ class OutputPortCmd: public Cmd {
   void Execute();
 };
 
+class Relation {
+ public:
+  bool less {false};
+  bool equal {true};
+  bool greater {false};
+};
+
 //|0 1 2 3  4 5 6 7 8 9 A B C D E F|
 //|   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
 //|  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+|
@@ -244,6 +251,8 @@ class CmpCmd: public Cmd {
 
   uint8_t DstVal();
   uint8_t SrcVal();
+
+  static Relation Compare(uint8_t left, uint8_t right);
 
   virtual void Execute();
 

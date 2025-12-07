@@ -1,8 +1,8 @@
 #include "commands.h"
 
+#include <cstdint>
 #include <iostream>
 
-#include "compare.h"
 #include "cpu.h"
 
 using namespace std;
@@ -216,6 +216,16 @@ uint8_t CmpCmd::DstVal() {
 
 uint8_t CmpCmd::SrcVal() {
   return IsConst() ? Const() : cpu_->ActiveRegsBank()[Src()];
+}
+
+Relation CmpCmd::Compare(uint8_t left, uint8_t right) {
+  if (left < right) {
+    return { true, false, false };
+  } else if (left == right) {
+    return { false, true, false };
+  } else {
+    return { false, false, true };
+  }
 }
 
 void CmpCmd::Execute() {
