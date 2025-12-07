@@ -161,8 +161,11 @@ int Names::PortFromName(string name, string prefix) {
 ///////////////////////////////////////////////////////////////////////////////
 class RightVal {
  public:
-  RightVal(int line_number, string right)
-    : line_number_(line_number), right_(right) {
+  RightVal() = default;
+
+  void Init(int line_number, string right) {
+    line_number_ = line_number;
+    right_ = right;
     Parse();
   }
 
@@ -228,8 +231,8 @@ class RightVal {
   }
 
   bool immediate() { return immediate_; }
-  uint16_t right_val() { return right_val_; }
-  REG right_reg() { return right_reg_; }
+  uint16_t val() { return right_val_; }
+  REG reg() { return right_reg_; }
   int line_number() { return line_number_; }
 
   bool zero_lo() { return zero_lo_; }
@@ -237,6 +240,11 @@ class RightVal {
   bool inv_lo() { return inv_lo_; }
   bool inv_hi() { return inv_hi_; }
   bool force_cf() { return force_cf_; }
+
+  void update_val(uint16_t val) {
+    right_val_ = val;
+    immediate_ = true;
+  }
 
  private:
   bool immediate_ {false};
@@ -262,35 +270,27 @@ class BinaryCodeGen: public CodeGen {
     if (left_op_ == rUnkReg)
       ErrorCollector::GetInstance().err("Unknown register: " + left, line_number);
 
-    RightVal rv(line_number, right);
-    immediate_ = rv.immediate();
-    right_op_ = rv.right_reg();
-    right_val_ = rv.right_val();
-    zero_lo_ = rv.zero_lo();
-    zero_hi_ = rv.zero_hi();
-    inv_lo_ = rv.inv_lo();
-    inv_hi_ = rv.inv_hi();
-    force_cf_ = rv.force_cf();
+    right_val_.Init(line_number, right);
   }
 
   uint16_t Emit() {
     uint16_t cop = operation_;
     cop |= left_op_ << 9;  // don't forget about C bit
-    if (immediate_) {
-      cop |= right_val_;
+    if (right_val_.immediate()) {
+      cop |= right_val_.val();
       cop |= 0x0100;  // set C bit to 1
     }
     else {
-      cop |= right_op_ << 5;
-      if (inv_lo_)
+      cop |= right_val_.reg() << 5;
+      if (right_val_.inv_lo())
         cop |= cINV_LO;
-      if (inv_hi_)
+      if (right_val_.inv_hi())
         cop |= cINV_HI;
-      if (zero_lo_)
+      if (right_val_.zero_lo())
         cop |= cZERO_LO;
-      if (zero_hi_)
+      if (right_val_.zero_hi())
         cop |= cZERO_HI;
-      if (force_cf_)
+      if (right_val_.force_cf())
         cop |= cFORCE_CF;
     }
     return cop;
@@ -322,15 +322,15 @@ class BinaryCodeGen: public CodeGen {
                                          // cause RegFromName know nothing about labels and LO/HI macro
     ErrorCollector::GetInstance().rep("Replace " + it->first + " to " + to_string(it->second), line_number());
 
-    right_val_ = it->second;
+    uint16_t rv = it->second;
     if (hi)
-      right_val_ >>= 8;
-    right_val_ &= 0x00FF;
-    immediate_ = true;
+      rv >>= 8;
+    rv &= 0x00FF;
+    right_val_.update_val(rv);
   }
 
   vector<int> get_blocks() {
-    if (immediate_)
+    if (right_val_.immediate())
       //    COP dst C value
       return {4, 3, 1, 8};
     else
@@ -340,15 +340,8 @@ class BinaryCodeGen: public CodeGen {
 
  private:
   REG left_op_ {rUnkReg};
-  REG right_op_ {rUnkReg};
-  uint16_t right_val_ {0};
-  bool immediate_ {false};
   string right_str_ {};  // TODO: try to remove it later
-  bool zero_lo_ {false};
-  bool zero_hi_ {false};
-  bool inv_lo_ {false};
-  bool inv_hi_ {false};
-  bool force_cf_ {false};
+  RightVal right_val_ {};
 };
 
 // LSR R7
@@ -512,10 +505,11 @@ class OutputCodeGen: public CodeGen {
   OutputCodeGen(int line_number, COP cop, string left, string right)
     : CodeGen(line_number, cop) {
 
-    RightVal rv(line_number, right);
+    RightVal rv;
+    rv.Init(line_number, right);
     immediate_ = rv.immediate();
-    reg_ = rv.right_reg();
-    right_val_ = rv.right_val();
+    reg_ = rv.reg();
+    right_val_ = rv.val();
 
     if (immediate_ && cop == cTOGL)
       ErrorCollector::GetInstance().err("Sorry. You can't use TOGL with immediate value", line_number);
@@ -645,7 +639,7 @@ CodeLine::CodeLine(int line_number, string line_text)
     REG r = Names::RegFromName(right);
     if (r == rUnkReg) {
       ErrorCollector::GetInstance().err(
-          "Sorry. You can use register only in right part of SUB cmd: " + right +
+          "Sorry. You can use only register in right part of SUB cmd: " + right +
           ". Try to replace SUB to ADD", line_number);
       return;
     }
