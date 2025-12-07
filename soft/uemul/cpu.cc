@@ -116,9 +116,9 @@ void CPU::PrintStack() {
 }
 
 void CPU::PrintLabels(uint16_t ip) {
-  auto it = name_to_address.begin();
+  auto it = NameToAddress.begin();
   bool found {false};
-  while (it != name_to_address.end()) {
+  while (it != NameToAddress.end()) {
     if (it->second == ip) {
       cout << it->first << ":";
       found = true;
@@ -342,7 +342,7 @@ void CPU::ReadDebugInfo(size_t data_start) {
     if (!lbl.size())
       break;
     // label was found
-    name_to_address[lbl] = addr;
+    NameToAddress[lbl] = addr;
     cout << hex << addr << " " << lbl << endl;
   }
 }
