@@ -296,7 +296,7 @@ class BinaryCodeGen: public CodeGen {
     return cop;
   }
 
-  void update_machine_code(const map<string, uint16_t>& name_to_address) {
+  void UpdateMachineCode(const map<string, uint16_t>& name_to_address) {
     if (right_str_.empty())
       return;
 
@@ -329,7 +329,7 @@ class BinaryCodeGen: public CodeGen {
     right_val_.update_val(rv);
   }
 
-  vector<int> get_blocks() {
+  vector<int> GetBlocks() {
     if (right_val_.immediate())
       //    COP dst C value
       return {4, 3, 1, 8};
@@ -367,7 +367,7 @@ class UnaryCodeGen: public CodeGen {
     return cop;
   }
 
-  vector<int> get_blocks() {
+  vector<int> GetBlocks() {
     //    COP reg 0  - TYP F
     return {4, 3, 1, 1, 2, 1};
   }
@@ -448,7 +448,7 @@ class MemoryCodeGen: public CodeGen {
     return cop;
   }
 
-  vector<int> get_blocks() {
+  vector<int> GetBlocks() {
     //    COP dst 0 EXT D  U  OFFSET
     return {4, 3, 1, 2, 1, 1, 4};
   }
@@ -488,7 +488,7 @@ class InputCodeGen: public CodeGen {
     return cop;
   }
 
-  vector<int> get_blocks() {
+  vector<int> GetBlocks() {
     //   COP dst port -- Ii
     return {4, 3, 5, 2, 2};
   }
@@ -542,7 +542,7 @@ class OutputCodeGen: public CodeGen {
     return cop;
   }
 
-  vector<int> get_blocks() {
+  vector<int> GetBlocks() {
     if (immediate_)
       //   COP port C const
       return {4, 3, 1, 8};
@@ -571,7 +571,7 @@ class BranchCodeGen: public CodeGen {
     return cop;
   }
 
-  void update_machine_code(const map<string, uint16_t>& name_to_address) {
+  void UpdateMachineCode(const map<string, uint16_t>& name_to_address) {
     map<string, uint16_t>::const_iterator it;
     for (it = name_to_address.begin(); it != name_to_address.end(); it++) {
       if (ToUpper(it->first) == label_) {
@@ -597,7 +597,7 @@ class BranchCodeGen: public CodeGen {
     }
   }
 
-  vector<int> get_blocks() {
+  vector<int> GetBlocks() {
     //    COP TYP offset/addr
     return {4, 4, 8};
   }
@@ -676,17 +676,17 @@ CodeLine::CodeLine(int line_number, string line_text)
   code_gen_.reset(cg);
 }
 
-uint16_t CodeLine::generate_machine_code() {
+uint16_t CodeLine::GenerateMachineCode() {
   if (!code_gen_)
     return bNOP | 0xFF;
 
   return code_gen_->Emit();
 }
 
-void CodeLine::update_machine_code(const map<string, uint16_t>& name_to_address) {
+void CodeLine::UpdateMachineCode(const map<string, uint16_t>& name_to_address) {
   if (!code_gen_)
     return;
-  code_gen_->update_machine_code(name_to_address);
+  code_gen_->UpdateMachineCode(name_to_address);
 }
 
 string CodeLine::FormattedCOP() {
@@ -876,7 +876,7 @@ void Assembler::pass2() {
 
     it->set_address(addr);  // change address of every line
     // and every label of this line
-    vector<string> labels = it->get_labels();
+    vector<string> labels = it->GetLabels();
     vector<string>::iterator lit;
     for (lit = labels.begin(); lit != labels.end(); lit++)
       name_to_address_[*lit] = addr;
@@ -904,7 +904,7 @@ void Assembler::pass2() {
 void Assembler::pass3() {
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
-    it->update_machine_code(name_to_address_);
+    it->UpdateMachineCode(name_to_address_);
 }
 
 uint16_t Assembler::get_max_address() {
@@ -928,9 +928,9 @@ void Assembler::out_code() {
          << setw(4) << setfill(' ') << right << it->line_number() << " "
          << hex
          << setw(4) << setfill('0') << right << it->address() << ": "
-         << setw(4) << setfill('0') << right << it->generate_machine_code() << "  "
+         << setw(4) << setfill('0') << right << it->GenerateMachineCode() << "  "
          << setw(24) << setfill(' ') << left << it->get_line_text() << "  "
-         << setw(16) << setfill(' ') << left << it->get_labels_as_string()
+         << setw(16) << setfill(' ') << left << it->GetLabelsAsString()
          << setw(16) << setfill(' ') << left << it->FormattedCOP()
          << endl;
 
@@ -963,7 +963,7 @@ void Assembler::out_code(vector<uint16_t>& code) {
 
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
-    code[it->address()] = it->generate_machine_code();
+    code[it->address()] = it->GenerateMachineCode();
 
   // StringConst::out_code will resize 'code' if required
   for (auto& s : string_consts_)

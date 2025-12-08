@@ -85,9 +85,9 @@ class CodeGen {
   virtual ~CodeGen() {}
 
   virtual uint16_t Emit() { return 0; }
-  virtual void update_machine_code(const std::map<std::string, uint16_t>& name_to_address) {}
+  virtual void UpdateMachineCode(const std::map<std::string, uint16_t>& name_to_address) {}
 
-  virtual std::vector<int> get_blocks() { return {}; }
+  virtual std::vector<int> GetBlocks() { return {}; }
   virtual std::string cop() {
     std::stringstream s;
     s << std::bitset<16>(Emit());
@@ -95,7 +95,7 @@ class CodeGen {
   }
   std::string FormattedCOP() {
     std::string res = cop();
-    std::vector<int> blocks = get_blocks();
+    std::vector<int> blocks = GetBlocks();
     if (blocks.empty())
       return res;
 
@@ -130,15 +130,15 @@ class CodeLine {
  public:
   CodeLine(int line_number, std::string line_text);
 
-  uint16_t generate_machine_code();
-  void update_machine_code(const std::map<std::string, uint16_t>& name_to_address);
+  uint16_t GenerateMachineCode();
+  void UpdateMachineCode(const std::map<std::string, uint16_t>& name_to_address);
   std::string FormattedCOP();
 
-  std::vector<std::string> get_labels() {
+  std::vector<std::string> GetLabels() {
     return labels_;
   }
 
-  std::string get_labels_as_string() {
+  std::string GetLabelsAsString() {
     if (!has_labels())
       return {};
 
