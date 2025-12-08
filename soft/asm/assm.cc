@@ -233,7 +233,7 @@ class RightVal {
   bool immediate() { return immediate_; }
   uint16_t val() { return right_val_; }
   REG reg() { return right_reg_; }
-  int line_number() { return line_number_; }
+  int LineNumber() { return line_number_; }
 
   bool zero_lo() { return zero_lo_; }
   bool zero_hi() { return zero_hi_; }
@@ -318,9 +318,9 @@ class BinaryCodeGen: public CodeGen {
     if (it == name_to_address.end())
       return;
 
-    ErrorCollector::GetInstance().clr(line_number());  // have to remove previous messages
+    ErrorCollector::GetInstance().clr(LineNumber());  // have to remove previous messages
                                          // cause RegFromName know nothing about labels and LO/HI macro
-    ErrorCollector::GetInstance().rep("Replace " + it->first + " to " + to_string(it->second), line_number());
+    ErrorCollector::GetInstance().rep("Replace " + it->first + " to " + to_string(it->second), LineNumber());
 
     uint16_t rv = it->second;
     if (hi)
@@ -416,12 +416,12 @@ class MemoryCodeGen: public CodeGen {
       return 0;
 
     if (tail[0] != '+' && tail[0] != '-') {
-      ErrorCollector::GetInstance().err("You can add or substract offset from pointer register. No other operations.", line_number());
+      ErrorCollector::GetInstance().err("You can add or substract offset from pointer register. No other operations.", LineNumber());
       return 0;
     }
 
     if (tail.size() < 2) {
-      ErrorCollector::GetInstance().err("You lost offset value.", line_number());
+      ErrorCollector::GetInstance().err("You lost offset value.", LineNumber());
       return 0;
     }
 
@@ -430,9 +430,9 @@ class MemoryCodeGen: public CodeGen {
     if (tail[0] == '-')
       off = -off;
     if (off > 7)
-      ErrorCollector::GetInstance().err("Offset has to be <= 7.", line_number());
+      ErrorCollector::GetInstance().err("Offset has to be <= 7.", LineNumber());
     else if (off < -8)
-      ErrorCollector::GetInstance().err("Offset has to be >= -8.", line_number());
+      ErrorCollector::GetInstance().err("Offset has to be >= -8.", LineNumber());
     else
       res = off & 0x0F;  // we need only 4 bits
     return res;
@@ -580,7 +580,7 @@ class BranchCodeGen: public CodeGen {
           if (label_addr % 256) {
             ErrorCollector::GetInstance().err(
                 "Label address in far call must be a multiple of 256. Now addr: "
-                + to_string(label_addr), line_number());
+                + to_string(label_addr), LineNumber());
           }
           target_addr_ = label_addr >> 8;  // absolute address divided by 256
         } else {
@@ -589,7 +589,7 @@ class BranchCodeGen: public CodeGen {
           if (offset > 127 || offset < -128)
             ErrorCollector::GetInstance().err(
                 "Error: Label " + label_ + " is too far from this instruction: "
-                + to_string(offset), line_number());
+                + to_string(offset), LineNumber());
           else
             target_addr_ = offset & 0xFF;
         }
@@ -699,57 +699,57 @@ string CodeLine::FormattedCOP() {
 
 StringConst& StringConst::operator=(const StringConst& rval) {
   this->str_ = rval.str_;
-  this->line_ = rval.line_;
-  this->addr_ = rval.addr_;
+  this->line_number_ = rval.line_number_;
+  this->address_ = rval.address_;
   return *this;
 }
 
-uint16_t StringConst::get_size() const {
+uint16_t StringConst::GetSize() const {
   if (str_.size() >= numeric_limits<uint16_t>::max()) {
-    ErrorCollector::GetInstance().err("String const is too long.", line_);
+    ErrorCollector::GetInstance().err("String const is too long.", line_number_);
     return 0;
   }
 
   return static_cast<uint16_t>(str_.size()) + 1;
 }
 
-void StringConst::set_addr(uint16_t addr) {
-  if (addr > 0xFFFF) {
-    cout << "Address is too much: " << addr;
+void StringConst::SetAddress(uint16_t address) {
+  if (address > 0xFFFF) {
+    cout << "Address is too much: " << address;
     return;
   }
 
-  addr_ = addr;
+  address_ = address;
 }
 
-void StringConst::out_code() const {
-  uint16_t addr = addr_;
+void StringConst::OutCode() const {
+  uint16_t address = address_;
   for (size_t i = 0; i < str_.size(); i++)
     cout << "     " << hex
-       << setw(4) << setfill('0') << right << addr++ << ": "
+       << setw(4) << setfill('0') << right << address++ << ": "
        << setw(4) << setfill('0') << right << uint16_t(str_[i]) << " "
        << str_[i] << endl;
 
   cout << "     " << hex
-       << setw(4) << setfill('0') << right << addr++ << ": "
+       << setw(4) << setfill('0') << right << address++ << ": "
        << setw(4) << setfill('0') << right << uint16_t(0) << " "
        << "Zero" << endl;
 }
 
-void StringConst::out_code(vector<uint16_t>& code) const {
+void StringConst::OutCode(vector<uint16_t>& code) const {
   if (!str_.size())
     return;
 
-  // string with str_.size() == 1 will store char at addr_
-  // and trailing zero at address addr_ + 1, so:
-  uint16_t max_str_addr = addr_ + static_cast<uint16_t>(str_.size());
+  // string with str_.size() == 1 will store char at address_
+  // and trailing zero at address address_ + 1, so:
+  uint16_t max_str_address = address_ + static_cast<uint16_t>(str_.size());
 
-  if (max_str_addr + 1 > code.size())
-    code.resize(max_str_addr + 1, 0xFFFFU);
+  if (max_str_address + 1 > code.size())
+    code.resize(max_str_address + 1, 0xFFFFU);
 
   for (size_t i = 0; i < str_.size(); i++)
-    code[addr_ + i] = str_[i];
-  code[max_str_addr] = 0;
+    code[address_ + i] = str_[i];
+  code[max_str_address] = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -866,7 +866,7 @@ void Assembler::pass2() {
   // for each line of code
   for (it = code_.begin(); it != code_.end(); it++, addr++) {
     if (oit != line_to_org_.end() &&
-        it->line_number() > oit->first) {  // if line placed after .org
+        it->LineNumber() > oit->first) {  // if line placed after .org
       if (oit->second > addr) {
         addr = oit->second;                // change line address to .org value
         cout << "move address to: " << addr << endl;
@@ -874,7 +874,7 @@ void Assembler::pass2() {
       oit++;  // this .org was used, we need new .org
     }
 
-    it->set_address(addr);  // change address of every line
+    it->SetAddress(addr);  // change address of every line
     // and every label of this line
     vector<string> labels = it->GetLabels();
     vector<string>::iterator lit;
@@ -889,14 +889,14 @@ void Assembler::pass2() {
   addr = max_addr + 1;
   for (auto& s : string_consts_) {
     if (oit != line_to_org_.end() &&
-        s.second.line() > oit->first) {  // if string is placed after .org
+        s.second.LineNumber() > oit->first) {  // if string is placed after .org
       addr = oit->second;                // we have to change its addresses
       oit++;  // probably we have more .orgs!
     }
-    s.second.set_addr(addr);
+    s.second.SetAddress(addr);
     name_to_address_[s.first] = addr;
     cout << "add to name_to_address_: " << s.first << " = " << to_string(addr) << endl;
-    addr += s.second.get_size();
+    addr += s.second.GetSize();
   }
 }
 
@@ -911,30 +911,30 @@ uint16_t Assembler::get_max_address() {
   uint16_t max_addr {0};
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
-    if (max_addr < it->address())
-      max_addr = it->address();
+    if (max_addr < it->Address())
+      max_addr = it->Address();
   return max_addr;
 }
 
 void Assembler::out_code() {
   cout << "STRINGS ADDR:" << endl;
   for (const auto& s : string_consts_)
-    cout << s.first << ": " << s.second.addr() << endl;
+    cout << s.first << ": " << s.second.Address() << endl;
 
   cout << "LINE ADDR: COP   ASM                       LABELS          FORMATTED_COP" << endl;
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++) {
     cout << dec
-         << setw(4) << setfill(' ') << right << it->line_number() << " "
+         << setw(4) << setfill(' ') << right << it->LineNumber() << " "
          << hex
-         << setw(4) << setfill('0') << right << it->address() << ": "
+         << setw(4) << setfill('0') << right << it->Address() << ": "
          << setw(4) << setfill('0') << right << it->GenerateMachineCode() << "  "
-         << setw(24) << setfill(' ') << left << it->get_line_text() << "  "
+         << setw(24) << setfill(' ') << left << it->GetLineText() << "  "
          << setw(16) << setfill(' ') << left << it->GetLabelsAsString()
          << setw(16) << setfill(' ') << left << it->FormattedCOP()
          << endl;
 
-    string el = ErrorCollector::GetInstance().get(it->line_number());
+    string el = ErrorCollector::GetInstance().get(it->LineNumber());
     if (el.size())  // for (auto& e : el)
       cout << "         > " << el << endl;
   }
@@ -944,8 +944,8 @@ void Assembler::out_code() {
     cout << " empty" << endl;
   for (auto& s : string_consts_) {
     cout << s.first << endl;
-    s.second.addr();
-    s.second.out_code();
+    s.second.Address();
+    s.second.OutCode();
   }
 }
 
@@ -963,11 +963,11 @@ void Assembler::out_code(vector<uint16_t>& code) {
 
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
-    code[it->address()] = it->GenerateMachineCode();
+    code[it->Address()] = it->GenerateMachineCode();
 
   // StringConst::out_code will resize 'code' if required
   for (auto& s : string_consts_)
-    s.second.out_code(code);
+    s.second.OutCode(code);
 
   if (name_to_address_.empty())
     return;

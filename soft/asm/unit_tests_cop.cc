@@ -237,7 +237,7 @@ TEST_CASE("check branches COPs") {
 
   // 1111 0001 11111111
   CodeLine cl4(1, "JMP LBL");
-  cl4.set_address(0x0010u);
+  cl4.SetAddress(0x0010u);
   // Try to set LBL offset (from current address)
   cl4.UpdateMachineCode( map<string, uint16_t> { { "LBL", 0x000Fu } } );
   CHECK(cl4.GenerateMachineCode() == 0xF1FF);  // jmp to previous instruction
@@ -312,14 +312,14 @@ TEST_CASE("check jump distance") {
 
   // 1111 0001 11111111
   CodeLine cl2(1, "JMP L1");
-  cl2.set_address(0x000Au);
+  cl2.SetAddress(0x000Au);
   // Try to set L1 label offset (from current address)
   cl2.UpdateMachineCode( map<string, uint16_t> { { "L1", 0x0009u } } );  // jmp to previous cmd
   CHECK(cl2.GenerateMachineCode() == 0xF1FF);
 
   // 1111 0001 11111110
   CodeLine cl3(1, "JMP L1");
-  cl3.set_address(0x000Au);
+  cl3.SetAddress(0x000Au);
   // Try to set L1 label offset (from current address)
   cl3.UpdateMachineCode( map<string, uint16_t> { { "L1", 0x0008u } } );  // jmp two cmd back
   CHECK(cl3.GenerateMachineCode() == 0xF1FE);

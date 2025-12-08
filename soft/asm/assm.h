@@ -109,14 +109,14 @@ class CodeGen {
     }
     return res;
   }
-  uint16_t address() {
+  uint16_t Address() {
     return address_;
   }
-  void set_address(uint16_t addr) {
+  void SetAddress(uint16_t addr) {
     address_ = addr;
   }
 
-  int line_number() {
+  int LineNumber() {
     return line_number_;
   }
 
@@ -139,7 +139,7 @@ class CodeLine {
   }
 
   std::string GetLabelsAsString() {
-    if (!has_labels())
+    if (!HasLabels())
       return {};
 
     std::string res;
@@ -150,24 +150,24 @@ class CodeLine {
     return res;
   }
 
-  bool has_labels() {
+  bool HasLabels() {
     return labels_.size() > 0;
   }
 
-  std::string get_line_text() {
+  std::string GetLineText() {
     return line_text_;
   }
 
-  uint16_t address() {
-    return code_gen_ ? code_gen_->address() : 0;
+  uint16_t Address() {
+    return code_gen_ ? code_gen_->Address() : 0;
   }
 
-  void set_address(uint16_t addr) {
+  void SetAddress(uint16_t addr) {
     if (code_gen_)
-      code_gen_->set_address(addr);
+      code_gen_->SetAddress(addr);
   }
 
-  int line_number() {
+  int LineNumber() {
     return line_number_;
   }
 
@@ -183,21 +183,21 @@ class CodeLine {
 class StringConst {
  public:
   StringConst() = default;
-  StringConst(const std::string& str, int line): str_(str), line_(line) {}
+  StringConst(const std::string& str, int line_number): str_(str), line_number_(line_number) {}
   StringConst& operator=(const StringConst& rval);
 
-  uint16_t get_size() const;
-  int line() const { return line_; }
-  uint16_t addr() const { return addr_; }
-  void set_addr(uint16_t);
-  void out_code() const;
-  void out_code(std::vector<uint16_t>& code) const;
-  std::string str() const { return str_; }
+  uint16_t GetSize() const;
+  int LineNumber() const { return line_number_; }
+  uint16_t Address() const { return address_; }
+  void SetAddress(uint16_t);
+  void OutCode() const;
+  void OutCode(std::vector<uint16_t>& code) const;
+  std::string Str() const { return str_; }
 
  private:
   std::string str_ {};
-  int line_ {0};
-  uint16_t addr_ {0};
+  int line_number_ {0};
+  uint16_t address_ {0};
 };
 
 class Assembler {
