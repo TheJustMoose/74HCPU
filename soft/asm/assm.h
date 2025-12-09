@@ -138,18 +138,6 @@ class CodeLine {
     return labels_;
   }
 
-  std::string GetLabelsAsString() {
-    if (!HasLabels())
-      return {};
-
-    std::string res;
-    for (auto& l : labels_) {
-      res += l;
-      res += " ";
-    }
-    return res;
-  }
-
   bool HasLabels() {
     return labels_.size() > 0;
   }

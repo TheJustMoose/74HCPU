@@ -930,7 +930,7 @@ void Assembler::out_code() {
          << setw(4) << setfill('0') << right << it->Address() << ": "
          << setw(4) << setfill('0') << right << it->GenerateMachineCode() << "  "
          << setw(24) << setfill(' ') << left << it->GetLineText() << "  "
-         << setw(16) << setfill(' ') << left << it->GetLabelsAsString()
+         << setw(16) << setfill(' ') << left << Join(it->GetLabels(), ' ')
          << setw(16) << setfill(' ') << left << it->FormattedCOP()
          << endl;
 
