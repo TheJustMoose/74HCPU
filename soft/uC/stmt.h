@@ -26,7 +26,7 @@ class Stmt: public Node {
 
   static Stmt* Enclosing;    // used for break stmts
 
- private:
+ protected:
   int after_ {0};           // saves label after
 };
 
@@ -100,6 +100,15 @@ class While: public Stmt {
     stmt_ = s;
     if (expr_->type() != Type::Bool())
       expr_->error("boolean required in while");
+  }
+
+  void gen(int b, int a) {
+    after_ = a;               // save label a
+    expr_->jumping(0, a);
+    int label = newlabel();   // label for stmt
+    emitlabel(label);
+    stmt_->gen(label, b);
+    emit("goto L" + std::to_string(b));
   }
 
  public:
