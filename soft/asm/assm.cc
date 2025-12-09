@@ -754,7 +754,7 @@ void StringConst::OutCode(vector<uint16_t>& code) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int Assembler::process(string fname, bool show_preprocess_out) {
+int Assembler::Process(string fname, bool show_preprocess_out) {
   FileReader fr;
   int res = fr.read_file(fname, &lines_);
   if (res != 0)
@@ -764,23 +764,23 @@ int Assembler::process(string fname, bool show_preprocess_out) {
   pre.Preprocess(&lines_);
 
   if (show_preprocess_out)
-    print_preprocessed();
+    PrintPreprocessed();
 
-  merge_code_with_labels();
-  extract_orgs();
-  extract_string();
-  pass1();
-  pass2();
-  pass3();
-  out_code();
+  MergeCodeWithLabels();
+  ExtractOrgs();
+  ExtractString();
+  Pass1();
+  Pass2();
+  Pass3();
+  OutCode();
 
-  out_labels();
-  out_orgs();
+  OutLabels();
+  OutOrgs();
 
   return ErrorCollector::GetInstance().have_errors();
 }
 
-void Assembler::print_preprocessed() {
+void Assembler::PrintPreprocessed() {
   cout << "-------- preprocessed source: --------" << endl;
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end(); it++)
@@ -788,7 +788,7 @@ void Assembler::print_preprocessed() {
   cout << "-------- end of preprocessed source --------" << endl;
 }
 
-void Assembler::merge_code_with_labels() {
+void Assembler::MergeCodeWithLabels() {
   map<int, string>::iterator it, prev;
   for (it = lines_.begin(); it != lines_.end();) {
     prev = it;
@@ -801,7 +801,7 @@ void Assembler::merge_code_with_labels() {
   }
 }
 
-void Assembler::extract_orgs() {
+void Assembler::ExtractOrgs() {
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end();) {
     int line = it->first;
@@ -824,7 +824,7 @@ void Assembler::extract_orgs() {
   }
 }
 
-void Assembler::extract_string() {
+void Assembler::ExtractString() {
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end();) {
     string str = NormalizeLine(it->second);
@@ -848,7 +848,7 @@ void Assembler::extract_string() {
 }
 
 // generate machine code
-void Assembler::pass1() {
+void Assembler::Pass1() {
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end(); it++) {
     string nl = NormalizeLine(it->second);
@@ -859,7 +859,7 @@ void Assembler::pass1() {
 }
 
 // get real address of labels & string
-void Assembler::pass2() {
+void Assembler::Pass2() {
   uint16_t addr = 0;
   vector<CodeLine>::iterator it;
   map<int, uint16_t>::iterator oit = line_to_org_.begin();
@@ -882,7 +882,7 @@ void Assembler::pass2() {
       name_to_address_[*lit] = addr;
   }
 
-  uint16_t max_addr = get_max_address();
+  uint16_t max_addr = GetMaxAddress();
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
 
   // now place strings after binary code
@@ -901,13 +901,13 @@ void Assembler::pass2() {
 }
 
 // set real jump addresses
-void Assembler::pass3() {
+void Assembler::Pass3() {
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
     it->UpdateMachineCode(name_to_address_);
 }
 
-uint16_t Assembler::get_max_address() {
+uint16_t Assembler::GetMaxAddress() {
   uint16_t max_addr {0};
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
@@ -916,7 +916,7 @@ uint16_t Assembler::get_max_address() {
   return max_addr;
 }
 
-void Assembler::out_code() {
+void Assembler::OutCode() {
   cout << "STRINGS ADDR:" << endl;
   for (const auto& s : string_consts_)
     cout << s.first << ": " << s.second.Address() << endl;
@@ -949,10 +949,10 @@ void Assembler::out_code() {
   }
 }
 
-void Assembler::out_code(vector<uint16_t>& code) {
+void Assembler::OutCode(vector<uint16_t>& code) {
   code.clear();
 
-  uint16_t max_addr = get_max_address();
+  uint16_t max_addr = GetMaxAddress();
   if (!max_addr) {
     cout << "No code to output" << endl;
     return;
@@ -990,9 +990,9 @@ void Assembler::out_code(vector<uint16_t>& code) {
   }
 }
 
-void Assembler::write_binary(string fname) {
+void Assembler::WriteBinary(string fname) {
   vector<uint16_t> code;
-  out_code(code);
+  OutCode(code);
   if (!code.size())
     return;
 
@@ -1008,7 +1008,7 @@ void Assembler::write_binary(string fname) {
   f.close();
 }
 
-void Assembler::out_labels() {
+void Assembler::OutLabels() {
   cout << "LABELS:" << endl;
   if (name_to_address_.empty())
     cout << " empty" << endl;
@@ -1017,7 +1017,7 @@ void Assembler::out_labels() {
     cout << v.first << " " << v.second << endl;
 }
 
-void Assembler::out_orgs() {
+void Assembler::OutOrgs() {
   cout << "ORGS:" << endl;
   if (line_to_org_.empty())
     cout << " empty" << endl;

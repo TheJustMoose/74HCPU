@@ -64,9 +64,9 @@ int main(int argc, char* argv[]) {
     // okay, probably cmd is file name ;)
     try {
       Assembler assm;
-      bool res = assm.process(cmd, show_pre);
+      bool res = assm.Process(cmd, show_pre);
       if (argc > 2 && argv[2] && !show_pre && !res)
-        assm.write_binary(argv[2]);
+        assm.WriteBinary(argv[2]);
       return res;
     } catch (const char* e) {
       cout << "Error: " << e << endl;

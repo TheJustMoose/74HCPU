@@ -190,23 +190,23 @@ class StringConst {
 
 class Assembler {
  public:
-  int process(std::string fname, bool show_preprocess_out = false);
-  void write_binary(std::string fname);
+  int Process(std::string fname, bool show_preprocess_out = false);
+  void WriteBinary(std::string fname);
 
  protected:
-  void print_preprocessed();
-  void merge_code_with_labels();
-  void extract_orgs();
-  void extract_string();
-  void extract_defs();
-  void pass1();
-  void pass2();
-  void pass3();
-  uint16_t get_max_address();
-  void out_code();
-  void out_code(std::vector<uint16_t>& code);
-  void out_labels();
-  void out_orgs();
+  void PrintPreprocessed();
+  void MergeCodeWithLabels();
+  void ExtractOrgs();
+  void ExtractString();
+  void ExtractDefs();
+  void Pass1();
+  void Pass2();
+  void Pass3();
+  uint16_t GetMaxAddress();
+  void OutCode();
+  void OutCode(std::vector<uint16_t>& code);
+  void OutLabels();
+  void OutOrgs();
 
  private:
   std::map<int, std::string> lines_ {};
