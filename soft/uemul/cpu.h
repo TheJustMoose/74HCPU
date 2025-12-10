@@ -43,8 +43,8 @@ class CPU {
   uint8_t regs_bank0[8] {};
   uint8_t regs_bank1[8] {};
 
-  bool Stop {false};
-  std::stack<uint16_t> Stack;
+  bool stop {false};
+  std::stack<uint16_t> call_stack;
   std::vector<uint16_t> rom;
   // Debug info from source asm file
   std::map<std::string, uint16_t> NameToAddress {};

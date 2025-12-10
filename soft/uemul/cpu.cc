@@ -101,12 +101,12 @@ void CPU::PrintPorts() {
 
 void CPU::PrintStack() {
   cout << "Stack: ";
-  if (Stack.empty()) {
+  if (call_stack.empty()) {
     cout << "empty" << endl << endl;
     return;
   }
 
-  stack<uint16_t> cpy = Stack;
+  stack<uint16_t> cpy = call_stack;
   while (!cpy.empty()) {
     cout << hex << setw(4) << cpy.top() << " ";
     cpy.pop();
@@ -262,10 +262,10 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     else
       cout << " " << BranchAddr(cmd, ip) << ", offs: " << offset << endl;
     switch (op) {
-      case 0xF0: Stack.push(ip + 1); ip += offset; break;                 // CALL
+      case 0xF0: call_stack.push(ip + 1); ip += offset; break;                 // CALL
       case 0xF1: ip += offset; break;                                     // JMP
-      case 0xF2: ip = Stack.top(); Stack.pop(); break;                    // RET
-      case 0xF3: ip = Stack.top(); Stack.pop(); break;                    // RETI
+      case 0xF2: ip = call_stack.top(); call_stack.pop(); break;                    // RET
+      case 0xF3: ip = call_stack.top(); call_stack.pop(); break;                    // RETI
       case 0xF4: if (flags[flags::LF]) ip += offset; else ip++; break;    // JL
       case 0xF5: if (flags[flags::EF]) ip += offset; else ip++; break;    // JE
       case 0xF6: if (!flags[flags::EF]) ip += offset; else ip++; break;   // JNE
@@ -276,8 +276,8 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
       case 0xFB: if (!flags[flags::CF]) ip += offset; else ip++; break;   // JNC
       case 0xFC: if (flags[flags::HCF]) ip += offset; else ip++; break;   // JHC
       case 0xFD: if (!flags[flags::HCF]) ip += offset; else ip++; break;  // JHNC
-      case 0xFE: Stack.push(ip + 1); ip = offset << 8; break;             // AFCALL
-      case 0xFF: ip++; if ((offset & 0x01) == 0) Stop = true; break;      // NOP/STOP
+      case 0xFE: call_stack.push(ip + 1); ip = offset << 8; break;             // AFCALL
+      case 0xFF: ip++; if ((offset & 0x01) == 0) stop = true; break;      // NOP/STOP
     }
     cout << "new ip: " << hex << setw(4) << ip << endl;
     PrintStack();
@@ -292,7 +292,7 @@ void CPU::Run(bool dbg) {
     ReadDebugInfo(start);
 
   PrintRegs();
-  for (uint16_t ip = 0; ip < rom.size() && !Stop;) {
+  for (uint16_t ip = 0; ip < rom.size() && !stop;) {
     Step(rom[ip], ip);
     if (dbg)
       getchar();
