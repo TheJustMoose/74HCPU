@@ -324,9 +324,9 @@ TEST_CASE("test Read Debug Info") {
   std::vector<uint16_t> rom {0, 0, 0, 0, 'D', 'B', 'G', 'I', 0x1234, 'L', 'a', 'b', 'e', 'l', 0};
   cpu.rom = rom;
   cpu.ReadDebugInfo(8);  // yes, I know index of data
-  CHECK( cpu.NameToAddress.size() );
-  CHECK( cpu.NameToAddress.find("Label") != cpu.NameToAddress.end() );
-  CHECK( cpu.NameToAddress["Label"] == 0x1234 );
+  CHECK( cpu.name_to_address.size() );
+  CHECK( cpu.name_to_address.find("Label") != cpu.name_to_address.end() );
+  CHECK( cpu.name_to_address["Label"] == 0x1234 );
 }
 
 //|   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|

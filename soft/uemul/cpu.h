@@ -47,5 +47,5 @@ class CPU {
   std::stack<uint16_t> call_stack;
   std::vector<uint16_t> rom;
   // Debug info from source asm file
-  std::map<std::string, uint16_t> NameToAddress {};
+  std::map<std::string, uint16_t> name_to_address {};
 };
