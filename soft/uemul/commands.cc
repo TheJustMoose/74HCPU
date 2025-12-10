@@ -41,38 +41,38 @@ string ArithmCmd::Params() {
 
 uint8_t AddCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d + s;
-  cpu_->Flags[flags::CF] = (d + s) > 255;
-  cpu_->Flags[flags::ZF] = res == 0;
+  cpu_->flags[flags::CF] = (d + s) > 255;
+  cpu_->flags[flags::ZF] = res == 0;
   return res;
 }
 
 uint8_t AddcCmd::Calculate(uint8_t d, uint8_t s) {
-  bool cf = cpu_->Flags[flags::CF];
+  bool cf = cpu_->flags[flags::CF];
   cf |= ForceCF();
   uint8_t res = d + s + cf;
-  cpu_->Flags[flags::CF] = (d + s + cf) > 255;
-  cpu_->Flags[flags::ZF] = res == 0;
+  cpu_->flags[flags::CF] = (d + s + cf) > 255;
+  cpu_->flags[flags::ZF] = res == 0;
   return res;
 }
 
 uint8_t AndCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d & s;
-  cpu_->Flags[flags::CF] = false;
-  cpu_->Flags[flags::ZF] = res == 0;
+  cpu_->flags[flags::CF] = false;
+  cpu_->flags[flags::ZF] = res == 0;
   return res;
 }
 
 uint8_t OrCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d | s;
-  cpu_->Flags[flags::CF] = false;
-  cpu_->Flags[flags::ZF] = res == 0;
+  cpu_->flags[flags::CF] = false;
+  cpu_->flags[flags::ZF] = res == 0;
   return res;
 }
 
 uint8_t XorCmd::Calculate(uint8_t d, uint8_t s) {
   uint8_t res = d ^ s;
-  cpu_->Flags[flags::CF] = false;
-  cpu_->Flags[flags::ZF] = res == 0;
+  cpu_->flags[flags::CF] = false;
+  cpu_->flags[flags::ZF] = res == 0;
   return res;
 }
 
@@ -81,8 +81,8 @@ void MulCmd::Execute() {
   uint8_t s = SrcVal();
 
   uint16_t res = d * s;
-  cpu_->Flags[flags::CF] = false;
-  cpu_->Flags[flags::ZF] = res == 0;
+  cpu_->flags[flags::CF] = false;
+  cpu_->flags[flags::ZF] = res == 0;
 
   cpu_->ActiveRegsBank()[DstLowReg()] = res & 0xFF;
   cpu_->ActiveRegsBank()[DstHighReg()] = (res >> 8) & 0xFF;
@@ -114,15 +114,15 @@ void SwapCmd::Execute() {
 
 void LsrCmd::Execute() {
   uint8_t val = DstVal();
-  cpu_->Flags[flags::CF] = val & 0x01;
+  cpu_->flags[flags::CF] = val & 0x01;
   val >>= 1;
   cpu_->ActiveRegsBank()[Dst()] = val;
 }
 
 void LsrcCmd::Execute() {
   uint8_t val = DstVal();
-  bool cf = cpu_->Flags[flags::CF];
-  cpu_->Flags[flags::CF] = val & 0x01;
+  bool cf = cpu_->flags[flags::CF];
+  cpu_->flags[flags::CF] = val & 0x01;
   val >>= 1;
   val |= (cf ? 0x80 : 0x00);
   cpu_->ActiveRegsBank()[Dst()] = val;
@@ -147,7 +147,7 @@ string LoadFromMemoryCmd::Params() {
 
 void LoadFromMemoryCmd::Execute() {
   uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
-  uint8_t val = cpu_->RAM[ptr];
+  uint8_t val = cpu_->ram[ptr];
   cpu_->ActiveRegsBank()[Reg()] = val;
   if (AutoInc())
     cpu_->IncPair(Ptr());
@@ -162,7 +162,7 @@ string StoreToMemoryCmd::Params() {
 void StoreToMemoryCmd::Execute() {
   uint8_t val = cpu_->ActiveRegsBank()[Reg()];
   uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
-  cpu_->RAM[ptr] = val;
+  cpu_->ram[ptr] = val;
   if (AutoInc())
     cpu_->IncPair(Ptr());
   if (AutoDec())
@@ -171,7 +171,7 @@ void StoreToMemoryCmd::Execute() {
 
 void LpmCmd::Execute() {
   uint16_t ptr = cpu_->GetPair(Ptr());
-  uint16_t val = ptr < cpu_->ROM.size() ? cpu_->ROM[ptr] : 0xFFFF;
+  uint16_t val = ptr < cpu_->rom.size() ? cpu_->rom[ptr] : 0xFFFF;
   if (W()) {
     cpu_->ActiveRegsBank()[DstLowReg()] = static_cast<uint8_t>(val & 0xFF);
     cpu_->ActiveRegsBank()[DstHighReg()] = static_cast<uint8_t>((val >> 8) & 0xFF);
@@ -189,7 +189,7 @@ string InputPortCmd::Params() {
 }
 
 void InputPortCmd::Execute() {
-  uint8_t rdst = cpu_->PINS[Port()];
+  uint8_t rdst = cpu_->pins[Port()];
   cpu_->ActiveRegsBank()[Reg()] = rdst;
 }
 
@@ -205,9 +205,9 @@ string OutputPortCmd::Params() {
 
 void OutputPortCmd::Execute() {
   if (IsConst())
-    cpu_->PORTS[Port()] = Const();
+    cpu_->ports[Port()] = Const();
   else
-    cpu_->PORTS[Port()] = cpu_->ActiveRegsBank()[Reg()];
+    cpu_->ports[Port()] = cpu_->ActiveRegsBank()[Reg()];
 }
 
 uint8_t CmpCmd::DstVal() {
@@ -230,9 +230,9 @@ Relation CmpCmd::Compare(uint8_t left, uint8_t right) {
 
 void CmpCmd::Execute() {
   auto [lf, ef, gf] = Compare(DstVal(), SrcVal());
-  cpu_->Flags[flags::LF] = lf;
-  cpu_->Flags[flags::EF] = ef;
-  cpu_->Flags[flags::GF] = gf;
+  cpu_->flags[flags::LF] = lf;
+  cpu_->flags[flags::EF] = ef;
+  cpu_->flags[flags::GF] = gf;
 }
 
 string CmpCmd::Params() {
@@ -243,12 +243,12 @@ string CmpCmd::Params() {
 
 void CmpcCmd::Execute() {
   // check previous command
-  if (!cpu_->Flags[flags::EF])  // ok, high byte is different
+  if (!cpu_->flags[flags::EF])  // ok, high byte is different
     return;  // nothing to do here
 
   // Let's compare this (low) byte
   auto [lf, ef, gf] = Compare(DstVal(), SrcVal());
-  cpu_->Flags[flags::LF] = lf;
-  cpu_->Flags[flags::EF] = ef;
-  cpu_->Flags[flags::GF] = gf;
+  cpu_->flags[flags::LF] = lf;
+  cpu_->flags[flags::EF] = ef;
+  cpu_->flags[flags::GF] = gf;
 }

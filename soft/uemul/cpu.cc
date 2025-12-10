@@ -28,9 +28,9 @@ uint16_t CPU::GetPair(uint8_t idx) {
     cout << "Error pointer register number: " << static_cast<int>(idx) << endl;
     return 0;
   }
-  uint16_t res = RegsBank1[idx*2 + 1];
+  uint16_t res = regs_bank1[idx*2 + 1];
   res <<= 8;
-  res += RegsBank1[idx*2];
+  res += regs_bank1[idx*2];
   return res;
 }
 
@@ -39,8 +39,8 @@ void CPU::SetPair(uint8_t idx, uint16_t val) {
     cout << "Error pointer register number: " << static_cast<int>(idx) << endl;
     return;
   }
-  RegsBank1[idx*2 + 1] = (val >> 8);
-  RegsBank1[idx*2] = val & 0xFF;
+  regs_bank1[idx*2 + 1] = (val >> 8);
+  regs_bank1[idx*2] = val & 0xFF;
 }
 
 uint16_t CPU::IncPair(uint8_t idx) {
@@ -58,7 +58,7 @@ uint16_t CPU::DecPair(uint8_t idx) {
 }
 
 uint8_t *CPU::ActiveRegsBank() { // current bank of registers
-  return IsBank1Active() ? RegsBank1 : RegsBank0;
+  return IsBank1Active() ? regs_bank1 : regs_bank0;
 }
 
 const char** CPU::ActiveRegsNames() {
@@ -66,19 +66,19 @@ const char** CPU::ActiveRegsNames() {
 }
 
 bool CPU::IsBank1Active() {
-  return Flags[flags::BF];
+  return flags[flags::BF];
 }
 
 void CPU::PrintFlags() {
   cout << "Flags: ";
   for (int i = 0; i < flags::CNT; i++)
-    cout << (Flags[i] ? FlagNames[i] : "--") << " ";
+    cout << (flags[i] ? FlagNames[i] : "--") << " ";
 }
 
 void CPU::PrintRegs() {
   cout << "Regs: ";
   for (int i = 0; i < 8; i++)
-    cout << hex << setw(2) << (uint16_t)RegsBank0[i] << " ";
+    cout << hex << setw(2) << (uint16_t)regs_bank0[i] << " ";
 
   cout << " Ptrs: " << setfill('0');
   cout << hex << setw(4) << GetPair(0) << " ";
@@ -94,7 +94,7 @@ void CPU::PrintRegs() {
 void CPU::PrintPorts() {
   cout << "Ports: ";
   for (int i = 0; i < 16; i++)
-    cout << hex << setw(2) << (uint16_t)PORTS[i] << " ";
+    cout << hex << setw(2) << (uint16_t)ports[i] << " ";
 
   cout << endl << endl;
 }
@@ -133,7 +133,7 @@ void CPU::PrintLabels(uint16_t ip) {
 void CPU::SyncFlags(uint8_t port) {
   const uint8_t CPU_FLAGS = 6;
   if (port == CPU_FLAGS)
-    Flags[flags::BF] = PORTS[CPU_FLAGS] & 0x40;
+    flags[flags::BF] = ports[CPU_FLAGS] & 0x40;
 }
 
 string BranchAddr(uint16_t cmd, uint16_t ip) {
@@ -266,16 +266,16 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
       case 0xF1: ip += offset; break;                                     // JMP
       case 0xF2: ip = Stack.top(); Stack.pop(); break;                    // RET
       case 0xF3: ip = Stack.top(); Stack.pop(); break;                    // RETI
-      case 0xF4: if (Flags[flags::LF]) ip += offset; else ip++; break;    // JL
-      case 0xF5: if (Flags[flags::EF]) ip += offset; else ip++; break;    // JE
-      case 0xF6: if (!Flags[flags::EF]) ip += offset; else ip++; break;   // JNE
-      case 0xF7: if (Flags[flags::ZF]) ip += offset; else ip++; break;    // JG
-      case 0xF8: if (Flags[flags::ZF]) ip += offset; else ip++; break;    // JZ
-      case 0xF9: if (!Flags[flags::ZF]) ip += offset; else ip++; break;   // JNZ
-      case 0xFA: if (Flags[flags::CF]) ip += offset; else ip++; break;    // JC
-      case 0xFB: if (!Flags[flags::CF]) ip += offset; else ip++; break;   // JNC
-      case 0xFC: if (Flags[flags::HCF]) ip += offset; else ip++; break;   // JHC
-      case 0xFD: if (!Flags[flags::HCF]) ip += offset; else ip++; break;  // JHNC
+      case 0xF4: if (flags[flags::LF]) ip += offset; else ip++; break;    // JL
+      case 0xF5: if (flags[flags::EF]) ip += offset; else ip++; break;    // JE
+      case 0xF6: if (!flags[flags::EF]) ip += offset; else ip++; break;   // JNE
+      case 0xF7: if (flags[flags::ZF]) ip += offset; else ip++; break;    // JG
+      case 0xF8: if (flags[flags::ZF]) ip += offset; else ip++; break;    // JZ
+      case 0xF9: if (!flags[flags::ZF]) ip += offset; else ip++; break;   // JNZ
+      case 0xFA: if (flags[flags::CF]) ip += offset; else ip++; break;    // JC
+      case 0xFB: if (!flags[flags::CF]) ip += offset; else ip++; break;   // JNC
+      case 0xFC: if (flags[flags::HCF]) ip += offset; else ip++; break;   // JHC
+      case 0xFD: if (!flags[flags::HCF]) ip += offset; else ip++; break;  // JHNC
       case 0xFE: Stack.push(ip + 1); ip = offset << 8; break;             // AFCALL
       case 0xFF: ip++; if ((offset & 0x01) == 0) Stop = true; break;      // NOP/STOP
     }
@@ -292,8 +292,8 @@ void CPU::Run(bool dbg) {
     ReadDebugInfo(start);
 
   PrintRegs();
-  for (uint16_t ip = 0; ip < ROM.size() && !Stop;) {
-    Step(ROM[ip], ip);
+  for (uint16_t ip = 0; ip < rom.size() && !Stop;) {
+    Step(rom[ip], ip);
     if (dbg)
       getchar();
   }
@@ -302,16 +302,16 @@ void CPU::Run(bool dbg) {
 bool CPU::FindDebugInfo(size_t& data_start) {
   // Debug Info should have at least 8 chars mark:
   // "\0\0\0\0DBGI"
-  if (ROM.size() < 8)
+  if (rom.size() < 8)
     return false;
 
-  cout << "ROM size: " << ROM.size() << endl;
+  cout << "ROM size: " << rom.size() << endl;
 
   bool found {false};
   data_start = 0;
-  for (size_t i = 0; i < ROM.size() - 8; i++) {
-    if (ROM[i] == 0 && ROM[i + 1] == 0 && ROM[i + 2] == 0 && ROM[i + 3] == 0 &&
-        ROM[i + 4] == 'D' && ROM[i + 5] == 'B' && ROM[i + 6] == 'G' && ROM[i + 7] == 'I') {
+  for (size_t i = 0; i < rom.size() - 8; i++) {
+    if (rom[i] == 0 && rom[i + 1] == 0 && rom[i + 2] == 0 && rom[i + 3] == 0 &&
+        rom[i + 4] == 'D' && rom[i + 5] == 'B' && rom[i + 6] == 'G' && rom[i + 7] == 'I') {
       data_start = i + 8;
       found = true;
       break;
@@ -325,18 +325,18 @@ bool CPU::FindDebugInfo(size_t& data_start) {
 void CPU::ReadDebugInfo(size_t data_start) {
   while (true) {
     uint16_t addr{0};
-    if (data_start < ROM.size())
-      addr = ROM[data_start++];
+    if (data_start < rom.size())
+      addr = rom[data_start++];
     else
       break;
 
     string lbl;
-    while (data_start < ROM.size()) {
-      if (!ROM[data_start]) {
+    while (data_start < rom.size()) {
+      if (!rom[data_start]) {
         data_start++;
         break;
       }
-      lbl += static_cast<char>(ROM[data_start]);
+      lbl += static_cast<char>(rom[data_start]);
       data_start++;
     }
     if (!lbl.size())

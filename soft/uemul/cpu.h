@@ -11,7 +11,7 @@
 class CPU {
  public:
   CPU() {}
-  CPU(std::vector<uint16_t> cmds): ROM(cmds) {}
+  CPU(std::vector<uint16_t> cmds): rom(cmds) {}
 
   void Step(uint16_t cmd, uint16_t &ip);
   void Run(bool dbg);
@@ -36,16 +36,16 @@ class CPU {
   bool FindDebugInfo(size_t& data_start);
   void ReadDebugInfo(size_t data_start);
 
-  uint8_t RAM[65536];
-  uint8_t PORTS[32];
-  uint8_t PINS[32];
-  bool Flags[flags::CNT] {};
-  uint8_t RegsBank0[8] {};
-  uint8_t RegsBank1[8] {};
+  uint8_t ram[65536];
+  uint8_t ports[32];
+  uint8_t pins[32];
+  bool flags[flags::CNT] {};
+  uint8_t regs_bank0[8] {};
+  uint8_t regs_bank1[8] {};
 
   bool Stop {false};
   std::stack<uint16_t> Stack;
-  std::vector<uint16_t> ROM;
+  std::vector<uint16_t> rom;
   // Debug info from source asm file
   std::map<std::string, uint16_t> NameToAddress {};
 };
