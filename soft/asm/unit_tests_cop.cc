@@ -192,11 +192,11 @@ TEST_CASE("check stack COPs") {
   // 1100 001 0 11 10 0000
   CodeLine cl1(1, "ST SPD, R1");
   CHECK(cl1.GenerateMachineCode() == 0xC2E0);
-  //.def pop(r)  LD r, SPI-1
+  //.def pop(r)  LD r, SPI+1
   // LD   DST - SR DU OFST
-  // 1001 001 0 11 01 1111
-  CodeLine cl2(2, "LD R1, SPI-1");
-  CHECK(cl2.GenerateMachineCode() == 0x92DF);
+  // 1001 001 0 11 01 0001
+  CodeLine cl2(2, "LD R1, SPI+1");
+  CHECK(cl2.GenerateMachineCode() == 0x92D1);
 }
 
 TEST_CASE("check I/O COPs") {

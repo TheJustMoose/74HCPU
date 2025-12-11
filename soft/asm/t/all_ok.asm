@@ -69,7 +69,7 @@ mov  YH, HI(Hello)
 end:
 jmp end
 
-;.org 1000h
+.org 150h
 
 .str Hello "Test string!"
 .str Menu  "Menu"
@@ -79,4 +79,4 @@ jmp end
 .def incc(reg) ADDC reg, 0
 .def test()  STOP
 .def push(r) ST SPD, r
-.def pop(r)  LD r, SPI-1
+.def pop(r)  LD r, SPI+1
