@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "cpu.h"
+#include "offset2int.h"
 
 using namespace std;
 
@@ -134,9 +135,10 @@ string MemoryCmd::Suffix() {
     suffix += "D";
   if (AutoInc())
     suffix += "I";
-  if (Offs()) {
+  int offs = OffsetToInt(Offs());
+  if (offs) {
     suffix += " + ";
-    suffix += to_string(Offs());  // offs may have value from -8 to +7 so I have to convert it to "int"
+    suffix += to_string(offs);  // offs may have value from -8 to +7 so I have to convert it to "int"
   }
   return suffix;
 }
@@ -146,7 +148,7 @@ string LoadFromMemoryCmd::Params() {
 }
 
 void LoadFromMemoryCmd::Execute() {
-  uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
+  uint16_t ptr = cpu_->GetPair(Ptr()) + OffsetToInt(Offs());
   uint8_t val = cpu_->ram[ptr];
   cpu_->ActiveRegsBank()[Reg()] = val;
   if (AutoInc())
@@ -161,7 +163,7 @@ string StoreToMemoryCmd::Params() {
 
 void StoreToMemoryCmd::Execute() {
   uint8_t val = cpu_->ActiveRegsBank()[Reg()];
-  uint16_t ptr = cpu_->GetPair(Ptr()) + Offs();
+  uint16_t ptr = cpu_->GetPair(Ptr()) + OffsetToInt(Offs());
   cpu_->ram[ptr] = val;
   if (AutoInc())
     cpu_->IncPair(Ptr());

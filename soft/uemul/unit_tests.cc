@@ -241,7 +241,26 @@ TEST_CASE("test Stack Cmds") {
   // 1100 001 0 11 10 0000
   StoreToMemoryCmd cmd1(0xC2E0, &cpu);  // ST SPD, R1
   cmd1.Execute();
-  CHECK( cpu.ram[0xFFFF] == 0x55 );  // *0xFFFF == 0x55
+  CHECK( cpu.ram[0xFFFF] == 0x55 );   // *0xFFFF == 0x55
+
+  cpu.regs_bank0[1] = 0x66;           // MOV R1, 0x66
+  cmd1.Execute();                     // SP := R1; SP--;
+  CHECK( cpu.ram[0xFFFE] == 0x66 );   // *0xFFFE == 0x66
+  CHECK( cpu.ram[0xFFFF] == 0x55 );   // *0xFFFF == 0x55
+
+  //.def pop(r)  LD r, SPI+1
+  // LD   DST - SR DU OFST
+  // 1001 001 0 11 01 0001
+  LoadFromMemoryCmd cmd2(0x92D1, &cpu);  // LD R1, SPI+1
+  cout << cmd2.Params() << endl;
+  cpu.regs_bank0[1] = 0;                 // MOV R1, 0
+  cmd2.Execute();                        // R1 := SP+1; SP++;
+  CHECK( cpu.regs_bank0[1] == 0x66 );
+  cmd2.Execute();                        // R1 := SP+1; SP++;
+  CHECK( cpu.regs_bank0[1] == 0x55 );
+
+  CHECK( cpu.regs_bank1[6] == 0xFF );    // MOV SPL, 0xFF
+  CHECK( cpu.regs_bank1[7] == 0xFF );    // MOV SPH, 0xFF
 }
 
 TEST_CASE("test Ports Cmds") {
