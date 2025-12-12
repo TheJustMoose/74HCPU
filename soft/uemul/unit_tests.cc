@@ -370,3 +370,33 @@ TEST_CASE("test Cmp command") {
   CHECK( !cpu.flags[flags::EF] );
   CHECK( cpu.flags[flags::GF] );
 }
+
+TEST_CASE("test BRANCH commands") {
+  //| F0 | BRNCH |  CALL  | 8 bit OFFSET  |
+  //  F0                     03
+  //| F2 | BRNCH |   RET  | 8 bit +STACK  |
+  //  F2                     FF
+  CPU cpu;
+  cpu.rom.push_back(0xF003);  // CALL +3 -|
+  cpu.rom.push_back(0xFFFF);  // NOP      |
+  cpu.rom.push_back(0xFFFF);  // NOP      |
+  cpu.rom.push_back(0xF2FF);  // RET    <-|
+
+  CHECK( cpu.call_stack.empty() );
+
+  uint16_t ip {0};
+  cpu.Step(cpu.rom[ip], ip);  // CALL
+  CHECK_EQ( ip, 0x03 );
+  CHECK_EQ( cpu.call_stack.size(), 1 );
+  CHECK_EQ( cpu.call_stack.top(), 0x01 );
+
+  cpu.Step(cpu.rom[ip], ip);  // RET
+  CHECK_EQ( ip, 0x01 );
+  CHECK( cpu.call_stack.empty() );
+
+  cpu.Step(cpu.rom[ip], ip);  // NOP
+  CHECK_EQ( ip, 0x02 );
+
+  cpu.Step(cpu.rom[ip], ip);  // NOP
+  CHECK_EQ( ip, 0x03 );
+}
