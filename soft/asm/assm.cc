@@ -89,6 +89,7 @@ map<string, PTR> ptr_names {
 };
 
 map<string, uint16_t> port_names {
+  //  output          input          function
   { "PORT0", 0 }, { "PINS0", 0 },
   { "OMASK0", 1 },
   { "PORT1", 2 }, { "PINS1", 2 }, { "LCD_CTRL", 2 },
