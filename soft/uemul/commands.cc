@@ -149,7 +149,7 @@ string LoadFromMemoryCmd::Params() {
 
 void LoadFromMemoryCmd::Execute() {
   uint16_t ptr = cpu_->GetPair(Ptr()) + OffsetToInt(Offs());
-  uint8_t val = cpu_->ram[ptr];
+  uint8_t val = cpu_->ReadRAM(ptr);
   cpu_->ActiveRegsBank()[Reg()] = val;
   if (AutoInc())
     cpu_->IncPair(Ptr());
@@ -164,7 +164,7 @@ string StoreToMemoryCmd::Params() {
 void StoreToMemoryCmd::Execute() {
   uint8_t val = cpu_->ActiveRegsBank()[Reg()];
   uint16_t ptr = cpu_->GetPair(Ptr()) + OffsetToInt(Offs());
-  cpu_->ram[ptr] = val;
+  cpu_->WriteRAM(ptr, val);
   if (AutoInc())
     cpu_->IncPair(Ptr());
   if (AutoDec())

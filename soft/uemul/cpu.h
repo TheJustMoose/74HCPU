@@ -36,6 +36,9 @@ class CPU {
   bool FindDebugInfo(size_t& data_start);
   void ReadDebugInfo(size_t data_start);
 
+  void WriteRAM(uint16_t addr, uint8_t data);
+  uint8_t ReadRAM(uint16_t addr);
+
   uint8_t ram[65536];
   uint8_t ports[32];
   uint8_t pins[32];

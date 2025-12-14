@@ -204,29 +204,29 @@ TEST_CASE("test Memory Cmds") {
   cpu.regs_bank0[0] = 10;             // MOV R0, 10
   cpu.regs_bank1[0] = 100;            // MOV XL, 100
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  cpu.ram[100] = 0;                  // *100 = 0
+  cpu.WriteRAM(100, 0);               // *100 = 0
   StoreToMemoryCmd mcmd(0xC000, &cpu);  // ST X, R0
   mcmd.Execute();
-  CHECK( cpu.ram[100] == 10 );       // *100 == 10
+  CHECK( cpu.ReadRAM(100) == 10 );       // *100 == 10
 
   // ST cmd with pointer autoincrement
   cpu.regs_bank0[0] = 20;             // MOV R0, 20
   cpu.regs_bank1[0] = 100;            // MOV XL, 100
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  cpu.ram[100] = 0;                  // *100 = 0
+  cpu.WriteRAM(100, 0);               // *100 = 0
   StoreToMemoryCmd mcmd2(0xC010, &cpu);  // ST XI, R0 (with autoinc)
   mcmd2.Execute();
-  CHECK( cpu.ram[100] == 20 );       // *100 == 20
+  CHECK( cpu.ReadRAM(100) == 20 );    // *100 == 20
   CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
 
   // ST cmd with pointer autoincrement and displacement
   cpu.regs_bank0[0] = 30;             // MOV R0, 30
   cpu.regs_bank1[0] = 100;            // MOV XL, 100
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  cpu.ram[105] = 0;                  // *105 = 0
+  cpu.WriteRAM(105, 0);               // *105 = 0
   StoreToMemoryCmd mcmd3(0xC015, &cpu);  // ST XI + 5, R0 (with autoinc)
   mcmd3.Execute();
-  CHECK( cpu.ram[105] == 30 );       // *105 == 30
+  CHECK( cpu.ReadRAM(105) == 30 );       // *105 == 30
   CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
 }
 
@@ -241,12 +241,12 @@ TEST_CASE("test Stack Cmds") {
   // 1100 001 0 11 10 0000
   StoreToMemoryCmd cmd1(0xC2E0, &cpu);  // ST SPD, R1
   cmd1.Execute();
-  CHECK( cpu.ram[0xFFFF] == 0x55 );   // *0xFFFF == 0x55
+  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );   // *0xFFFF == 0x55
 
   cpu.regs_bank0[1] = 0x66;           // MOV R1, 0x66
   cmd1.Execute();                     // SP := R1; SP--;
-  CHECK( cpu.ram[0xFFFE] == 0x66 );   // *0xFFFE == 0x66
-  CHECK( cpu.ram[0xFFFF] == 0x55 );   // *0xFFFF == 0x55
+  CHECK( cpu.ReadRAM(0xFFFE) == 0x66 );   // *0xFFFE == 0x66
+  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );   // *0xFFFF == 0x55
 
   //.def pop(r)  LD r, SPI+1
   // LD   DST - SR DU OFST

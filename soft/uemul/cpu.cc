@@ -346,3 +346,11 @@ void CPU::ReadDebugInfo(size_t data_start) {
     cout << hex << addr << " " << lbl << endl;
   }
 }
+
+void CPU::WriteRAM(uint16_t addr, uint8_t data) {
+  ram[addr] = data;
+}
+
+uint8_t CPU::ReadRAM(uint16_t addr) {
+  return ram[addr];
+}
