@@ -8,6 +8,9 @@
 
 #include "flags.h"
 
+constexpr int _32K = 32768;
+constexpr int _64K = 65536;
+
 class CPU {
  public:
   CPU() {}
@@ -39,9 +42,8 @@ class CPU {
   void WriteRAM(uint16_t addr, uint8_t data);
   uint8_t ReadRAM(uint16_t addr);
 
-  uint8_t ram[65536];
-  uint8_t ports[32];
-  uint8_t pins[32];
+  uint8_t ports[32] {};
+  uint8_t pins[32] {};
   bool flags[flags::CNT] {};
   uint8_t regs_bank0[8] {};
   uint8_t regs_bank1[8] {};
@@ -51,4 +53,8 @@ class CPU {
   std::vector<uint16_t> rom;
   // Debug info from source asm file
   std::map<std::string, uint16_t> name_to_address {};
+
+ private:
+  uint8_t ram[_32K*2] {};
+  uint8_t video_ram[_32K*8] {};  // 8 pages for TFT LCD
 };
