@@ -360,38 +360,33 @@ on address bus |   ^               |  (first 32K)         (second 32K)        (t
 */
 
 void CPU::WriteRAM(uint16_t addr, uint8_t data) {
-  cout << "WriteRAM " << hex << addr << " := " << static_cast<int>(data) << endl;
   if (addr < _32K) {
     ram[addr] = data;
     return;
   }
 
   uint8_t ramp = ports[5];  // RAM page is stored in PORT5
-  if (ramp == 0)
+  if (ramp == 0) {
     ram[addr] = data;
-  else if (ramp > 0 && ramp <= 8) {
+  } else if (ramp > 0 && ramp <= 8) {
     const int offset = (ramp - 1)*_32K;
     const int vram_addr = offset + addr - _32K;
     video_ram[vram_addr] = data;
-    cout << "vram_addr: " << hex << vram_addr << endl;
   } else {
     cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;
   }
 }
 
 uint8_t CPU::ReadRAM(uint16_t addr) {
-  cout << "ReadRAM " << hex << addr << endl;
   if (addr < _32K)
     return ram[addr];
 
   uint8_t ramp = ports[5];  // RAM page is stored in PORT5
   if (ramp == 0) {
-    cout << "RAMP == 0, will read ordinary RAM" << endl;
     return ram[addr];
   } else if (ramp > 0 && ramp <= 8) {
     const int offset = ramp*_32K;
     const int vram_addr = offset + addr - _32K;
-    cout << "vram_addr: " << hex << vram_addr << endl;
     return video_ram[vram_addr];
   } else {
     cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;

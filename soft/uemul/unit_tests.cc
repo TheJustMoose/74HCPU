@@ -247,7 +247,7 @@ TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
 
   cpu.WriteRAM(100, 12);                 // *100 = 12
   CHECK_EQ( cpu.GetRAM(100), 12 );       // first half of RAM
-  CHECK_EQ( cpu.ReadRAM(100), 21 );      // test ReadRAM
+  CHECK_EQ( cpu.ReadRAM(100), 12 );      // test ReadRAM
 
   cpu.ports[5] = 0;                      // ram page = 0
   cpu.WriteRAM(_32K + 100, 21);          // *(32768 + 100) = 21
@@ -257,6 +257,11 @@ TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
   cpu.ports[5] = 1;                      // ram page = 1 (video ram, zero page of it)
   cpu.WriteRAM(_32K + 100, 33);          // *(32768 + 100) = 33
   CHECK_EQ( cpu.GetVideoRAM(100), 33 );  // Video RAM was successfully changed
+  CHECK_EQ( cpu.GetRAM(_32K + 100), 21 );// second half of RAM was not changed
+
+  cpu.ports[5] = 8;                      // ram page = 8 (video ram, last page of it)
+  cpu.WriteRAM(_32K + 100, 88);          // *(32768 + 100) = 88
+  CHECK_EQ( cpu.GetVideoRAM(_32K*7 + 100), 88 );  // Video RAM was successfully changed
   CHECK_EQ( cpu.GetRAM(_32K + 100), 21 );// second half of RAM was not changed
 }
 
