@@ -201,56 +201,52 @@ TEST_CASE("test Ptrs Arithm") {
 TEST_CASE("test Memory Cmds") {
   CPU cpu;
   // ST cmd
+  cpu.WriteRAM(100, 0);               // *100 = 0 - any value
   cpu.regs_bank0[0] = 10;             // MOV R0, 10
   cpu.regs_bank1[0] = 100;            // MOV XL, 100
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  cpu.WriteRAM(100, 0);               // *100 = 0
   StoreToMemoryCmd mcmd(0xC000, &cpu);  // ST X, R0
   mcmd.Execute();
   CHECK( cpu.ReadRAM(100) == 10 );       // *100 == 10
 
   // ST cmd with pointer autoincrement
+  cpu.WriteRAM(100, 0);               // *100 = 0
   cpu.regs_bank0[0] = 20;             // MOV R0, 20
   cpu.regs_bank1[0] = 100;            // MOV XL, 100
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  cpu.WriteRAM(100, 0);               // *100 = 0
   StoreToMemoryCmd mcmd2(0xC010, &cpu);  // ST XI, R0 (with autoinc)
   mcmd2.Execute();
   CHECK( cpu.ReadRAM(100) == 20 );    // *100 == 20
   CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
 
   // ST cmd with pointer autoincrement and displacement
+  cpu.WriteRAM(105, 0);               // *105 = 0
   cpu.regs_bank0[0] = 30;             // MOV R0, 30
   cpu.regs_bank1[0] = 100;            // MOV XL, 100
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  cpu.WriteRAM(105, 0);               // *105 = 0
   StoreToMemoryCmd mcmd3(0xC015, &cpu);  // ST XI + 5, R0 (with autoinc)
   mcmd3.Execute();
   CHECK( cpu.ReadRAM(105) == 30 );       // *105 == 30
   CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
 }
 
-TEST_CASE("test Video RAM") {
-
-}
-
 TEST_CASE("test Stack Cmds") {
   CPU cpu;
-  cpu.regs_bank1[6] = 0xFF;           // MOV SPL, 0xFF
-  cpu.regs_bank1[7] = 0xFF;           // MOV SPH, 0xFF
+  cpu.regs_bank1[6] = 0xFF;              // MOV SPL, 0xFF
+  cpu.regs_bank1[7] = 0xFF;              // MOV SPH, 0xFF
 
-  cpu.regs_bank0[1] = 0x55;           // MOV R1, 0x55
+  cpu.regs_bank0[1] = 0x55;              // MOV R1, 0x55
   //.def push(r) ST SPD, r
   // ST   SRC - DS DU OFST
   // 1100 001 0 11 10 0000
-  StoreToMemoryCmd cmd1(0xC2E0, &cpu);  // ST SPD, R1
+  StoreToMemoryCmd cmd1(0xC2E0, &cpu);   // ST SPD, R1
   cmd1.Execute();
-  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );   // *0xFFFF == 0x55
+  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );  // *0xFFFF == 0x55
 
-  cpu.regs_bank0[1] = 0x66;           // MOV R1, 0x66
-  cmd1.Execute();                     // SP := R1; SP--;
-  CHECK( cpu.ReadRAM(0xFFFE) == 0x66 );   // *0xFFFE == 0x66
-  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );   // *0xFFFF == 0x55
+  cpu.regs_bank0[1] = 0x66;              // MOV R1, 0x66
+  cmd1.Execute();                        // SP := R1; SP--;
+  CHECK( cpu.ReadRAM(0xFFFE) == 0x66 );  // *0xFFFE == 0x66
+  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );  // *0xFFFF == 0x55
 
   //.def pop(r)  LD r, SPI+1
   // LD   DST - SR DU OFST
@@ -269,20 +265,20 @@ TEST_CASE("test Stack Cmds") {
 
 TEST_CASE("test Ports Cmds") {
   CPU cpu;
-  cpu.regs_bank0[0] = 0x55;           // MOV R0, 0x55
-  OutputPortCmd ocmd(0xB400, &cpu);  // OUT PORT1, R0
+  cpu.regs_bank0[0] = 0x55;              // MOV R0, 0x55
+  OutputPortCmd ocmd(0xB400, &cpu);      // OUT PORT1, R0
   CHECK( ocmd.PortLo() == 2 );
   CHECK( ocmd.PortHi() == 0 );
   CHECK( ocmd.Reg() == 0 );
   CHECK( ocmd.IsConst() == false );
 
   ocmd.Execute();
-  CHECK( cpu.ports[2] == 0x55 );     // *1 == 0x55
+  CHECK( cpu.ports[2] == 0x55 );         // *1 == 0x55
 
-  cpu.pins[2] = 0x66;                // PINS1 has binary number 2
-  InputPortCmd icmd(0xA220, &cpu);   // IN R1, PINS1
+  cpu.pins[2] = 0x66;                    // PINS1 has binary number 2
+  InputPortCmd icmd(0xA220, &cpu);       // IN R1, PINS1
   icmd.Execute();
-  CHECK( cpu.regs_bank0[1] == 0x66 ); // R1 == 0x66
+  CHECK( cpu.regs_bank0[1] == 0x66 );    // R1 == 0x66
 }
 
 TEST_CASE("test LPM Cmd") {
