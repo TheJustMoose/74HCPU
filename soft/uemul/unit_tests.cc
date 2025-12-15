@@ -230,6 +230,10 @@ TEST_CASE("test Memory Cmds") {
   CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
 }
 
+TEST_CASE("test Video RAM") {
+
+}
+
 TEST_CASE("test Stack Cmds") {
   CPU cpu;
   cpu.regs_bank1[6] = 0xFF;           // MOV SPL, 0xFF

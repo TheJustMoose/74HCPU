@@ -348,9 +348,34 @@ void CPU::ReadDebugInfo(size_t data_start) {
 }
 
 void CPU::WriteRAM(uint16_t addr, uint8_t data) {
-  ram[addr] = data;
+  if (addr < _32K) {
+    ram[addr] = data;
+    return;
+  }
+
+  uint8_t ramp = ports[5];  // RAM page is stored in PORT5
+  if (ramp == 0)
+    ram[addr] = data;
+  else if (ramp > 0 && ramp <= 8) {
+    const int offset = ramp*_32K;
+    video_ram[offset + addr] = data;
+  } else {
+    cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;
+  }
 }
 
 uint8_t CPU::ReadRAM(uint16_t addr) {
-  return ram[addr];
+  if (addr < _32K)
+    return ram[addr];
+
+  uint8_t ramp = ports[5];  // RAM page is stored in PORT5
+  if (ramp == 0)
+    return ram[addr];
+  else if (ramp > 0 && ramp <= 8) {
+    const int offset = ramp*_32K;
+    return video_ram[offset + addr];
+  } else {
+    cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;
+    return 0;
+  }
 }

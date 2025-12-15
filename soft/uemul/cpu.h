@@ -54,7 +54,7 @@ class CPU {
   // Debug info from source asm file
   std::map<std::string, uint16_t> name_to_address {};
 
- private:
+ protected:
   uint8_t ram[_32K*2] {};
   uint8_t video_ram[_32K*8] {};  // 8 pages for TFT LCD
 };
