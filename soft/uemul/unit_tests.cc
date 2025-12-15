@@ -230,10 +230,40 @@ TEST_CASE("test Memory Cmds") {
   CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
 }
 
+class TestCPU: public CPU {
+ public:
+  // getters to read ram without pages:
+  uint8_t GetRAM(uint16_t addr) {
+    return ram[addr];
+  }
+
+  uint8_t GetVideoRAM(uint32_t addr) {  // yes! we need 32 bit here!
+    return video_ram[addr];
+  }
+};
+
+TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
+  TestCPU cpu;
+
+  cpu.WriteRAM(100, 12);                 // *100 = 12
+  CHECK_EQ( cpu.GetRAM(100), 12 );       // first half of RAM
+  CHECK_EQ( cpu.ReadRAM(100), 21 );      // test ReadRAM
+
+  cpu.ports[5] = 0;                      // ram page = 0
+  cpu.WriteRAM(_32K + 100, 21);          // *(32768 + 100) = 21
+  CHECK_EQ( cpu.ReadRAM(_32K + 100), 21 );// second half of RAM
+  CHECK_EQ( cpu.GetRAM(_32K + 100), 21 );// second half of RAM
+
+  cpu.ports[5] = 1;                      // ram page = 1 (video ram, zero page of it)
+  cpu.WriteRAM(_32K + 100, 33);          // *(32768 + 100) = 33
+  CHECK_EQ( cpu.GetVideoRAM(100), 33 );  // Video RAM was successfully changed
+  CHECK_EQ( cpu.GetRAM(_32K + 100), 21 );// second half of RAM was not changed
+}
+
 TEST_CASE("test Stack Cmds") {
   CPU cpu;
   cpu.regs_bank1[6] = 0xFF;              // MOV SPL, 0xFF
-  cpu.regs_bank1[7] = 0xFF;              // MOV SPH, 0xFF
+  cpu.regs_bank1[7] = 0x7F;              // MOV SPH, 0x7F
 
   cpu.regs_bank0[1] = 0x55;              // MOV R1, 0x55
   //.def push(r) ST SPD, r
@@ -241,12 +271,12 @@ TEST_CASE("test Stack Cmds") {
   // 1100 001 0 11 10 0000
   StoreToMemoryCmd cmd1(0xC2E0, &cpu);   // ST SPD, R1
   cmd1.Execute();
-  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );  // *0xFFFF == 0x55
+  CHECK( cpu.ReadRAM(0x7FFF) == 0x55 );  // *0x7FFF == 0x55
 
   cpu.regs_bank0[1] = 0x66;              // MOV R1, 0x66
   cmd1.Execute();                        // SP := R1; SP--;
-  CHECK( cpu.ReadRAM(0xFFFE) == 0x66 );  // *0xFFFE == 0x66
-  CHECK( cpu.ReadRAM(0xFFFF) == 0x55 );  // *0xFFFF == 0x55
+  CHECK( cpu.ReadRAM(0x7FFE) == 0x66 );  // *0x7FFE == 0x66
+  CHECK( cpu.ReadRAM(0x7FFF) == 0x55 );  // *0x7FFF == 0x55
 
   //.def pop(r)  LD r, SPI+1
   // LD   DST - SR DU OFST
@@ -259,8 +289,8 @@ TEST_CASE("test Stack Cmds") {
   cmd2.Execute();                        // R1 := SP+1; SP++;
   CHECK( cpu.regs_bank0[1] == 0x55 );
 
-  CHECK( cpu.regs_bank1[6] == 0xFF );    // MOV SPL, 0xFF
-  CHECK( cpu.regs_bank1[7] == 0xFF );    // MOV SPH, 0xFF
+  CHECK( cpu.regs_bank1[6] == 0xFF );    // SPL == 0xFF
+  CHECK( cpu.regs_bank1[7] == 0x7F );    // SPH == 0xFF
 }
 
 TEST_CASE("test Ports Cmds") {
