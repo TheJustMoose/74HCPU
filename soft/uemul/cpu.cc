@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <cstdio>
 
@@ -372,6 +373,7 @@ void CPU::WriteRAM(uint16_t addr, uint8_t data) {
     const int offset = (ramp - 1)*_32K;
     const int vram_addr = offset + addr - _32K;
     video_ram[vram_addr] = data;
+    DumpVideoRAM();
   } else {
     cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;
   }
@@ -392,4 +394,19 @@ uint8_t CPU::ReadRAM(uint16_t addr) {
     cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;
     return 0;
   }
+}
+
+void CPU::DumpVideoRAM() {
+  //uint8_t video_ram[_32K*8]
+  const char *fname = "video.dump";
+
+  ofstream f;
+  f.open(fname, ios::binary);
+  if (!f) {
+    cout << "Error. Can't open file " << fname << endl;
+    return;
+  }
+
+  f.write(reinterpret_cast<const char*>(video_ram), _32K*8);
+  f.close();
 }

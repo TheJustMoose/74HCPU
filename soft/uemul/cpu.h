@@ -55,6 +55,8 @@ class CPU {
   std::map<std::string, uint16_t> name_to_address {};
 
  protected:
+  void DumpVideoRAM();
+
   uint8_t ram[_32K*2] {};
   uint8_t video_ram[_32K*8] {};  // 8 pages for TFT LCD
 };
