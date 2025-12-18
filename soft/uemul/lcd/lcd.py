@@ -1,18 +1,25 @@
 import tkinter as tk
 
 cnt = 1
-
-def update_loop():
-  global cnt
-  cnt = cnt + 1
-  if cnt > 255:
-    cnt = 0
-  clr = "#%02x%02x%02x" % (0, 0, cnt)
-  img.put(clr, to=(10, 10, 20, 20))
-  root.after(10, update_loop)
-
 w = 480
 h = 272
+
+image_data = []
+
+def read_image():
+  with open("dump.bin", "rb") as file:
+    image_data = file.read()
+    if len(image_data) != 480*272*2:
+      print("Image size should be 480*272*2 but it's", len(image_data))
+
+def update_loop():
+  read_image()
+  if image_data:
+    for y in range(0, 272):
+      for x in range(0, 480):
+        img.put(clr, (x, y))
+
+  root.after(10, update_loop)
 
 root = tk.Tk()
 root.title("74HCPU")
