@@ -1,59 +1,58 @@
-import tkinter as tk
+# This code require opencv to work
+# To install type:
+# pip install opencv-python
 
-cnt = 1
-w = 480
-h = 272
+import cv2
+import numpy as np
 
-image_data = []
-img = 0
-root = 0
+width = 480
+height = 272
+size = width * height
 
-def read_image():
-  global image_data
-  with open("dump.bin", "rb") as file:
-    image_data = file.read()
-    if len(image_data) != 480*272*2:
-      print("Image size should be 480*272*2 but it's", len(image_data))
-  print("Read ok")
+image = []
 
-def rgb2str(clr):
+def rgb(clr):
   r = clr & 0x1F
   clr = clr >> 5
   g = clr & 0x1F
   clr = clr >> 5
   b = clr & 0x1F
-  return "#%02X%02X%02X" % (r<<3, g<<3, b<<3)
+  return (r<<3, g<<3, b<<3)
+
+def read_image():
+  dtype_string = '<u2'
+  values_array = np.fromfile("dump.bin", dtype=np.dtype(dtype_string))
+  if len(values_array) != width*height:
+    print("Image size should be 480*272 but it's", len(values_array))
+  else:
+    print("Read ok")
+
+  image_data = bytearray(width*height*3)
+  for y in range(0, height):
+    for x in range(0, width):
+      t = rgb(values_array[y*width + x])      # array of 16 bit values
+      image_data[(y*width + x)*3 + 2] = t[2]  # red
+      image_data[(y*width + x)*3 + 1] = t[1]  # green
+      image_data[(y*width + x)*3] = t[0]      # blue
+
+  return image_data
 
 def update_loop():
-  read_image()
-  global img
-  global root
-  if image_data:
-    print("Out...")
-    for y in range(0, 272):
-      for x in range(0, 480):
-        clr = image_data[y*480 + x]
-        img.put(rgb2str(clr), (x, y))
-  else:
-    print("No image")
+  global image
 
-  root.after(10, update_loop)
+  image_data = read_image()
+  image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width, 3))
+
+  #self.after(100, update_loop)
 
 def main():
-  global root
-  root = tk.Tk()
-  root.title("74HCPU")
-  root.resizable(False, False)
-  root.geometry("{}x{}".format(w + 20, h + 10))
-
-  canvas = tk.Canvas(root, width=w, height=h, bg='white', highlightthickness=0)
-  canvas.pack()
-
-  global img
-  img = tk.PhotoImage(width=w, height=h)
-  canvas.create_image(0, 0, image=img, anchor="nw")
+  window_name = 'TFT LCD'
+  cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
 
   update_loop()
-  root.mainloop()
+
+  cv2.imshow(window_name, image)
+  cv2.waitKey(0)
+  cv2.destroyAllWindows()
 
 main()
