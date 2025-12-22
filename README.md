@@ -36,7 +36,7 @@ Not a very scary instruction set discrete logic processor.
 |    LD |  DST |0|EXT|D|U|OFFSET4| 90 1001 0000| |
 |    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
 |--------------|7-8-9-A-B|-------|-------------|-|
-|   OUT |  SRC |  PORT   |O|o|X|x| B0 1011 0000| |
+|   OUT | PORT |C| SRC |PRT|X|O|o| B0 1011 0000| |
 |    ST |  SRC |0|EXT|D|U|OFFSET4| C0 1100 0000| |
 |   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
 |  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+|
