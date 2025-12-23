@@ -323,6 +323,9 @@ TEST_CASE("test LPM Cmd") {
   cpu.rom.push_back(0x0330);
   cpu.rom.push_back(0x0440);
 
+//|F E D C  B A 9 8 7 6 5 4 3 2 1 0|
+//|   LPM |  DST |0|EXT|D|U|-|-|-|W|
+
   // read 1 byte from ROM into "low" register R4
   cpu.regs_bank1[0] = 1;              // MOV XL, 1
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
@@ -336,13 +339,13 @@ TEST_CASE("test LPM Cmd") {
   CHECK( cpu.regs_bank0[5] == 0x20 ); // R5 == 0x20
 
   // read 2 bytes from ROM into register pair R5:R4
-  LpmCmd lcmd3(0x8B00, &cpu);        // LPMW R5, X
+  LpmCmd lcmd3(0x8B01, &cpu);        // LPMW R5, X
   lcmd3.Execute();
   CHECK( cpu.regs_bank0[4] == 0x20 ); // R4 == 0x20  // low byte register
   CHECK( cpu.regs_bank0[5] == 0x02 ); // R5 == 0x02  // high byte register
 
   // read 2 bytes from ROM into register pair R5:R4
-  LpmCmd lcmd4(0x8900, &cpu);        // LPMW R4, X
+  LpmCmd lcmd4(0x8801, &cpu);        // LPMW R4, X
   lcmd4.Execute();
   CHECK( cpu.regs_bank0[4] == 0x20 ); // R4 == 0x20  // low byte register
   CHECK( cpu.regs_bank0[5] == 0x02 ); // R5 == 0x02  // high byte register
