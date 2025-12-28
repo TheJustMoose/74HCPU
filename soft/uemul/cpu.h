@@ -42,6 +42,9 @@ class CPU {
   void WriteRAM(uint16_t addr, uint8_t data);
   uint8_t ReadRAM(uint16_t addr);
 
+  void WriteVRAM(uint32_t addr, uint16_t data);
+  uint16_t ReadVRAM(uint32_t addr);
+
   uint8_t ports[32] {};
   uint8_t pins[32] {};
   bool flags[flags::CNT] {};
@@ -57,6 +60,6 @@ class CPU {
  protected:
   void DumpVideoRAM();
 
-  uint8_t ram[_32K*2] {};
-  uint8_t video_ram[_32K*8] {};  // 8 pages for TFT LCD
+  uint8_t ram[_64K] {};
+  uint16_t video_ram[_64K*2] {};  // 256KB == 128KW/16bit for TFT LCD
 };

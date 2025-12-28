@@ -348,52 +348,36 @@ void CPU::ReadDebugInfo(size_t data_start) {
   }
 }
 
-/*                    ramp == RAM page
-   Addresses   |      ramp=0       |      ramp=1       |      ramp=2       |      ramp=3       |      ramp=4       |...|      ramp=8       |
-(in X, Y.. SP) |                   |                   |                   |                   |                   |...|                   |
-  0000 - 7FFF  |  RAM (first 32K)  |  RAM (first 32K)  |  RAM (first 32K)  |  RAM (first 32K)  |  RAM (first 32K)  |...|  RAM (first 32K)  |
-  8000 - FFFF  |  RAM (second 32K) |  Video RAM        |  Video RAM        |  Video RAM        |  Video RAM        |...|  Video RAM        |
-on address bus |   ^               |  (first 32K)         (second 32K)        (third 32K)         (fourth 32K)
-                   | (8000 - FFFF) |  (0000 - 7FFF)       (8000 - FFFF)       (10000 - 17FFF)     (18000 - 1FFFF)         (38000 - 3FFFF)
-                   |         ^- addresses on input pins of RAM
-          This is a second half
-             of ordinary RAM
-*/
-
 void CPU::WriteRAM(uint16_t addr, uint8_t data) {
-  if (addr < _32K) {
-    ram[addr] = data;
-    return;
-  }
-
-  uint8_t ramp = ports[5];  // RAM page is stored in PORT5
-  if (ramp == 0) {
-    ram[addr] = data;
-  } else if (ramp > 0 && ramp <= 8) {
-    const int offset = (ramp - 1)*_32K;
-    const int vram_addr = offset + addr - _32K;
-    video_ram[vram_addr] = data;
-    DumpVideoRAM();
-  } else {
-    cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;
-  }
+  ram[addr] = data;
 }
 
 uint8_t CPU::ReadRAM(uint16_t addr) {
-  if (addr < _32K)
-    return ram[addr];
+  return ram[addr];
+}
 
+void CPU::WriteVRAM(uint32_t addr, uint16_t data) {
   uint8_t ramp = ports[5];  // RAM page is stored in PORT5
-  if (ramp == 0) {
-    return ram[addr];
-  } else if (ramp > 0 && ramp <= 8) {
-    const int offset = ramp*_32K;
-    const int vram_addr = offset + addr - _32K;
-    return video_ram[vram_addr];
-  } else {
-    cout << "RAMP[age] value should be in range 0-8 where 0 is RAM and 1-8 is video RAM" << endl;
+  if (ramp > 1) {
+    cout << "RAMP[age] value should be in range 0-1" << endl;
+    return;
+  }
+
+  uint32_t vram_addr = addr;
+  vram_addr |= ramp << 16;
+  video_ram[vram_addr] = data;
+}
+
+uint16_t CPU::ReadVRAM(uint32_t addr) {
+  uint8_t ramp = ports[5];  // RAM page is stored in PORT5
+  if (ramp > 1) {
+    cout << "RAMP[age] value should be in range 0-1" << endl;
     return 0;
   }
+
+  uint32_t vram_addr = addr;
+  vram_addr |= ramp << 16;
+  return video_ram[vram_addr];
 }
 
 void CPU::DumpVideoRAM() {
