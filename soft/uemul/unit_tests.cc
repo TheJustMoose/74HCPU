@@ -227,42 +227,28 @@ TEST_CASE("test Memory Cmds") {
   StoreToMemoryCmd mcmd3(0xC015, &cpu);  // ST XI + 5, R0 (with autoinc)
   mcmd3.Execute();
   CHECK( cpu.ReadRAM(105) == 30 );       // *105 == 30
-  CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
+  CHECK( cpu.regs_bank1[0] == 101 );     // autoinc work!
 }
 
-class TestCPU: public CPU {
- public:
-  // getters to read ram without pages:
-  uint8_t GetRAM(uint16_t addr) {
-    return ram[addr];
-  }
-
-  uint8_t GetVideoRAM(uint32_t addr) {  // yes! we need 32 bit here!
-    return video_ram[addr];
-  }
-};
-
 TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
-  TestCPU cpu;
+  CPU cpu;
+  cpu.ports[5] = 0;                        // ram page = 0
 
-  cpu.WriteRAM(100, 12);                 // *100 = 12
-  CHECK_EQ( cpu.GetRAM(100), 12 );       // first half of RAM
-  CHECK_EQ( cpu.ReadRAM(100), 12 );      // test ReadRAM
+  cpu.WriteRAM(100, 12);                   // RAM[100] = 12
+  CHECK_EQ( cpu.ReadRAM(100), 12 );        // test ReadRAM
 
-  cpu.ports[5] = 0;                      // ram page = 0
-  cpu.WriteRAM(_32K + 100, 21);          // *(32768 + 100) = 21
-  CHECK_EQ( cpu.ReadRAM(_32K + 100), 21 );// second half of RAM
-  CHECK_EQ( cpu.GetRAM(_32K + 100), 21 );// second half of RAM
+  cpu.WriteRAM(_32K + 100, 21);            // RAM[32768 + 100] = 21
+  CHECK_EQ( cpu.ReadRAM(_32K + 100), 21 ); // second half of RAM is Ok
 
-  cpu.ports[5] = 1;                      // ram page = 1 (video ram, zero page of it)
-  cpu.WriteRAM(_32K + 100, 33);          // *(32768 + 100) = 33
-  CHECK_EQ( cpu.GetVideoRAM(100), 33 );  // Video RAM was successfully changed
-  CHECK_EQ( cpu.GetRAM(_32K + 100), 21 );// second half of RAM was not changed
+  cpu.WriteVRAM(100, 33);                  // VRAM[32768 + 100] = 33
+  CHECK_EQ( cpu.ReadVRAM(100), 33 );       // Video RAM was successfully changed
+  CHECK_EQ( cpu.ReadRAM(_32K + 100), 21 ); // second half of RAM was not changed
 
-  cpu.ports[5] = 8;                      // ram page = 8 (video ram, last page of it)
-  cpu.WriteRAM(_32K + 100, 88);          // *(32768 + 100) = 88
-  CHECK_EQ( cpu.GetVideoRAM(_32K*7 + 100), 88 );  // Video RAM was successfully changed
-  CHECK_EQ( cpu.GetRAM(_32K + 100), 21 );// second half of RAM was not changed
+  cpu.ports[5] = 1;                        // ram page = 1 (second page of video ram)
+  cpu.WriteVRAM(100, 88);                  // RAM[_64K + 100] = 88
+  CHECK_EQ( cpu.ReadVRAM(100), 88 );       // Video RAM was successfully changed
+  cpu.ports[5] = 0;                        // ram page = 0
+  CHECK_EQ( cpu.ReadVRAM(100), 33 );       // First page of Video RAM was not changed
 }
 
 TEST_CASE("test Stack Cmds") {
@@ -329,23 +315,23 @@ TEST_CASE("test LPM Cmd") {
   // read 1 byte from ROM into "low" register R4
   cpu.regs_bank1[0] = 1;              // MOV XL, 1
   cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  LpmCmd lcmd(0x8800, &cpu);         // LPM R4, X
+  LpmCmd lcmd(0x8800, &cpu);          // LPM R4, X
   lcmd.Execute();
   CHECK( cpu.regs_bank0[4] == 0x20 ); // R4 == 0x20
 
   // read 1 byte from ROM into "high" register R5
-  LpmCmd lcmd2(0x8A00, &cpu);        // LPM R5, X
+  LpmCmd lcmd2(0x8A00, &cpu);         // LPM R5, X
   lcmd2.Execute();
   CHECK( cpu.regs_bank0[5] == 0x20 ); // R5 == 0x20
 
   // read 2 bytes from ROM into register pair R5:R4
-  LpmCmd lcmd3(0x8B01, &cpu);        // LPMW R5, X
+  LpmCmd lcmd3(0x8B01, &cpu);         // LPMW R5, X
   lcmd3.Execute();
   CHECK( cpu.regs_bank0[4] == 0x20 ); // R4 == 0x20  // low byte register
   CHECK( cpu.regs_bank0[5] == 0x02 ); // R5 == 0x02  // high byte register
 
   // read 2 bytes from ROM into register pair R5:R4
-  LpmCmd lcmd4(0x8801, &cpu);        // LPMW R4, X
+  LpmCmd lcmd4(0x8801, &cpu);         // LPMW R4, X
   lcmd4.Execute();
   CHECK( cpu.regs_bank0[4] == 0x20 ); // R4 == 0x20  // low byte register
   CHECK( cpu.regs_bank0[5] == 0x02 ); // R5 == 0x02  // high byte register
