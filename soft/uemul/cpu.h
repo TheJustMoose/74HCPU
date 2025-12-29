@@ -45,6 +45,8 @@ class CPU {
   void WriteVRAM(uint32_t addr, uint16_t data);
   uint16_t ReadVRAM(uint32_t addr);
 
+  uint8_t ramp() { return ports[5]; }  // RAM page is stored in PORT5
+
   uint8_t ports[32] {};
   uint8_t pins[32] {};
   bool flags[flags::CNT] {};

@@ -357,26 +357,24 @@ uint8_t CPU::ReadRAM(uint16_t addr) {
 }
 
 void CPU::WriteVRAM(uint32_t addr, uint16_t data) {
-  uint8_t ramp = ports[5];  // RAM page is stored in PORT5
-  if (ramp > 1) {
+  if (ramp() > 1) {
     cout << "RAMP[age] value should be in range 0-1" << endl;
     return;
   }
 
   uint32_t vram_addr = addr;
-  vram_addr |= ramp << 16;
+  vram_addr |= ramp() << 16;
   video_ram[vram_addr] = data;
 }
 
 uint16_t CPU::ReadVRAM(uint32_t addr) {
-  uint8_t ramp = ports[5];  // RAM page is stored in PORT5
-  if (ramp > 1) {
+  if (ramp() > 1) {
     cout << "RAMP[age] value should be in range 0-1" << endl;
     return 0;
   }
 
   uint32_t vram_addr = addr;
-  vram_addr |= ramp << 16;
+  vram_addr |= ramp() << 16;
   return video_ram[vram_addr];
 }
 
