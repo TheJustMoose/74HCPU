@@ -240,11 +240,13 @@ TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
   cpu.WriteRAM(_32K + 100, 21);            // RAM[32768 + 100] = 21
   CHECK_EQ( cpu.ReadRAM(_32K + 100), 21 ); // second half of RAM is Ok
 
-  cpu.WriteVRAM(100, 33);                  // VRAM[32768 + 100] = 33
+  cpu.WriteVRAM(100, 33);                  // VRAM[100] = 33
   CHECK_EQ( cpu.ReadVRAM(100), 33 );       // Video RAM was successfully changed
+  CHECK_EQ( cpu.ReadRAM(100), 12 );        // first half of RAM was not changed
   CHECK_EQ( cpu.ReadRAM(_32K + 100), 21 ); // second half of RAM was not changed
 
   cpu.ports[5] = 1;                        // ram page = 1 (second page of video ram)
+  CHECK_EQ( cpu.ramp(), 1 );               // check ramp() method
   cpu.WriteVRAM(100, 88);                  // RAM[_64K + 100] = 88
   CHECK_EQ( cpu.ReadVRAM(100), 88 );       // Video RAM was successfully changed
   cpu.ports[5] = 0;                        // ram page = 0
