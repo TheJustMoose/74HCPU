@@ -149,8 +149,15 @@ string LoadFromMemoryCmd::Params() {
 
 void LoadFromMemoryCmd::Execute() {
   uint16_t ptr = cpu_->GetPair(Ptr()) + OffsetToInt(Offs());
-  uint8_t val = cpu_->ReadRAM(ptr);
-  cpu_->ActiveRegsBank()[Reg()] = val;
+  if (V()) {
+    uint16_t val = cpu_->ReadVRAM(ptr);
+    cpu_->ActiveRegsBank()[LowReg()] = val & 0xFF;
+    cpu_->ActiveRegsBank()[HighReg()] = (val >> 8) & 0xFF;
+  } else {
+    uint8_t val = cpu_->ReadRAM(ptr);
+    cpu_->ActiveRegsBank()[Reg()] = val;
+  }
+
   if (AutoInc())
     cpu_->IncPair(Ptr());
   if (AutoDec())
@@ -162,9 +169,17 @@ string StoreToMemoryCmd::Params() {
 }
 
 void StoreToMemoryCmd::Execute() {
-  uint8_t val = cpu_->ActiveRegsBank()[Reg()];
   uint16_t ptr = cpu_->GetPair(Ptr()) + OffsetToInt(Offs());
-  cpu_->WriteRAM(ptr, val);
+  if (V()) {
+    uint16_t val = cpu_->ActiveRegsBank()[HighReg()];
+    val <<= 8;
+    val |= cpu_->ActiveRegsBank()[LowReg()];
+    cpu_->WriteVRAM(ptr, val);
+  } else {
+    uint8_t val = cpu_->ActiveRegsBank()[Reg()];
+    cpu_->WriteRAM(ptr, val);
+  }
+
   if (AutoInc())
     cpu_->IncPair(Ptr());
   if (AutoDec())

@@ -21,7 +21,7 @@ class Cmd {
   CPU* cpu_ {nullptr};
 };
 
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
+//|F E D C  B A 9 8 7 6 5 4 3 2 1 0|
 //|   ADD |  DST |C| SRC |-|Z|z|I|i|
 class ArithmCmd: public Cmd {
  public:
@@ -102,7 +102,7 @@ class MovCmd: public ArithmCmd {
   uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
 
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
+//|F E D C  B A 9 8 7 6 5 4 3 2 1 0|
 //|   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*| унарные команды не используют операнд SRC, поэтому нельзя использовать инверторы и отдельные нибблы
 class UnaryCmd: public Cmd {
  public:
@@ -145,18 +145,22 @@ class LsrcCmd: public UnaryCmd {
   void Execute() override;
 };
 
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
-//|    LD |  DST |0|EXT|D|U|OFFSET4| 90 1001 0000| |
-//|    ST |  SRC |0|EXT|D|U|OFFSET4| C0 1100 0000| |
+//|F E D C  B A 9 8 7 6 5 4 3 2 1 0|
+//|    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| |
+//|    ST |  SRC |V|EXT|D|U|OFFSET4| C0 1100 0000| |
 class MemoryCmd: public Cmd {
  public:
   MemoryCmd(uint16_t cmd, CPU* cpu): Cmd(cmd, cpu) {}
 
-  uint8_t Reg() { return (cmd_ >> 9) & 0x07; }
-  uint8_t Ptr() { return (cmd_ >> 6) & 0x03; }
-  uint8_t AutoDec() { return (cmd_ >> 5) & 0x01; }
-  uint8_t AutoInc() { return (cmd_ >> 4) & 0x01; }
-  uint8_t Offs() { return cmd_ & 0x0F; }
+  uint8_t Reg() const { return (cmd_ >> 9) & 0x07; }
+  uint8_t V() const { return (cmd_ >> 8) & 0x01; }
+  uint8_t Ptr() const { return (cmd_ >> 6) & 0x03; }
+  uint8_t AutoDec() const { return (cmd_ >> 5) & 0x01; }
+  uint8_t AutoInc() const { return (cmd_ >> 4) & 0x01; }
+  uint8_t Offs() const { return cmd_ & 0x0F; }
+
+  uint8_t LowReg() const { return Reg() & 0x06; }   // low byte register
+  uint8_t HighReg() const { return LowReg() | 1; }  // high byte register
 
   virtual void Execute() {}
 
@@ -238,7 +242,7 @@ class Relation {
   bool greater {false};
 };
 
-//|0 1 2 3  4 5 6 7 8 9 A B C D E F|
+//|F E D C  B A 9 8 7 6 5 4 3 2 1 0|
 //|   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
 //|  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+|
 class CmpCmd: public Cmd {
