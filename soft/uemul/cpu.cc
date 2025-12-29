@@ -356,7 +356,7 @@ uint8_t CPU::ReadRAM(uint16_t addr) {
   return ram[addr];
 }
 
-void CPU::WriteVRAM(uint32_t addr, uint16_t data) {
+void CPU::WriteVRAM(uint16_t addr, uint16_t data) {
   if (ramp() > 1) {
     cout << "RAMP[age] value should be in range 0-1" << endl;
     return;
@@ -367,7 +367,7 @@ void CPU::WriteVRAM(uint32_t addr, uint16_t data) {
   video_ram[vram_addr] = data;
 }
 
-uint16_t CPU::ReadVRAM(uint32_t addr) {
+uint16_t CPU::ReadVRAM(uint16_t addr) {
   if (ramp() > 1) {
     cout << "RAMP[age] value should be in range 0-1" << endl;
     return 0;
