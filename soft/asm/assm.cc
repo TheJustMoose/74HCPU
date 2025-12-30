@@ -441,7 +441,8 @@ class MemoryCodeGen: public CodeGen {
 
   uint16_t Emit() {
     uint16_t cop = operation_;
-    cop |= reg_ << 9;  // don't forget about C bit
+    cop |= reg_ << 9;
+    // TODO: add V flag processing here
     cop |= ptr_ << 6;
     cop |= dec_ << 5;
     cop |= inc_ << 4;
