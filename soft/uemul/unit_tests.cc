@@ -201,33 +201,47 @@ TEST_CASE("test Ptrs Arithm") {
 TEST_CASE("test Memory Cmds") {
   CPU cpu;
   // ST cmd
-  cpu.WriteRAM(100, 0);               // *100 = 0 - any value
-  cpu.regs_bank0[0] = 10;             // MOV R0, 10
-  cpu.regs_bank1[0] = 100;            // MOV XL, 100
-  cpu.regs_bank1[1] = 0;              // MOV XH, 0
-  StoreToMemoryCmd mcmd(0xC000, &cpu);  // ST X, R0
+  cpu.WriteRAM(100, 0);                  // *100 = 0 - any value
+  cpu.regs_bank0[0] = 10;                // MOV R0, 10
+  cpu.regs_bank1[0] = 100;               // MOV XL, 100
+  cpu.regs_bank1[1] = 0;                 // MOV XH, 0
+  StoreToMemoryCmd mcmd(0xC000, &cpu);   // ST X, R0
   mcmd.Execute();
   CHECK( cpu.ReadRAM(100) == 10 );       // *100 == 10
 
   // ST cmd with pointer autoincrement
-  cpu.WriteRAM(100, 0);               // *100 = 0
-  cpu.regs_bank0[0] = 20;             // MOV R0, 20
-  cpu.regs_bank1[0] = 100;            // MOV XL, 100
-  cpu.regs_bank1[1] = 0;              // MOV XH, 0
+  cpu.WriteRAM(100, 0);                  // *100 = 0
+  cpu.regs_bank0[0] = 20;                // MOV R0, 20
+  cpu.regs_bank1[0] = 100;               // MOV XL, 100
+  cpu.regs_bank1[1] = 0;                 // MOV XH, 0
   StoreToMemoryCmd mcmd2(0xC010, &cpu);  // ST XI, R0 (with autoinc)
   mcmd2.Execute();
-  CHECK( cpu.ReadRAM(100) == 20 );    // *100 == 20
-  CHECK( cpu.regs_bank1[0] == 101 );  // autoinc work!
+  CHECK( cpu.ReadRAM(100) == 20 );       // *100 == 20
+  CHECK( cpu.regs_bank1[0] == 101 );     // autoinc work!
 
   // ST cmd with pointer autoincrement and displacement
-  cpu.WriteRAM(105, 0);               // *105 = 0
-  cpu.regs_bank0[0] = 30;             // MOV R0, 30
-  cpu.regs_bank1[0] = 100;            // MOV XL, 100
-  cpu.regs_bank1[1] = 0;              // MOV XH, 0
+  cpu.WriteRAM(105, 0);                  // *105 = 0
+  cpu.regs_bank0[0] = 30;                // MOV R0, 30
+  cpu.regs_bank1[0] = 100;               // MOV XL, 100
+  cpu.regs_bank1[1] = 0;                 // MOV XH, 0
   StoreToMemoryCmd mcmd3(0xC015, &cpu);  // ST XI + 5, R0 (with autoinc)
   mcmd3.Execute();
   CHECK( cpu.ReadRAM(105) == 30 );       // *105 == 30
   CHECK( cpu.regs_bank1[0] == 101 );     // autoinc work!
+}
+
+TEST_CASE("test VRAM Memory Cmds") {
+  CPU cpu;
+
+  cpu.regs_bank0[0] = 10;                // MOV R0, 10
+  cpu.regs_bank1[0] = 100;               // MOV XL, 100
+  cpu.regs_bank1[1] = 0;                 // MOV XH, 0
+
+  // |    ST |  SRC |V|EXT|D|U|OFFSET4|
+  //    1100    000  1  00 0 0  0000
+  StoreToMemoryCmd mcmd(0xC100, &cpu);   // STV X, R0
+  mcmd.Execute();
+  CHECK( cpu.ReadVRAM(100) == 10 );      // *100 == 10
 }
 
 TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
