@@ -379,7 +379,6 @@ uint16_t CPU::ReadVRAM(uint16_t addr) {
 }
 
 void CPU::DumpVideoRAM() {
-  //uint8_t video_ram[_32K*8]
   const char *fname = "video.dump";
 
   ofstream f;
@@ -389,6 +388,7 @@ void CPU::DumpVideoRAM() {
     return;
   }
 
-  f.write(reinterpret_cast<const char*>(video_ram), _32K*8);
+  //uint16_t video_ram[_64K*2]
+  f.write(reinterpret_cast<const char*>(video_ram), _64K*2*sizeof(uint16_t));
   f.close();
 }
