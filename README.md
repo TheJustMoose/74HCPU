@@ -32,12 +32,12 @@ Not a very scary instruction set discrete logic processor.
 |   MUL |  DST |C| SRC |-|Z|z|I|i| 50 0101 0000|*|
 |   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*|
 |   MOV |  DST |0| SRC |*|Z|z|I|i| 70 0111 0000| |
-|   LPM |  DST |W|EXT|D|U|OFFSET4| 80 1000 0000| |
-|    LD |  DST |0|EXT|D|U|OFFSET4| 90 1001 0000| |
+|   LPM |  DST |0|EXT|D|U|-|-|-|W| 80 1000 0000| |
+|    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| |
 |    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
 |--------------|7-8-9-A-B|-------|-------------|-|
 |   OUT | PORT |C| SRC |PRT|X|O|o| B0 1011 0000| |
-|    ST |  SRC |0|EXT|D|U|OFFSET4| C0 1100 0000| |
+|    ST |  SRC |V|EXT|D|U|OFFSET4| C0 1100 0000| |
 |   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
 |  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+|
 | BRNCH |  CALL  | 8 bit OFFSET  | F0 1111 0000| |
