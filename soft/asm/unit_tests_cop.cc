@@ -70,7 +70,7 @@ TEST_CASE("check Inversion COPs") {
   //     0001    001  0  010  1   0011
   // SUB A, B == ADD A, ~B + 1
   CodeLine cl1(1, "SUB R1, R2");
-  //CHECK(cl1.GenerateMachineCode() == 0x1253);
+  //CHECK(cl1.GenerateMachineCode() == 0x1253);  // TODO: fix crash here!!
 }
 
 TEST_CASE("check Nibble (4 bit) COPs") {
@@ -167,15 +167,19 @@ TEST_CASE("check ROM COPs") {
 }
 
 TEST_CASE("check RAM COPs") {
-  // LD   DST - SR DU OFST
+  // LD   DST V SR DU OFST
   // 1001 000 0 00 00 0000
   CodeLine cl1(1, "LD R0, X");
   CHECK(cl1.GenerateMachineCode() == 0x9000);
+  CodeLine cl5(1, "LDV R0, X");
+  CHECK(cl5.GenerateMachineCode() == 0x9100);
 
-  // ST   SRC - DS DU OFST
+  // ST   SRC V DS DU OFST
   // 1100 000 0 00 00 0000
   CodeLine cl2(1, "ST X, R0");
   CHECK(cl2.GenerateMachineCode() == 0xC000);
+  CodeLine cl6(1, "STV X, R0");
+  CHECK(cl6.GenerateMachineCode() == 0xC100);
 
   // 1100 000 0 00 00 0101
   CodeLine cl3(1, "ST X+5, R0");

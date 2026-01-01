@@ -31,7 +31,7 @@ OP_TYPE CopToType(COP cop) {
     return tBINARY;
   else if (cop == cUNO)
     return tUNARY;
-  else if (cop == cLPM || cop == cLPMW || cop == cLD || cop == cST)
+  else if (cop == cLPM || cop == cLPMW || cop == cLD || cop == cLDV || cop == cST || cop == cSTV)
     return tMEMORY;
   else if (cop == cIN || cop == cOUT || cop == cTOGL)
     return tIO;
@@ -54,9 +54,10 @@ map<string, COP> cop_names {
   { "MUL", cMUL},
   { "INV", cUNO}, { "SWAP", cUNO}, { "LSR", cUNO}, { "LSRC", cUNO},
   { "MOV", cMOV},
-  { "LPM", cLPM}, { "LPMW", cLPMW}, { "LD", cLD}, { "LOAD", cLD},
+  { "LPM", cLPM}, { "LPMW", cLPMW},
+  { "LD", cLD}, { "LOAD", cLD}, { "LDV", cLDV},
   { "IN", cIN}, { "OUT", cOUT}, { "TOGL", cTOGL},
-  { "ST", cST}, { "STORE", cST},
+  { "ST", cST}, { "STORE", cST}, { "STV", cSTV},
   { "CMP", cCMP}, { "CMPC", cCMPC},
   { "CALL", bCALL},
   { "JMP", bJMP },
@@ -276,8 +277,8 @@ class BinaryCodeGen: public CodeGen {
 
   uint16_t Emit() {
     uint16_t cop = operation_;
-    cop |= left_op_ << 9;  // don't forget about C bit
-    if (right_val_.immediate()) {
+    cop |= left_op_ << 9;
+    if (right_val_.immediate()) {  // don't forget about C bit
       cop |= right_val_.val();
       cop |= 0x0100;  // set C bit to 1
     }
@@ -385,7 +386,7 @@ class MemoryCodeGen: public CodeGen {
  public:
   MemoryCodeGen(int line_number, COP cop, string left, string right)
     : CodeGen(line_number, cop) {
-    if (cop == cLD || cop == cLPM || cop == cLPMW) {
+    if (cop == cLD || cop == cLDV || cop == cLPM || cop == cLPMW) {
       reg_ = Names::RegFromName(left);
       if (reg_ == rUnkReg)
         ErrorCollector::GetInstance().err("Unknown register: " + left, line_number);
@@ -393,7 +394,7 @@ class MemoryCodeGen: public CodeGen {
       if (ptr_ == rUnkPtr)
         ErrorCollector::GetInstance().err("Unknown pointer register: " + right, line_number);
       offset_ = parse_offset(right);
-    } else if (cop == cST) {
+    } else if (cop == cST || cop == cSTV) {
       ptr_ = Names::PtrFromName(left, &inc_, &dec_);
       if (ptr_ == rUnkPtr)
         ErrorCollector::GetInstance().err("Unknown pointer register: " + left, line_number);
@@ -402,7 +403,7 @@ class MemoryCodeGen: public CodeGen {
         ErrorCollector::GetInstance().err("Unknown register: " + right, line_number);
       offset_ = parse_offset(left);
     } else {
-      ErrorCollector::GetInstance().err("Unknown memory operation. Should be LD or ST or LPM.", line_number);
+      ErrorCollector::GetInstance().err("Unknown memory operation. Should be LD/LDV or ST/STV or LPM.", line_number);
     }
   }
 
@@ -440,9 +441,8 @@ class MemoryCodeGen: public CodeGen {
   }
 
   uint16_t Emit() {
-    uint16_t cop = operation_;
+    uint16_t cop = operation_;  // COP already contain V flag
     cop |= reg_ << 9;
-    // TODO: add V flag processing here
     cop |= ptr_ << 6;
     cop |= dec_ << 5;
     cop |= inc_ << 4;
@@ -451,7 +451,7 @@ class MemoryCodeGen: public CodeGen {
   }
 
   vector<int> GetBlocks() {
-    //    COP dst 0 EXT D  U  OFFSET
+    //    COP dst V EXT D  U  OFFSET
     return {4, 3, 1, 2, 1, 1, 4};
   }
 
