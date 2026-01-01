@@ -70,7 +70,7 @@ TEST_CASE("check Inversion COPs") {
   //     0001    001  0  010  1   0011
   // SUB A, B == ADD A, ~B + 1
   CodeLine cl1(1, "SUB R1, R2");
-  //CHECK(cl1.GenerateMachineCode() == 0x1253);  // TODO: fix crash here!!
+  CHECK(cl1.GenerateMachineCode() == 0x1253);
 }
 
 TEST_CASE("check Nibble (4 bit) COPs") {
