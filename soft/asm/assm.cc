@@ -177,22 +177,45 @@ class RightVal {
       right_.resize(right_.size() - 2);
     }
 
+    // It's duplicate of StripPrefix but for immediate values:
+    if (right_.find("LO(") == 0) {
+      if (*right_.rbegin() != ')')
+        ErrorCollector::GetInstance().err("Can't find right parentheses - )",
+                                          LineNumber());
+      right_ = right_.substr(3, right_.size() - 4);
+      ErrorCollector::GetInstance().rep("New right_: " + right_, LineNumber());
+      lo_macro_ = true;
+    } else if (right_.find("HI(") == 0) {
+      if (*right_.rbegin() != ')')
+        ErrorCollector::GetInstance().err("Can't find right parentheses - )",
+                                          LineNumber());
+      right_ = right_.substr(3, right_.size() - 4);
+      hi_macro_ = true;
+    }
+
     int t = 0;
     immediate_ = StrToInt(right_, &t);  // MOV R1, 10
     if (immediate_) {
       if (t < 0)
-        right_val_ = t & 0x00FF;
-      else
-        right_val_ = t;
+        right_val_ = t & 0x00FF;  // TODO: how LO() should work when value is negative?
+      else {
+        if (lo_macro_)
+          right_val_ = t & 0xFF;
+        else if (hi_macro_)
+          right_val_ = (t >> 8) & 0xFF;
+        else
+          right_val_ = t;
+      }
 
       if (right_val_> 0xFF)
-        ErrorCollector::GetInstance().err("Error. Immediate value should have 8 bit only (0 - 255). Got: " + right_, line_number_);
+        ErrorCollector::GetInstance().err(
+          "Error. Immediate value should have 8 bit only (0 - 255). Got: " + right_, line_number_);
     } else {  // not val, try to check register name
       string rest = StripPrefix(right_);
       right_reg_ = Names::RegFromName(rest);  // MOV R0, R1
       if (right_reg_ == rUnkReg) {
-        ErrorCollector::GetInstance().err("Unknown register: " + rest, line_number_);
-        ErrorCollector::GetInstance().err("You have to use Register name or immediate value as rval.", line_number_);
+        ErrorCollector::GetInstance().err(
+          "You have to use Register name or immediate value as rval. Now it's: " + rest, line_number_);
       }
     }
   }
@@ -236,12 +259,15 @@ class RightVal {
   uint16_t val() { return right_val_; }
   REG reg() { return right_reg_; }
   int LineNumber() { return line_number_; }
+  string str_val() { return right_; }
 
   bool zero_lo() { return zero_lo_; }
   bool zero_hi() { return zero_hi_; }
   bool inv_lo() { return inv_lo_; }
   bool inv_hi() { return inv_hi_; }
   bool force_cf() { return force_cf_; }
+  bool lo_macro() { return lo_macro_; }
+  bool hi_macro() { return hi_macro_; }
 
   void update_val(uint16_t val) {
     right_val_ = val;
@@ -258,6 +284,8 @@ class RightVal {
   bool inv_lo_ {false};
   bool inv_hi_ {false};
   bool force_cf_ {false};
+  bool lo_macro_ {false};
+  bool hi_macro_ {false};
   string right_;
 };
 ///////////////////////////////////////////////////////////////////////////////
@@ -299,27 +327,18 @@ class BinaryCodeGen: public CodeGen {
   }
 
   void UpdateMachineCode(const map<string, uint16_t>& name_to_address) {
+    cout << "UpdateMachineCode" << endl;
     if (right_str_.empty())
       return;
-
-    bool hi {false};
-    if (right_str_.find("LO(") == 0) {
-      if (*right_str_.rbegin() != ')')
-        ErrorCollector::GetInstance().err("Can't find right parentheses - )",
-                                          LineNumber());
-      right_str_ = right_str_.substr(3, right_str_.size() - 4);
-    } else if (right_str_.find("HI(") == 0) {
-      if (*right_str_.rbegin() != ')')
-        ErrorCollector::GetInstance().err("Can't find right parentheses - )",
-                                          LineNumber());
-      right_str_ = right_str_.substr(3, right_str_.size() - 4);
-      hi = true;
+    else {
+      cout << "right_str_: " << right_str_ << endl;
+      cout << "str_val(): " << right_val_.str_val() << endl;
     }
 
     map<string, uint16_t>::const_iterator it;
     for (it = name_to_address.begin(); it != name_to_address.end(); it++) {
       string t = ToUpper(it->first);
-      if (t == right_str_)
+      if (t == right_val_.str_val())
         break;
     }
 
@@ -328,14 +347,17 @@ class BinaryCodeGen: public CodeGen {
 
     ErrorCollector::GetInstance().clr(LineNumber());  // have to remove previous messages
                                          // cause RegFromName know nothing about labels and LO/HI macro
-    ErrorCollector::GetInstance().rep(
-      "Replace " + it->first + " to " + to_string(it->second), LineNumber());
-
     uint16_t rv = it->second;
-    if (hi)
+    if (right_val_.hi_macro()) {
       rv >>= 8;
-    rv &= 0x00FF;
+      rv &= 0x00FF;
+    } else if (right_val_.lo_macro()) {
+      rv &= 0x00FF;
+    }
     right_val_.update_val(rv);
+
+    ErrorCollector::GetInstance().rep(
+      "Replace " + it->first + " to " + to_string(rv), LineNumber());
   }
 
   vector<int> GetBlocks() {
