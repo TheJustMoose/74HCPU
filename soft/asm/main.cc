@@ -14,6 +14,7 @@ void help() {
       "Support next operations:\n",
       "arithmetic: ADD, ADDC, AND, OR, XOR, MUL, UNO (SWAP, INV, LSR, LSRC), MOV\n",
       "memory: LPM, LD, ST\n",
+      "video memory: LDV, STV\n",
       "port: IN, OUT\n",
       "compare: CMP, CMPC\n",
       "jmp: CALL, JMP, RET, JZ, JL, JNE, JE, JG, JC, JNZ, JNC, JHC, JNHC, STOP, AFCALL, NOP\n",
@@ -22,7 +23,11 @@ void help() {
       "Auto-increment pointers: XI, YI, ZI, SPI\n",
       "Auto-decrement pointers: XD, YD, ZD, SPD\n",
       "PORTS: PORT0-31, PIN0-31\n",
-      "Macro: LO()/HI() for pointers, for example:\nmov YL, LO(StringName)\n",
+      "Macro: LO()/HI() for pointers, for example:\n mov YL, LO(StringName)\n",
+      "Macro: L()/H()/~/'/` for registers, for example:\n ` - invert high nibble, ' - invert low nibble, ~ - invert whole byte\n",
+      " L() - use low nibble, H() - use high nibble\n"
+      " MOV R0, L(R1) - copy low nibble of R1 into R0\n"
+      " MOV R0, `R1 - invert high nibble of R1 and copy both nibbles into R0\n"
       "Directives:\n.org 1000h\n.str S \"Some str\"\n.def FROM TO\n.def FROM(param) TO param, bla-bla\n",
       ".def push(r) ST SPD, r ; example for .def with param\n",
       "\nRun:\n",
