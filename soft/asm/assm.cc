@@ -295,7 +295,7 @@ class RightVal {
 class BinaryCodeGen: public CodeGen {
  public:
   BinaryCodeGen(int line_number, COP cop, string left, string right)
-    : CodeGen(line_number, cop), right_str_(right) {
+    : CodeGen(line_number, cop) {
     left_op_ = Names::RegFromName(left);
     if (left_op_ == rUnkReg)
       ErrorCollector::GetInstance().err("Unknown register: " + left, line_number);
@@ -327,13 +327,8 @@ class BinaryCodeGen: public CodeGen {
   }
 
   void UpdateMachineCode(const map<string, uint16_t>& name_to_address) {
-    cout << "UpdateMachineCode" << endl;
-    if (right_str_.empty())
+    if (right_val_.str_val().empty())
       return;
-    else {
-      cout << "right_str_: " << right_str_ << endl;
-      cout << "str_val(): " << right_val_.str_val() << endl;
-    }
 
     map<string, uint16_t>::const_iterator it;
     for (it = name_to_address.begin(); it != name_to_address.end(); it++) {
@@ -371,7 +366,6 @@ class BinaryCodeGen: public CodeGen {
 
  private:
   REG left_op_ {rUnkReg};
-  string right_str_ {};  // TODO: try to remove it later
   RightVal right_val_ {};
 };
 
