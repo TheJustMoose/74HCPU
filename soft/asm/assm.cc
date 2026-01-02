@@ -303,9 +303,15 @@ class BinaryCodeGen: public CodeGen {
       return;
 
     bool hi {false};
-    if (right_str_.find("LO(") == 0)
+    if (right_str_.find("LO(") == 0) {
+      if (*right_str_.rbegin() != ')')
+        ErrorCollector::GetInstance().err("Can't find right parentheses - )",
+                                          LineNumber());
       right_str_ = right_str_.substr(3, right_str_.size() - 4);
-    else if (right_str_.find("HI(") == 0) {
+    } else if (right_str_.find("HI(") == 0) {
+      if (*right_str_.rbegin() != ')')
+        ErrorCollector::GetInstance().err("Can't find right parentheses - )",
+                                          LineNumber());
       right_str_ = right_str_.substr(3, right_str_.size() - 4);
       hi = true;
     }
@@ -322,7 +328,8 @@ class BinaryCodeGen: public CodeGen {
 
     ErrorCollector::GetInstance().clr(LineNumber());  // have to remove previous messages
                                          // cause RegFromName know nothing about labels and LO/HI macro
-    ErrorCollector::GetInstance().rep("Replace " + it->first + " to " + to_string(it->second), LineNumber());
+    ErrorCollector::GetInstance().rep(
+      "Replace " + it->first + " to " + to_string(it->second), LineNumber());
 
     uint16_t rv = it->second;
     if (hi)
