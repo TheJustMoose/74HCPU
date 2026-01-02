@@ -233,7 +233,8 @@ TEST_CASE("test Memory Cmds") {
 TEST_CASE("test VRAM Memory Cmds") {
   CPU cpu;
 
-  cpu.regs_bank0[0] = 10;                // MOV R0, 10
+  cpu.regs_bank0[0] = 0x0A;              // MOV R0, 10
+  cpu.regs_bank0[1] = 0x14;              // MOV R1, 20 - VRAM store 16 bit words
   cpu.regs_bank1[0] = 100;               // MOV XL, 100
   cpu.regs_bank1[1] = 0;                 // MOV XH, 0
 
@@ -241,7 +242,7 @@ TEST_CASE("test VRAM Memory Cmds") {
   //    1100    000  1  00 0 0  0000
   StoreToMemoryCmd mcmd(0xC100, &cpu);   // STV X, R0
   mcmd.Execute();
-  CHECK( cpu.ReadVRAM(100) == 10 );      // *100 == 10
+  CHECK( cpu.ReadVRAM(100) == 0x140A );  // *100 == (10 in low and 20 in high parts of word)
 }
 
 TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
