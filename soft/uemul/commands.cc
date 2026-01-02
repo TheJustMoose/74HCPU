@@ -165,7 +165,11 @@ void LoadFromMemoryCmd::Execute() {
 }
 
 string StoreToMemoryCmd::Params() {
-  return string(" ") + PtrNames[Ptr()] + Suffix() + string(", ") + cpu_->ActiveRegsNames()[Reg()];
+  string pref;
+  if (V())
+    pref += "V";
+  pref += " ";
+  return pref + PtrNames[Ptr()] + Suffix() + string(", ") + cpu_->ActiveRegsNames()[Reg()];
 }
 
 void StoreToMemoryCmd::Execute() {

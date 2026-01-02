@@ -365,6 +365,8 @@ void CPU::WriteVRAM(uint16_t addr, uint16_t data) {
   uint32_t vram_addr = addr;
   vram_addr |= ramp() << 16;
   video_ram[vram_addr] = data;
+
+  DumpVideoRAM();
 }
 
 uint16_t CPU::ReadVRAM(uint16_t addr) {
