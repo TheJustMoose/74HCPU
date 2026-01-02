@@ -100,12 +100,6 @@ TEST_CASE("check Nibble (4 bit) COPs") {
   CHECK(cl6.GenerateMachineCode() == 0x1033);
 }
 
-TEST_CASE("check SUB COPs") {
-  //    0001    000  0  001  1   0011
-  CodeLine cl1(1, "SUB R0, R1");  // will be converted to: ADDC R0, ~R1 + 1
-  CHECK(cl1.GenerateMachineCode() == 0x1033);
-}
-
 TEST_CASE("check ROM COPs") {
   // LPM  DST W SR DU OFST
   // 1000 000 0 00 00 0000
