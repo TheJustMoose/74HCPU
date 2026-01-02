@@ -181,14 +181,13 @@ class RightVal {
     if (right_.find("LO(") == 0) {
       if (*right_.rbegin() != ')')
         ErrorCollector::GetInstance().err("Can't find right parentheses - )",
-                                          LineNumber());
+                                          line_number_);
       right_ = right_.substr(3, right_.size() - 4);
-      ErrorCollector::GetInstance().rep("New right_: " + right_, LineNumber());
       lo_macro_ = true;
     } else if (right_.find("HI(") == 0) {
       if (*right_.rbegin() != ')')
         ErrorCollector::GetInstance().err("Can't find right parentheses - )",
-                                          LineNumber());
+                                          line_number_);
       right_ = right_.substr(3, right_.size() - 4);
       hi_macro_ = true;
     }
@@ -441,7 +440,9 @@ class MemoryCodeGen: public CodeGen {
       return 0;
 
     if (tail[0] != '+' && tail[0] != '-') {
-      ErrorCollector::GetInstance().err("You can add or substract offset from pointer register. No other operations.", LineNumber());
+      ErrorCollector::GetInstance().err(
+        "You can add or substract offset from pointer register. No other operations.",
+        LineNumber());
       return 0;
     }
 
@@ -920,7 +921,6 @@ void Assembler::Pass2() {
     }
     s.second.SetAddress(addr);
     name_to_address_[s.first] = addr;
-    cout << "add to name_to_address_: " << s.first << " = " << to_string(addr) << endl;
     addr += s.second.GetSize();
   }
 }
