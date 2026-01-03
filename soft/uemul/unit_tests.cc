@@ -62,11 +62,25 @@ TEST_CASE("test Cmds") {
   CHECK( cpu.regs_bank0[0] == 200 );
 
   // test AddcCmd::Execute
-  cpu.regs_bank0[0] = 100;    // MOV R0, 100
+  cpu.regs_bank0[0] = 100;            // MOV R0, 100
   cpu.flags[flags::CF] = true;
-  AddcCmd acc(0x1164, &cpu); // ADDC R0, 100
+  AddcCmd acc(0x1164, &cpu);          // ADDC R0, 100
   acc.Execute();
   CHECK( cpu.regs_bank0[0] == 201 );  // 100 + 100 + CF
+
+  // test AddcCmd::Execute when CF == 0
+  cpu.regs_bank0[0] = 100;            // MOV R0, 100
+  cpu.flags[flags::CF] = false;
+  AddcCmd acc2(0x1164, &cpu);         // ADDC R0, 100
+  acc2.Execute();
+  CHECK( cpu.regs_bank0[0] == 200 );  // 100 + 100, no CF
+
+  // test AddcCmd::Execute when CF == 0 and ForceCF look like 1 ;)
+  cpu.regs_bank0[0] = 100;            // MOV R0, 100
+  cpu.flags[flags::CF] = false;
+  AddcCmd acc3(0x111F, &cpu);         // ADDC R0, 1F (31)
+  acc3.Execute();
+  CHECK( cpu.regs_bank0[0] == 131 );  // 100 + 31, no CF
 
   // test AndCmd::Execute
   cpu.regs_bank0[0] = 0x55;   // MOV R0, 0x55

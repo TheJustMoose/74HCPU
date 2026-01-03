@@ -62,7 +62,7 @@ class AddcCmd: public ArithmCmd {
  public:
   AddcCmd(uint16_t cmd, CPU* cpu): ArithmCmd(cmd, cpu) {}
 
-  bool ForceCF() { return cmd_ & 0x10; }
+  bool ForceCF() { return IsConst() ? false : (cmd_ & 0x10); }
 
   uint8_t Calculate(uint8_t d, uint8_t s) override;
 };
