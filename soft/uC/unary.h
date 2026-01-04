@@ -4,11 +4,11 @@
 
 class Unary: public Op {
  public:
-  Expr* expr;
+  Expr* expr_ { nullptr };
 
-  Unary(Token* tok, Expr* x): Op(tok, nullptr) {  // handles minus, for ! see Not
-    expr = x;
-    type_ = Type::max(Type::Int(), expr->type());
+  Unary(Token* tok, Expr* x)
+    : Op(tok, nullptr), expr_(x) {  // handles minus, for ! see Not
+    type_ = Type::max(Type::Int(), expr_->type());
     if (type_ == nullptr)
       error("type error");
    }

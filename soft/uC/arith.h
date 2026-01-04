@@ -3,6 +3,8 @@
 #include "op.h"
 #include "type.h"
 
+#include <string>
+
 class Arith: public Op {
  public:
   Arith(Token* tok, Expr* x1, Expr* x2)
@@ -13,6 +15,15 @@ class Arith: public Op {
     if (type_ == nullptr)
       error("type error");
   }
+
+  Expr* gen() {
+    return new Arith(op, expr1_->reduce(), expr2_->reduce());
+  }
+
+  std::string toString() {
+    return expr1_->toString() + " " + op.toString() + " " + expr2_->toString();
+  }
+
 
  public:
   Expr* expr1_ { nullptr };

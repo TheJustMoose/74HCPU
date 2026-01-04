@@ -86,6 +86,14 @@ class Do: public Stmt {
        expr_->error("boolean required in do");
   }
 
+  void gen(int b, int a) {
+    after = a;
+    int label = newlabel();   // label for expr
+    stmt_->gen(b,label);
+    emitlabel(label);
+    expr_->jumping(b, 0);
+  }
+
  public:
   Expr* expr_ {nullptr};
   Stmt* stmt_ {nullptr};
@@ -134,10 +142,57 @@ class Break: public Stmt {
 
 class Set: public Stmt {
  public:
-  Set(Id* id, Expr* x) {}
+  Set(Id* id, Expr* x)
+    : id_(id), expr_(x) {
+    if (check(id_->type, expr_->type) == nullptr)
+      error("type error");
+  }
+
+  Type check(Type p1, Type p2) {
+    if (Type.numeric(p1) && Type.numeric(p2))
+      return p2;
+    else if (p1 == Type.Bool && p2 == Type.Bool)
+      return p2;
+    else
+      return null;
+  }
+
+  void gen(int b, int a) {
+    emit(id_->toString() + " = " + expr->gen().toString());
+  }
+
+ public:
+  Id* id_ {nullptr};
+  Expr* expr_ {nullptr};
 };
 
 class SetElem: public Stmt {
  public:
-  SetElem(Access* x, Expr* y) {}
+  SetElem(Access* x, Expr* y)
+    : array_(x.array), index_(x.index), expr_(y) {
+    if (check(x.type, expr.type) == null)
+      error("type error");
+  }
+
+  Type check(Type p1, Type p2) {
+    if ( p1 instanceof Array || p2 instanceof Array )
+      return null;
+    else if ( p1 == p2 )
+      return p2;
+    else if ( Type.numeric(p1) && Type.numeric(p2) )
+      return p2;
+    else
+      return null;
+  }
+
+  void gen(int b, int a) {
+    std::string s1 = index_->reduce().toString();
+    std::string s2 = expr_->reduce().toString();
+    emit(array_->toString() + " [ " + s1 + " ] = " + s2);
+  }
+
+ public:
+  Id* array_ {nullptr};
+  Expr* index_ {nullptr};
+  Expr* expr_ {nullptr};
 };
