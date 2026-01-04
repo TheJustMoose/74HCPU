@@ -17,11 +17,11 @@ class Arith: public Op {
   }
 
   Expr* gen() {
-    return new Arith(op, expr1_->reduce(), expr2_->reduce());
+    return new Arith(op_, expr1_->reduce(), expr2_->reduce());
   }
 
   std::string toString() {
-    return expr1_->toString() + " " + op.toString() + " " + expr2_->toString();
+    return expr1_->toString() + " " + op_->toString() + " " + expr2_->toString();
   }
 
 

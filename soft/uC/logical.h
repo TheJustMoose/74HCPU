@@ -1,6 +1,10 @@
 #pragma once
 
 #include "expr.h"
+#include "temp.h"
+#include "type.h"
+
+#include <string>
 
 class Logical: public Expr {
  public:
@@ -21,10 +25,10 @@ class Logical: public Expr {
   Expr* gen() {
     int f = newlabel();
     int a = newlabel();
-    Temp* temp = new Temp(type);
+    Temp* temp = new Temp(type_);
     jumping(0, f);
-    emit(temp.toString() + " = true");
-    emit("goto L" + a);
+    emit(temp->toString() + " = true");
+    emit("goto L" + std::to_string(a));
     emitlabel(f);
     emit(temp->toString() + " = false");
     emitlabel(a);
