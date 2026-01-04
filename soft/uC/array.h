@@ -7,13 +7,14 @@
 
 class Array: public Type {
  public:
-  Type* of {nullptr};    // array *of* type
-  int size = 1;          // number of elements
+  Type* of_ {nullptr};    // array *of* type
+  int size_ = 1;          // number of elements
 
   Array(int sz, Type* p)
-    : Type("[]", Tag::tINDEX, sz*p->width()), size(sz), of(p) {}
+    : Type("[]", Tag::tINDEX, sz*p->width()), size_(sz), of_(p) {}
 
   std::string toString() {
-    return std::string("[") + std::to_string(size) + std::string("] ") + of->toString();
+    return std::string("[") + std::to_string(size_) +
+           std::string("] ") + of_->toString();
   }
 };

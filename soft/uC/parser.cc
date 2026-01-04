@@ -2,18 +2,21 @@
 
 #include <stdexcept>
 
+#include "access.h"
 #include "and.h"
 #include "arith.h"
 #include "array.h"
 #include "const.h"
 #include "env.h"
 #include "expr.h"
+#include "id.h"
 #include "lexer.h"
 #include "logical.h"
 #include "or.h"
 #include "not.h"
 #include "rel.h"
 #include "seq.h"
+#include "stmt.h"
 #include "tag.h"
 #include "token.h"
 #include "unary.h"
@@ -108,11 +111,10 @@ Type* Parser::type() {
   if (tag::cTag(look_->tag()) != '[')
     return p;            // T -> basic
   else
-    return nullptr; //dims(p);   // return array type
+    return dims(p);   // return array type
 }
 
-/*
-Type Parser::dims(Type p) {
+Type* Parser::dims(Type* p) {
   match('[');
   Token tok = look_;
   match(Tag::tNUM);
@@ -121,7 +123,7 @@ Type Parser::dims(Type p) {
     p = dims(p);
   return new Array(((Num)tok).value, p);
 }
-*/
+
 Stmt* Parser::stmts() {
   cout << __func__ << endl;
   if (tag::cTag(look_->tag()) == '}')
@@ -166,7 +168,7 @@ Stmt* Parser::stmt() {
       Stmt::Enclosing = savedStmt;  // reset Stmt.Enclosing
       return whilenode;
     }
-/* Do not required yet.
+
     case Tag::tDO: {
       Do* donode = new Do();
       savedStmt = Stmt::Enclosing;
@@ -178,7 +180,7 @@ Stmt* Parser::stmt() {
       Stmt::Enclosing = savedStmt;  // reset Stmt.Enclosing
       return donode;
     }
-*/
+
     case Tag::tBREAK: {
       match(Tag::tBREAK); match(';');
       return new Break();
@@ -326,7 +328,7 @@ Expr* Parser::factor() {
       pmove();
       return x;
     case Tag::tID: {
-      //string s = look_->toString();
+      //string s = look_->toString();  ??????
       Id* id = top_->get(look_);
       if (id == nullptr)
         error(look_->toString() + " undeclared");
@@ -334,7 +336,7 @@ Expr* Parser::factor() {
       if (tag::cTag(look_->tag()) != '[')
         return id;
       else
-        return nullptr; //offset(id);
+        return offset(id);
     }
     default:
       error("syntax error");

@@ -25,6 +25,13 @@ class Constant: public Expr {
     return false_;
   }
 
+  void jumping(int t, int f) {
+    if (this == True && t != 0)
+      emit("goto L" + t);
+    else if (this == False && f != 0)
+      emit("goto L" + f);
+  }
+
  private:
   static Constant* true_;
   static Constant* false_;

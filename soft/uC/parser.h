@@ -3,15 +3,16 @@
 #include <memory>
 #include <string>
 
-#include "access.h"
-#include "expr.h"
-#include "id.h"
-#include "stmt.h"
 #include "tag.h"
-#include "token.h"
 
+class Access;
 class Env;
+class Expr;
+class Id;
 class Lexer;
+class Stmt;
+class Token;
+class Type;
 
 class Parser {
  public:
@@ -25,7 +26,7 @@ class Parser {
   Stmt* block();
   void decls();
   Type* type();
-  //Type dims(Type p);
+  Type dims(Type* p);
   Stmt* stmts();
   Stmt* stmt();
   Stmt* assign();
