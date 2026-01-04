@@ -1,6 +1,7 @@
 #pragma once
 
 #include "logical.h"
+#include "type.h"
 
 class Rel: public Logical {
  public:
@@ -9,9 +10,9 @@ class Rel: public Logical {
 
   Type* check(Type* p1, Type* p2) {
     if (p1 instanceof Array || p2 instanceof Array)
-      return null;
-    else if (p1 == p2)
-      return Type.Bool;
+      return nullptr;
+    else if (*p1 == *p2)
+      return Type::Bool();
     else
       return nullptr;
   }
@@ -19,7 +20,8 @@ class Rel: public Logical {
   void jumping(int t, int f) {
     Expr* a = expr1.reduce();
     Expr* b = expr2.reduce();
-    std::string test = a.toString() + " " + op.toString() + " " + b.toString();
+    std::string test = a->toString() + " " +
+                       op.toString() + " " + b->toString();
     emitjumps(test, t, f);
   }
 };

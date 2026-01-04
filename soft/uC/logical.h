@@ -36,6 +36,6 @@ class Logical: public Expr {
   }
 
  public:
-  Expr* expr1_ { nullptr };
-  Expr* expr2_ { nullptr };
+  Expr* expr1_ {nullptr};
+  Expr* expr2_ {nullptr};
 };

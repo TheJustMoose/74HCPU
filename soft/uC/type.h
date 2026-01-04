@@ -2,6 +2,10 @@
 
 #include "word.h"
 
+#include <string>
+
+class Token;
+
 class Type: public Word {
  public:
   Type(std::string s, Tag tag, int w)

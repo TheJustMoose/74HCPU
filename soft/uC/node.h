@@ -1,10 +1,10 @@
 #pragma once
 
+#include "lexer.h"
+
 #include <iostream>
 #include <string>
 #include <stdexcept>
-
-#include "lexer.h"
 
 class Node {
  public:
@@ -19,6 +19,6 @@ class Node {
   }
 
  private:
-  int lexline_ = 0;
+  int lexline_ {0};
   static int labels_;
 };

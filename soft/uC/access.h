@@ -14,11 +14,11 @@ class Access: public Op {
     array_(a), index_(i) {}
 
   Expr* gen() {
-    return new Access(array_, index_->reduce(), type);
+    return new Access(array_, index_->reduce(), type_);
   }
 
   void jumping(int t,int f) {
-    emitjumps(reduce().toString(), t, f);
+    emitjumps(reduce()->toString(), t, f);
   }
 
   std::string toString() {

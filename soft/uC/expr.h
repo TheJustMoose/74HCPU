@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-
 #include "node.h"
 #include "token.h"
+
+#include <string>
 
 class Token;
 class Type;

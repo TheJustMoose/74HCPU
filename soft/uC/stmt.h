@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "access.h"
 #include "expr.h"
 #include "id.h"
@@ -9,6 +7,8 @@
 #include "node.h"
 #include "type.h"
 #include "word.h"
+
+#include <string>
 
 // TODO: try to implement it:
 // std::string operator+(const char*, int);
@@ -18,13 +18,16 @@ class Stmt: public Node {
   Stmt() {}
 
   static Stmt* Null() {
-    return new Stmt();  // TODO: should it be singleton?
+    if (!NullStmt)
+      NullStmt = new Stmt();
+    return NullStmt;
   }
 
   void gen(int b, int a) {} // called with labels begin and after
   int after() { return after_; }
 
-  static Stmt* Enclosing;    // used for break stmts
+  static Stmt* Enclosing;  // used for break stmts
+  static Stmt* NullStmt;
 
  protected:
   int after_ {0};           // saves label after
@@ -186,8 +189,8 @@ class SetElem: public Stmt {
   }
 
   void gen(int b, int a) {
-    std::string s1 = index_->reduce().toString();
-    std::string s2 = expr_->reduce().toString();
+    std::string s1 = index_->reduce()->toString();
+    std::string s2 = expr_->reduce()->toString();
     emit(array_->toString() + " [ " + s1 + " ] = " + s2);
   }
 

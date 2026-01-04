@@ -31,5 +31,5 @@ class Env {
   Env* prev_ {nullptr};
 
  private:
-  SymTable table_;  // Hashtable
+  SymTable table_;  // see above
 };

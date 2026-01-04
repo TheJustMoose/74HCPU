@@ -4,7 +4,7 @@
 
 class Unary: public Op {
  public:
-  Expr* expr_ { nullptr };
+  Expr* expr_ {nullptr};
 
   Unary(Token* tok, Expr* x)
     : Op(tok, nullptr), expr_(x) {  // handles minus, for ! see Not
@@ -18,6 +18,6 @@ class Unary: public Op {
   }
 
   std::string toString() {
-    return op_->toString() + " " + expr->toString();
+    return op_->toString() + " " + expr_->toString();
   }
 };

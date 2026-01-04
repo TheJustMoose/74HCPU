@@ -8,9 +8,9 @@ class Seq: public Stmt {
     : stmt1_(s1), stmt2_(s2) {}
 
   void gen(int b, int a) {
-    if (stmt1 == Stmt.Null)
+    if (stmt1 == Stmt::Null())
       stmt2_->gen(b, a);
-    else if ( stmt2 == Stmt.Null )
+    else if (stmt2 == Stmt::Null())
       stmt1_->gen(b, a);
     else {
        int label = newlabel();

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <string>
 #include "tag.h"
+
+#include <string>
 
 class Temp;
 
@@ -20,7 +21,7 @@ class Token {
   Tag tag() { return tag_; }
 
  private:
-  Tag tag_ { Tag::tEMPTY };
+  Tag tag_ {Tag::tEMPTY};
 };
 
 class NullToken: public Token {

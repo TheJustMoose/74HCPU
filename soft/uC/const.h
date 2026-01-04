@@ -5,6 +5,8 @@
 #include "num.h"
 #include "type.h"
 
+#include <string>
+
 class Constant: public Expr {
  public:
   Constant(Token* tok, Type* p)
@@ -13,23 +15,14 @@ class Constant: public Expr {
   Constant(int i)
     : Expr(new Num(i), Type::Int()) {}
 
-  static Constant* True() {
-    if (!true_)
-      true_ = new Constant(Lexer::get_word("true"),  Type::Bool());
-    return true_;
-  }
-
-  static Constant* False() {
-    if (!false_)
-      false_ = new Constant(Lexer::get_word("false"),  Type::Bool());
-    return false_;
-  }
+  static Constant* True();
+  static Constant* False();
 
   void jumping(int t, int f) {
-    if (this == True && t != 0)
-      emit("goto L" + t);
-    else if (this == False && f != 0)
-      emit("goto L" + f);
+    if (this == True() && t != 0)
+      emit("goto L" + std::to_string(t));
+    else if (this == False() && f != 0)
+      emit("goto L" + std::to_string(f));
   }
 
  private:

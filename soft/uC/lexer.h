@@ -1,10 +1,11 @@
 #pragma once
 
+#include "token.h"
+
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include "token.h"
 
 class Word;
 
