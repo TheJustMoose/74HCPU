@@ -116,12 +116,12 @@ Type* Parser::type() {
 
 Type* Parser::dims(Type* p) {
   match('[');
-  Token tok = look_;
+  Token* tok = look_;
   match(Tag::tNUM);
   match(']');
   if (tag::cTag(look_->tag()) == '[')
     p = dims(p);
-  return new Array(((Num)tok).value, p);
+  return new Array(((Num*)tok)->value(), p);
 }
 
 Stmt* Parser::stmts() {
@@ -353,13 +353,13 @@ Access* Parser::offset(Id* a) {   // I -> [E] | [E] I
 
   Type* type = a->type();
   match('['); i = boolean(); match(']');     // first index, I -> [ E ]
-  type = ((Array*)type)->of;
+  type = ((Array*)type)->of_;
   w = new Constant(type->width());
   t1 = new Arith(new Token('*'), i, w);
   loc = t1;
   while (tag::cTag(look_->tag()) == '[') {      // multi-dimensional I -> [ E ] I
     match('['); i = boolean(); match(']');
-    type = ((Array*)type)->of;
+    type = ((Array*)type)->of_;
     w = new Constant(type->width());
     t1 = new Arith(new Token('*'), i, w);
     t2 = new Arith(new Token('+'), loc, t1);

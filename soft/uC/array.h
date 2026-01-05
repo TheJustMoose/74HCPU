@@ -13,8 +13,10 @@ class Array: public Type {
   Array(int sz, Type* p)
     : Type("[]", Tag::tINDEX, sz*p->width()), size_(sz), of_(p) {}
 
-  std::string toString() {
+  std::string toString() override {
     return std::string("[") + std::to_string(size_) +
            std::string("] ") + of_->toString();
   }
+
+  bool is_array() override { return true; }
 };

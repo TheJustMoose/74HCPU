@@ -14,7 +14,7 @@ class Unary: public Op {
    }
 
   Expr* gen() {
-    return new Unary(op_, expr->reduce());
+    return new Unary(op_, expr_->reduce());
   }
 
   std::string toString() {

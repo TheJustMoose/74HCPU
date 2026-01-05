@@ -21,6 +21,10 @@ class Type: public Word {
   static Type* Int();
   static Type* Float();
 
+  virtual bool is_array() { return false; }
+
+  virtual std::string toString() { return ""; }
+
  private:
   int width_ {0};
 };

@@ -64,7 +64,7 @@ class Else: public Stmt {
   void gen(int b, int a) {
     int label1 = newlabel();    // label1 for stmt1
     int label2 = newlabel();    // label2 for stmt2
-    expr_->jumping(0,label2);   // fall through to stmt1 on true
+    expr_->jumping(0, label2);  // fall through to stmt1 on true
     emitlabel(label1);
     stmt1_->gen(label1, a);
     emit("goto L" + std::to_string(a));
@@ -90,7 +90,7 @@ class Do: public Stmt {
   }
 
   void gen(int b, int a) {
-    after = a;
+    after_ = a;
     int label = newlabel();   // label for expr
     stmt_->gen(b,label);
     emitlabel(label);
@@ -147,21 +147,21 @@ class Set: public Stmt {
  public:
   Set(Id* id, Expr* x)
     : id_(id), expr_(x) {
-    if (check(id_->type, expr_->type) == nullptr)
+    if (check(id_->type(), expr_->type()) == nullptr)
       error("type error");
   }
 
-  Type check(Type p1, Type p2) {
-    if (Type.numeric(p1) && Type.numeric(p2))
+  Type* check(Type* p1, Type* p2) {
+    if (Type::numeric(p1) && Type::numeric(p2))
       return p2;
-    else if (p1 == Type.Bool && p2 == Type.Bool)
+    else if (p1 == Type::Bool() && p2 == Type::Bool())
       return p2;
     else
-      return null;
+      return nullptr;
   }
 
   void gen(int b, int a) {
-    emit(id_->toString() + " = " + expr->gen().toString());
+    emit(id_->toString() + " = " + expr_->gen()->toString());
   }
 
  public:
@@ -172,20 +172,20 @@ class Set: public Stmt {
 class SetElem: public Stmt {
  public:
   SetElem(Access* x, Expr* y)
-    : array_(x.array), index_(x.index), expr_(y) {
-    if (check(x.type, expr.type) == null)
+    : array_(x->array_), index_(x->index_), expr_(y) {
+    if (check(x->type(), expr_->type()) == nullptr)
       error("type error");
   }
 
-  Type check(Type p1, Type p2) {
-    if ( p1 instanceof Array || p2 instanceof Array )
-      return null;
-    else if ( p1 == p2 )
+  Type* check(Type* p1, Type* p2) {
+    if (p1->is_array() || p2->is_array() )
+      return nullptr;
+    else if (p1 == p2)
       return p2;
-    else if ( Type.numeric(p1) && Type.numeric(p2) )
+    else if (Type::numeric(p1) && Type::numeric(p2))
       return p2;
     else
-      return null;
+      return nullptr;
   }
 
   void gen(int b, int a) {

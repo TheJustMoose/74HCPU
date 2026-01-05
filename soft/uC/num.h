@@ -9,6 +9,8 @@ class Num: public Token {
 
   std::string toString() override;
 
+  int value() { return value_; }
+
  private:
   int value_ {0};
 };
