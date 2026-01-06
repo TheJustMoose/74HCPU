@@ -156,7 +156,8 @@ void CPU::Step(uint16_t cmd, uint16_t &ip) {
     op &= 0xF0;  // have to clean low bits
 
   PrintLabels(ip);
-  cout << "IP: " << hex << setw(4) << ip
+  cout << hex << setw(4) << tacts_
+       << ", IP: " << hex << setw(4) << ip
        << ", cmd: " << cmd << ", " << Op(cmd);
 
   if (op == 0x00) {  // ADD
@@ -295,6 +296,7 @@ void CPU::Run(bool dbg) {
   PrintRegs();
   for (uint16_t ip = 0; ip < rom.size() && !stop;) {
     Step(rom[ip], ip);
+    tacts_++;
     if (dbg)
       getchar();
   }

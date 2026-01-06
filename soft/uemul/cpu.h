@@ -64,4 +64,5 @@ class CPU {
 
   uint8_t ram[_64K] {};
   uint16_t video_ram[_64K*2] {};  // 256KB == 128KW/16bit for TFT LCD
+  uint32_t tacts_ {0};
 };
