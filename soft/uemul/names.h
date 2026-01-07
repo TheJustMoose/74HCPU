@@ -21,11 +21,11 @@ inline const char* RegNames[] {
 };
 
 inline const char* PtrRegNames[] {
-  "XL", "XH", "YL", "YH", "ZL", "ZH", "SPL", "SPH"
+  "XL", "XH", "YL", "YH", "VL", "VH", "SPL", "SPH"
 };
 
 inline const char* PtrNames[] {
-  "X", "Y", "Z", "SP"
+  "X", "Y", "V", "SP"
 };
 
 inline const char* UnoNames[] {
