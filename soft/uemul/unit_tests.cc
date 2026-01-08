@@ -193,17 +193,28 @@ TEST_CASE("test Ptrs Arithm") {
   cpu.DecPair(Y_PTR);
   CHECK( cpu.GetPair(Y_PTR) == 0x00FF);
 
+  cpu.SetRamp(0);
   cpu.SetPair(V_PTR, 0x0010);
   cpu.IncPair(V_PTR);
+  CHECK( cpu.ramp() == 0 );  // RAMP was not changed
   CHECK( cpu.GetPair(V_PTR) == 0x0011);
   cpu.DecPair(V_PTR);
   CHECK( cpu.GetPair(V_PTR) == 0x0010);
 
+  cpu.SetRamp(0);
   cpu.SetPair(SP_PTR, 0xFFFF);
   cpu.IncPair(SP_PTR);
+  CHECK( cpu.ramp() == 0 );  // RAMP was not changed
   CHECK( cpu.GetPair(SP_PTR) == 0x0000);
   cpu.DecPair(SP_PTR);
   CHECK( cpu.GetPair(SP_PTR) == 0xFFFF);
+
+  // try to check extra bit of V_PTR
+  cpu.SetRamp(0);
+  cpu.SetPair(V_PTR, 0xFFFF);
+  cpu.IncPair(V_PTR);
+  CHECK( cpu.ramp() == 1 );  // RAMP was incremented
+  CHECK( cpu.GetPair(V_PTR) == 0x0000);
 
   // ptr are stored in different places
   CHECK( cpu.GetPair(X_PTR) != cpu.GetPair(Y_PTR) );

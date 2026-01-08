@@ -46,6 +46,14 @@ void CPU::SetPair(uint8_t idx, uint16_t val) {
 
 uint16_t CPU::IncPair(uint8_t idx) {
   uint16_t res = GetPair(idx);
+  if (idx == V_PTR) {
+    if (res == 0xFFFF) {
+      if (ports[5] == 0)
+        ports[5] = 1;  // Additional bit of V_PTR :)
+      else
+        ports[5] = 0;
+    }
+  }
   res++;
   SetPair(idx, res);
   return res;
