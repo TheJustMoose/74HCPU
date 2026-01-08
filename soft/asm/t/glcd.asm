@@ -8,10 +8,32 @@ entry:
 
   mov R0, 31       ; color and y counter
   xor R1, R1
-y_lp:
+b_lp:
+  call line
   call line
   add R0, 0xFF     ; dec R0
-  jnz y_lp
+  jnz b_lp
+
+  mov R4, 31       ; color and y counter
+  xor R1, R1
+g_lp:
+  mov R0, R4
+  mul R0, 32       ; 5 bit left shift
+  call line
+  call line
+  add R4, 0xFF     ; dec R4
+  jnz g_lp
+
+  mov R4, 31       ; color and y counter
+  xor R0, R0
+r_lp:
+  mov R1, R4
+  add R1, R1
+  add R1, R1
+  call line
+  call line
+  add R4, 0xFF     ; dec R4
+  jnz r_lp
 
   stop
 
