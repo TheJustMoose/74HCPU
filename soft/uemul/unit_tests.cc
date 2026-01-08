@@ -178,38 +178,38 @@ TEST_CASE("test UnoCmds") {
 
 TEST_CASE("test Ptrs Arithm") {
   CPU cpu;
-  cpu.SetPair(0, 0x1234);
+  cpu.SetPair(X_PTR, 0x1234);
   CHECK( cpu.regs_bank1[0] == 0x34 );
   CHECK( cpu.regs_bank1[1] == 0x12 );
-  CHECK( cpu.GetPair(0) == 0x1234);
-  cpu.IncPair(0);
-  CHECK( cpu.GetPair(0) == 0x1235);
-  cpu.DecPair(0);
-  CHECK( cpu.GetPair(0) == 0x1234);
+  CHECK( cpu.GetPair(X_PTR) == 0x1234);
+  cpu.IncPair(X_PTR);
+  CHECK( cpu.GetPair(X_PTR) == 0x1235);
+  cpu.DecPair(X_PTR);
+  CHECK( cpu.GetPair(X_PTR) == 0x1234);
 
-  cpu.SetPair(1, 0x00FF);
-  cpu.IncPair(1);
-  CHECK( cpu.GetPair(1) == 0x0100);
-  cpu.DecPair(1);
-  CHECK( cpu.GetPair(1) == 0x00FF);
+  cpu.SetPair(Y_PTR, 0x00FF);
+  cpu.IncPair(Y_PTR);
+  CHECK( cpu.GetPair(Y_PTR) == 0x0100);
+  cpu.DecPair(Y_PTR);
+  CHECK( cpu.GetPair(Y_PTR) == 0x00FF);
 
-  cpu.SetPair(2, 0x0010);
-  cpu.IncPair(2);
-  CHECK( cpu.GetPair(2) == 0x0011);
-  cpu.DecPair(2);
-  CHECK( cpu.GetPair(2) == 0x0010);
+  cpu.SetPair(V_PTR, 0x0010);
+  cpu.IncPair(V_PTR);
+  CHECK( cpu.GetPair(V_PTR) == 0x0011);
+  cpu.DecPair(V_PTR);
+  CHECK( cpu.GetPair(V_PTR) == 0x0010);
 
-  cpu.SetPair(3, 0xFFFF);
-  cpu.IncPair(3);
-  CHECK( cpu.GetPair(3) == 0x0000);
-  cpu.DecPair(3);
-  CHECK( cpu.GetPair(3) == 0xFFFF);
+  cpu.SetPair(SP_PTR, 0xFFFF);
+  cpu.IncPair(SP_PTR);
+  CHECK( cpu.GetPair(SP_PTR) == 0x0000);
+  cpu.DecPair(SP_PTR);
+  CHECK( cpu.GetPair(SP_PTR) == 0xFFFF);
 
   // ptr are stored in different places
-  CHECK( cpu.GetPair(0) != cpu.GetPair(1) );
-  CHECK( cpu.GetPair(1) != cpu.GetPair(2) );
-  CHECK( cpu.GetPair(2) != cpu.GetPair(3) );
-  CHECK( cpu.GetPair(3) != cpu.GetPair(0) );
+  CHECK( cpu.GetPair(X_PTR) != cpu.GetPair(Y_PTR) );
+  CHECK( cpu.GetPair(Y_PTR) != cpu.GetPair(V_PTR) );
+  CHECK( cpu.GetPair(V_PTR) != cpu.GetPair(SP_PTR) );
+  CHECK( cpu.GetPair(SP_PTR) != cpu.GetPair(X_PTR) );
 }
 
 TEST_CASE("test Memory Cmds") {
