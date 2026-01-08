@@ -115,7 +115,7 @@ TEST_CASE("check ROM COPs") {
   CHECK(cl3.GenerateMachineCode() == 0x8040);
 
   // 1000 000 0 10 00 0000
-  CodeLine cl4(1, "LPM R0, Z");  // R0 = *Z;
+  CodeLine cl4(1, "LPM R0, V");  // R0 = *Z;
   CHECK(cl4.GenerateMachineCode() == 0x8080);
 
   // 1000 000 0 11 00 0000

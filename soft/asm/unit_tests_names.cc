@@ -20,8 +20,8 @@ TEST_CASE("check names getter") {
   CHECK(Names::RegFromName("XH") == rXH);
   CHECK(Names::RegFromName("YL") == rYL);
   CHECK(Names::RegFromName("YH") == rYH);
-  CHECK(Names::RegFromName("ZL") == rZL);
-  CHECK(Names::RegFromName("ZH") == rZH);
+  CHECK(Names::RegFromName("VL") == rVL);
+  CHECK(Names::RegFromName("VH") == rVH);
   CHECK(Names::RegFromName("SPL") == rSPL);
   CHECK(Names::RegFromName("SPH") == rSPH);
 
@@ -44,13 +44,13 @@ TEST_CASE("check names getter") {
   CHECK(Names::PtrFromName("YD", &inc, &dec) == rY);
   CHECK(!inc); CHECK(dec);  // post decrement
 
-  CHECK(Names::PtrFromName("Z", &inc, &dec) == rZ);
+  CHECK(Names::PtrFromName("V", &inc, &dec) == rV);
   CHECK(!inc); CHECK(!dec);
 
-  CHECK(Names::PtrFromName("ZI", &inc, &dec) == rZ);
+  CHECK(Names::PtrFromName("VI", &inc, &dec) == rV);
   CHECK(inc); CHECK(!dec);  // post increment
 
-  CHECK(Names::PtrFromName("ZD", &inc, &dec) == rZ);
+  CHECK(Names::PtrFromName("VD", &inc, &dec) == rV);
   CHECK(!inc); CHECK(dec);  // post decrement
 
   CHECK(Names::PtrFromName("SP", &inc, &dec) == rSP);

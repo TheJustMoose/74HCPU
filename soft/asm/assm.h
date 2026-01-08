@@ -53,21 +53,21 @@ enum REG : uint16_t {
   // Arithmetic registers
   rR0 = 0, rR1 = 1, rR2 = 2, rR3 = 3, rR4 = 4, rR5 = 5, rR6 = 6, rR7 = 7,   // Bank 0
   // Pointer registers
-  rXL = 0, rXH = 1, rYL = 2, rYH = 3, rZL = 4, rZH = 5, rSPL = 6, rSPH = 7, // Bank 1
+  rXL = 0, rXH = 1, rYL = 2, rYH = 3, rVL = 4, rVH = 5, rSPL = 6, rSPH = 7, // Bank 1
   rUnkReg = 0x100
 };
 
 enum PTR : uint16_t {
   // Pointer register pairs
-  rX = 0, rY = 1, rZ = 2, rSP = 3,
+  rX = 0, rY = 1, rV = 2, rSP = 3,
   // Pointer register mask
   rMask = 0x3,
   // Flags
   rInc = 0x10, rDec = 0x20,
   // Same pointers but with post increment
-  rXI = rX | rInc, rYI = rY | rInc, rZI = rZ | rInc, rSPI = rSP | rInc,
+  rXI = rX | rInc, rYI = rY | rInc, rVI = rV | rInc, rSPI = rSP | rInc,
   // Same pointers but with post decrement
-  rXD = rX | rDec, rYD = rY | rDec, rZD = rZ | rDec, rSPD = rSP | rDec,
+  rXD = rX | rDec, rYD = rY | rDec, rVD = rV | rDec, rSPD = rSP | rDec,
   rUnkPtr = 0x100
 };
 

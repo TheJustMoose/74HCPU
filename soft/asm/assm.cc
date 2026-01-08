@@ -80,13 +80,13 @@ map<string, COP> cop_names {
 
 map<string, REG> reg_names {
   { "R0", rR0 }, { "R1", rR1 }, { "R2", rR2 }, { "R3", rR3 }, { "R4", rR4 }, { "R5", rR5 }, { "R6", rR6 }, { "R7", rR7 },
-  { "XL", rXL}, { "XH", rXH}, { "YL", rYL}, { "YH", rYH}, { "ZL", rZL}, { "ZH", rZH}, { "SPL", rSPL}, { "SPH", rSPH},
+  { "XL", rXL}, { "XH", rXH}, { "YL", rYL}, { "YH", rYH}, { "VL", rVL}, { "VH", rVH}, { "SPL", rSPL}, { "SPH", rSPH},
 };
 
 map<string, PTR> ptr_names {
-  { "X", rX }, { "Y", rY }, { "Z", rZ }, { "SP", rSP },
-  { "XI", rXI }, { "YI", rYI }, { "ZI", rZI }, { "SPI", rSPI },
-  { "XD", rXD }, { "YD", rYD }, { "ZD", rZD }, { "SPD", rSPD },
+  { "X", rX }, { "Y", rY }, { "V", rV }, { "SP", rSP },
+  { "XI", rXI }, { "YI", rYI }, { "VI", rVI }, { "SPI", rSPI },
+  { "XD", rXD }, { "YD", rYD }, { "VD", rVD }, { "SPD", rSPD },
 };
 
 map<string, uint16_t> port_names {
