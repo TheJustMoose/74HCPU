@@ -49,7 +49,7 @@ class CPU {
   void WriteVRAM(uint16_t addr, uint16_t data);
   uint16_t ReadVRAM(uint16_t addr);
 
-  uint8_t ramp() { return ports[5]; }  // RAM page is stored in PORT5
+  uint8_t Ramp() { return ports[5]; }  // RAM page is stored in PORT5
   void SetRamp(uint8_t val) { ports[5] = val; }
 
   uint8_t ports[32] {};

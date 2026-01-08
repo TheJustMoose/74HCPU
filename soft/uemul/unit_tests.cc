@@ -196,7 +196,7 @@ TEST_CASE("test Ptrs Arithm") {
   cpu.SetRamp(0);
   cpu.SetPair(V_PTR, 0x0010);
   cpu.IncPair(V_PTR);
-  CHECK( cpu.ramp() == 0 );  // RAMP was not changed
+  CHECK( cpu.Ramp() == 0 );  // RAMP was not changed
   CHECK( cpu.GetPair(V_PTR) == 0x0011);
   cpu.DecPair(V_PTR);
   CHECK( cpu.GetPair(V_PTR) == 0x0010);
@@ -204,17 +204,20 @@ TEST_CASE("test Ptrs Arithm") {
   cpu.SetRamp(0);
   cpu.SetPair(SP_PTR, 0xFFFF);
   cpu.IncPair(SP_PTR);
-  CHECK( cpu.ramp() == 0 );  // RAMP was not changed
+  CHECK( cpu.Ramp() == 0 );  // RAMP was not changed
   CHECK( cpu.GetPair(SP_PTR) == 0x0000);
   cpu.DecPair(SP_PTR);
   CHECK( cpu.GetPair(SP_PTR) == 0xFFFF);
 
   // try to check extra bit of V_PTR
-  cpu.SetRamp(0);
-  cpu.SetPair(V_PTR, 0xFFFF);
+  cpu.SetRamp(1);
+  cpu.SetPair(V_PTR, 0);
+  cpu.DecPair(V_PTR);
+  CHECK( cpu.Ramp() == 0 );  // RAMP was decremented
+  CHECK( cpu.GetPair(V_PTR) == 0xFFFF);
   cpu.IncPair(V_PTR);
-  CHECK( cpu.ramp() == 1 );  // RAMP was incremented
   CHECK( cpu.GetPair(V_PTR) == 0x0000);
+  CHECK( cpu.Ramp() == 1 );  // RAMP was incremented
 
   // ptr are stored in different places
   CHECK( cpu.GetPair(X_PTR) != cpu.GetPair(Y_PTR) );
@@ -286,7 +289,7 @@ TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
   CHECK_EQ( cpu.ReadRAM(_32K + 100), 21 ); // second half of RAM was not changed
 
   cpu.ports[5] = 1;                        // ram page = 1 (second page of video ram)
-  CHECK_EQ( cpu.ramp(), 1 );               // check ramp() method
+  CHECK_EQ( cpu.Ramp(), 1 );               // check ramp() method
   cpu.WriteVRAM(100, 88);                  // RAM[_64K + 100] = 88
   CHECK_EQ( cpu.ReadVRAM(100), 88 );       // Video RAM was successfully changed
   cpu.ports[5] = 0;                        // ram page = 0

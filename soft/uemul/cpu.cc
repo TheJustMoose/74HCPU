@@ -61,6 +61,14 @@ uint16_t CPU::IncPair(uint8_t idx) {
 
 uint16_t CPU::DecPair(uint8_t idx) {
   uint16_t res = GetPair(idx);
+  if (idx == V_PTR) {
+    if (res == 0x0000) {
+      if (ports[5] == 0)
+        ports[5] = 1;  // Additional bit of V_PTR :)
+      else
+        ports[5] = 0;
+    }
+  }
   res--;
   SetPair(idx, res);
   return res;
@@ -367,26 +375,26 @@ uint8_t CPU::ReadRAM(uint16_t addr) {
 }
 
 void CPU::WriteVRAM(uint16_t addr, uint16_t data) {
-  if (ramp() > 1) {
+  if (Ramp() > 1) {
     cout << "RAMP[age] value should be in range 0-1" << endl;
     return;
   }
 
   uint32_t vram_addr = addr;
-  vram_addr |= ramp() << 16;
+  vram_addr |= Ramp() << 16;
   video_ram[vram_addr] = data;
 
   DumpVideoRAM();
 }
 
 uint16_t CPU::ReadVRAM(uint16_t addr) {
-  if (ramp() > 1) {
+  if (Ramp() > 1) {
     cout << "RAMP[age] value should be in range 0-1" << endl;
     return 0;
   }
 
   uint32_t vram_addr = addr;
-  vram_addr |= ramp() << 16;
+  vram_addr |= Ramp() << 16;
   return video_ram[vram_addr];
 }
 
