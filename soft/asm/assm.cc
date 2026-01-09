@@ -49,17 +49,17 @@ map<string, uint16_t> unary_codes {
 };
 
 map<string, COP> cop_names {
-  { "ADD", cADD}, { "ADDC", cADDC},
-  { "AND", cAND}, { "OR", cOR}, { "XOR", cXOR},
-  { "MUL", cMUL},
-  { "INV", cUNO}, { "SWAP", cUNO}, { "LSR", cUNO}, { "LSRC", cUNO},
-  { "MOV", cMOV},
-  { "LPM", cLPM}, { "LPMW", cLPMW},
-  { "LD", cLD}, { "LOAD", cLD}, { "LDV", cLDV},
-  { "IN", cIN}, { "OUT", cOUT}, { "TOGL", cTOGL},
-  { "ST", cST}, { "STORE", cST}, { "STV", cSTV},
-  { "CMP", cCMP}, { "CMPC", cCMPC},
-  { "CALL", bCALL},
+  { "ADD", cADD }, { "ADDC", cADDC },
+  { "AND", cAND }, { "OR", cOR }, { "XOR", cXOR },
+  { "MUL", cMUL },
+  { "INV", cUNO }, { "SWAP", cUNO }, { "LSR", cUNO }, { "LSRC", cUNO },
+  { "MOV", cMOV },
+  { "LPM", cLPM }, { "LPMW", cLPMW },
+  { "LD", cLD }, { "LOAD", cLD }, { "LDV", cLDV },
+  { "IN", cIN }, { "OUT", cOUT }, { "TOGL", cTOGL },
+  { "ST", cST }, { "STORE", cST }, { "STV", cSTV },
+  { "CMP", cCMP }, { "CMPC", cCMPC },
+  { "CALL", bCALL },
   { "JMP", bJMP },
   { "RET", bRET },
   { "RETI", bRETI },
@@ -80,7 +80,7 @@ map<string, COP> cop_names {
 
 map<string, REG> reg_names {
   { "R0", rR0 }, { "R1", rR1 }, { "R2", rR2 }, { "R3", rR3 }, { "R4", rR4 }, { "R5", rR5 }, { "R6", rR6 }, { "R7", rR7 },
-  { "XL", rXL}, { "XH", rXH}, { "YL", rYL}, { "YH", rYH}, { "VL", rVL}, { "VH", rVH}, { "SPL", rSPL}, { "SPH", rSPH},
+  { "XL", rXL }, { "XH", rXH }, { "YL", rYL }, { "YH", rYH }, { "VL", rVL }, { "VH", rVH }, { "SPL", rSPL }, { "SPH", rSPH },
 };
 
 map<string, PTR> ptr_names {
@@ -97,7 +97,7 @@ map<string, uint16_t> port_names {
   { "OMASK0", 3 },
   { "PORT2", 4 }, { "LCD_DATA", 4 },
   { "PORT3", 5 }, { "PINS3", 5 }, { "RAMP", 5 },
-  { "PORT4", 6 }, { "PINS4", 6 }, {"CPU_FLAGS", 6},
+  { "PORT4", 6 }, { "PINS4", 6 }, {"CPU_FLAGS", 6 },
   { "PORT5", 7 }, { "PINS5", 7 }, { "MSW", 7 },
   { "PORT6", 8 }, { "PINS6", 8 }, { "DAC", 8 },
   { "PORT7", 9 }, { "PINS7", 9 },

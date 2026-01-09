@@ -200,9 +200,9 @@ class Assembler {
   void ExtractOrgs();
   void ExtractString();
   void ExtractDefs();
-  void Pass1();
-  void Pass2();
-  void Pass3();
+  void Pass1();  // generate machine code
+  void Pass2();  // get real address of labels & string
+  void Pass3();  // set real jump addresses
   uint16_t GetMaxAddress();
   void OutCode();
   void OutCode(std::vector<uint16_t>& code);
