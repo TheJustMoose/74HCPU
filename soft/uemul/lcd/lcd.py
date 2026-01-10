@@ -21,9 +21,9 @@ def rgb(clr):
 
 def read_image():
   dtype_string = '<u2'
-  values_array = np.fromfile("dump.bin", dtype=np.dtype(dtype_string))
+  values_array = np.fromfile("video.dump", dtype=np.dtype(dtype_string))
   if len(values_array) != width*height:
-    print("Image size should be 480*272 but it's", len(values_array))
+    print("Image size should be 480*272 (130560) but it's", len(values_array))
   else:
     print("Read ok")
 
@@ -37,22 +37,24 @@ def read_image():
 
   return image_data
 
-def update_loop():
+def update_img():
   global image
 
   image_data = read_image()
   image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width, 3))
 
-  #self.after(100, update_loop)
-
 def main():
   window_name = 'TFT LCD'
   cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
 
-  update_loop()
+  update_img()
 
   cv2.imshow(window_name, image)
-  cv2.waitKey(0)
+  res = -1
+  while (res == -1):
+    res = cv2.waitKey(100)
+    update_img()
+
   cv2.destroyAllWindows()
 
 main()
