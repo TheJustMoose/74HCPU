@@ -59,6 +59,7 @@ Not a very scary instruction set discrete logic processor.
 |----------------------------------------------|-|
 ```
 
+```
 ADD, ADDC, AND, OR, XOR, MUL is binary commands.
 You can use it:
 CMD Rd, Rs
@@ -73,16 +74,21 @@ A pair of registers is needed to store the multiplication results.
 For example:
 MUL R1, R2 will store result into R1:R0 pair.
 That is, R1:R0 := R1 * R2.
+```
 
+```
 Examples:
 MUL R0, R1 -> R1:R0 := R0 * R1
 MUL R1, R2 -> R1:R0 := R1 * R2
 MUL R2, R3 -> R3:R2 := R2 * R3
 MUL R2, R7 -> R3:R2 := R2 * R7
 ....
+```
 
+```
 The command uses the following register pairs:
 R1:R0
 R3:R2
 R5:R4
 R7:R6
+```
