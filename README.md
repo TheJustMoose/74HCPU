@@ -92,3 +92,12 @@ R3:R2
 R5:R4
 R7:R6
 ```
+
+```
+UNO - unary commands.
+There are four unary commands: LSR, LSRC, INV, SWAP.
+LSR shift register bits to the right. CF flag get value of right (low) bit.
+LSRC do same, but left (high) bit get value of CF.
+SWAP simply swap the nibbles.
+INV simply invert all the bits.
+```
