@@ -59,7 +59,7 @@ Not a very scary instruction set discrete logic processor.
 |----------------------------------------------|-|
 ```
 
-### ADD, ADDC, AND, OR, XOR, MUL is binary commands.
+### ADD, ADDC, AND, OR, XOR, MUL are binary commands
 ```
 You can use it:
 CMD Rd, Rs
@@ -85,7 +85,7 @@ I - Will invert high nibble of SRC before use.
 i - Will invert low nibble of SRC before use.
 ```
 
-### Examples:
+### MUL Examples
 ```
 MUL R0, R1 -> R1:R0 := R0 * R1
 MUL R1, R2 -> R1:R0 := R1 * R2
@@ -95,14 +95,14 @@ MUL R2, R7 -> R3:R2 := R2 * R7
 ```
 
 ```
-The command uses the following register pairs:
+The MUL command uses the following register pairs:
 R1:R0
 R3:R2
 R5:R4
 R7:R6
 ```
 
-### UNO - unary commands.
+### UNO - unary commands
 ```
 There are four unary commands: LSR, LSRC, INV, SWAP.
 LSR shift register bits to the right. CF flag get value of right (low) bit.
