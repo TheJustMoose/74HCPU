@@ -44,7 +44,7 @@ def update_img():
   image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width, 3))
 
 def main():
-  window_name = 'TFT LCD'
+  window_name = 'TFT LCD (press any key to stop!)'
   cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
 
   update_img()
