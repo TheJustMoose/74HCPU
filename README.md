@@ -114,3 +114,21 @@ INV simply invert all the bits.
 ### LPM - Load Program Memory
 This command read data from ROM, not RAM.
 This command stores data in the same ROM that stores the commands themselves.
+
+### LD, ST - Memory commands
+LD - load data from memory
+ST - store date from memory
+V - 0 for RAM and 1 for Video RAM
+SRC/DST - register to read/write
+EXT - register pair which store pointer to memory
+D - decrement pointer after use
+U - increment pointer after use
+OFFSET4 - 4 bit integer offset
+(CPU whill read/write memory with address ptr(EXT) + OFFSET4)
+Example:
+LD R0, X   ; read memory data from X pointer into the R0 register
+ST Y, R1   ; write data from R1 into memory with address from Y pointer
+ST YI, R1  ; write data and increment Y pointer
+ST YD, R1  ; write data and decrement Y pointer
+ST Y+5, R1 ; write data into memory address Y+5
+LDV R7, V  ; read data from Video RAM with address V and store it into R7 (R7:R6 pair)
