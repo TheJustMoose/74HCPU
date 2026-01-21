@@ -199,7 +199,6 @@ class Assembler {
   void MergeCodeWithLabels();
   void ExtractOrgs();
   void ExtractString();
-  void ExtractDefs();
   void Pass1();  // generate machine code
   void Pass2();  // get real address of labels & string
   void Pass3();  // set real jump addresses
