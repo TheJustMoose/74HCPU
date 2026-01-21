@@ -795,6 +795,11 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
   MergeCodeWithLabels();
   ExtractOrgs();
   ExtractString();
+  ExtractDBs();
+
+  if (show_preprocess_out)  // post process ;)
+    PrintPreprocessed();
+
   Pass1();
   Pass2();
   Pass3();
@@ -865,6 +870,43 @@ void Assembler::ExtractString() {
         string str_val = RemoveQuotes(Trim(str.substr(pos + 1)));
         string_consts_[str_name] = StringConst(str_val, it->first);
         cout << "STR '" << str_name << "' = '" << str_val << "'" << endl;
+      }
+      it = lines_.erase(it);  // now remove this directive from asm
+    }
+    else
+      it++;
+  }
+}
+
+void Assembler::ExtractDBs() {
+  map<int, string>::iterator it;
+  for (it = lines_.begin(); it != lines_.end();) {
+    string str = NormalizeLine(it->second);
+    if (str.find(".db") == 0) {
+      str.erase(0, sizeof(".db"));
+
+      size_t pos = str.find(" ");
+      if (pos == string::npos) {
+        cout << "Error in .db const: '" << it->second << "'" << endl;
+        cout << "Line: " << it->first << ". .db value not found" << endl;
+      } else if (pos < str.size()) {
+        string db_name = Trim(str.substr(0, pos));
+        vector<string> db_vals = Split(str.substr(pos + 1));
+        DBConsts db_ints;
+        for (const auto& s : db_vals) {
+          if (s == ",")
+            continue;
+
+          int val {0};
+          string msg_err;
+          if (StrToInt(ToUpper(s), &val, &msg_err))
+            db_ints.push_back(val);
+          else
+            cout << "Can't convert .db value to int" << endl << msg_err << endl;
+        }
+
+        db_consts_[db_name] = db_ints;
+        cout << ".DB " << db_name << " = " << Join(db_vals, '|') << endl;
       }
       it = lines_.erase(it);  // now remove this directive from asm
     }

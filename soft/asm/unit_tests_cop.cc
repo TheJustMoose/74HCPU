@@ -305,7 +305,7 @@ TEST_CASE("check jump distance") {
   // 1111 0001 00000000
   CodeLine cl1(1, "JMP L1");
   // Try to set L1 label offset (from current address)
-  cl1.UpdateMachineCode( map<string, uint16_t> { {"L1", 0} } );  // no jmp (jmp to same command)
+  cl1.UpdateMachineCode( map<string, uint16_t> { { "L1", 0 } } );  // no jmp (jmp to same command)
   CHECK(cl1.GenerateMachineCode() == 0xF100);
 
   // 1111 0001 11111111

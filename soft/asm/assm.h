@@ -189,6 +189,8 @@ class StringConst {
   uint16_t address_ {0};
 };
 
+typedef std::vector<uint8_t> DBConsts;
+
 class Assembler {
  public:
   int Process(std::string fname, bool show_preprocess_out = false);
@@ -199,6 +201,7 @@ class Assembler {
   void MergeCodeWithLabels();
   void ExtractOrgs();
   void ExtractString();
+  void ExtractDBs();
   void Pass1();  // generate machine code
   void Pass2();  // get real address of labels & string
   void Pass3();  // set real jump addresses
@@ -214,4 +217,5 @@ class Assembler {
   std::vector<CodeLine> code_ {};
   std::map<std::string, uint16_t> name_to_address_ {};
   std::map<std::string, StringConst> string_consts_ {};
+  std::map<std::string, DBConsts> db_consts_ {};
 };
