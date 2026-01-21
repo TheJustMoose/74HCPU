@@ -26,8 +26,8 @@ ld   r3, YI + 4
 in   r4, pins0
 out  port0, r5
 togl port1, r7
-st   ZI, r6
-st   ZI+3, r7
+st   VI, r6
+st   VI+3, r7
 cmp  r7, -5
 cmpc r7, 0
 call proc
@@ -73,6 +73,8 @@ jmp end
 
 .str Hello "Test string!"
 .str Menu  "Menu"
+
+.db Num 1
 
 .def clr(reg) XOR reg, reg
 .def inc(reg) ADD reg, 1
