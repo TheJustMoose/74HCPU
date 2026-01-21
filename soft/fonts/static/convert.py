@@ -2,16 +2,19 @@
 
 from PIL import Image, ImageDraw, ImageFont
 
-def conv_fnt(image):
-    print(f"'{char}' image.size: {image.size}")
+def conv_fnt(image, char):
+    print(f"// '{char}' image.size: {image.size}")
     pixels = image.load()
     w, h = image.size
+    print(f"glyph_{char}_width db {w}")
+    print(f"glyph_{char}_height db {h}")
+    print(f"glyph_{char} db")
     for y in range(h):
         for x in range(w):
             r, g, b, a = pixels[x, y]
             if r != g or g != b:
                 print("Not equal!");
-            print("%2X |" % a, end = " ")
+            print(" 0x%02X," % a, end = "")
             if r != 0:
                 print("Alarm!!!")
 
@@ -36,5 +39,5 @@ for char in characters:
     # Draw char
     draw.text((10, 10), char, font = font, fill = "black")
     image = image.crop(image.getbbox())
-    conv_fnt(image)
+    conv_fnt(image, char)
     image.save(f"chr-{char}-{ord(char)}.png")
