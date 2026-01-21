@@ -49,6 +49,12 @@ TEST_CASE("check split") {
   CHECK(c4[0] == ".def");
   CHECK(c4[1] == "ACC");
   CHECK(c4[2] == "R0");
+
+  vector<string> c5 = Split(".db N 100");
+  REQUIRE(c5.size() == 3);
+  CHECK(c5[0] == ".db");
+  CHECK(c5[1] == "N");
+  CHECK(c5[2] == "100");
 }
 
 TEST_CASE("check split command parts") {
@@ -126,4 +132,11 @@ TEST_CASE("check str_util") {
 
   CHECK(StrToInt("0B1111", &val));
   CHECK(15 == val);
+}
+
+TEST_CASE("check Join") {
+  CHECK(Join({}) == "");
+  CHECK(Join({"1"}) == "1");
+  CHECK(Join({"1", "2"}) == "1|2");
+  CHECK(Join({"1", "2"}, ',') == "1,2");
 }
