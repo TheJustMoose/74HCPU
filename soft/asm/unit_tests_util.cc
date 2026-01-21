@@ -55,6 +55,16 @@ TEST_CASE("check split") {
   CHECK(c5[0] == ".db");
   CHECK(c5[1] == "N");
   CHECK(c5[2] == "100");
+
+  vector<string> c6 = Split(".db N 100, 200, 300");
+  REQUIRE(c6.size() == 7);
+  CHECK(c6[0] == ".db");
+  CHECK(c6[1] == "N");
+  CHECK(c6[2] == "100");
+  CHECK(c6[3] == ",");
+  CHECK(c6[4] == "200");
+  CHECK(c6[5] == ",");
+  CHECK(c6[6] == "300");
 }
 
 TEST_CASE("check split command parts") {
