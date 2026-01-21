@@ -3,12 +3,10 @@
 from PIL import Image, ImageDraw, ImageFont
 
 def conv_fnt(image, char):
-    print(f"// '{char}' image.size: {image.size}")
+    print(f"# '{char}' image.size: {image.size}")
     pixels = image.load()
     w, h = image.size
-    print(f"glyph_{char}_width db {w}")
-    print(f"glyph_{char}_height db {h}")
-    print(f"glyph_{char} db")
+    print(f"glyph_{char} db {w}, {h}, # width, height, data...")
     for y in range(h):
         for x in range(w):
             r, g, b, a = pixels[x, y]
