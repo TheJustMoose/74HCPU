@@ -225,8 +225,10 @@ class Assembler {
 
   void OutCode();
   void OutCode(std::vector<uint16_t>& code);
+  void OutDebugInfo(std::vector<uint16_t>& code);
   void OutLabels();
   void OutOrgs();
+  void OutStrings();
   void OutDBs();
 
  private:

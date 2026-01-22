@@ -1041,14 +1041,7 @@ void Assembler::OutCode() {
       cout << "         > " << el << endl;
   }
 
-  cout << "STRINGS:" << endl;
-  if (string_consts_.empty())  // TODO: extract it to OutStrings()
-    cout << " empty" << endl;
-  for (auto& s : string_consts_) {
-    cout << s.first << endl;
-    s.second.Address();
-    s.second.OutCode();
-  }
+  OutStrings();
 }
 
 void Assembler::OutCode(vector<uint16_t>& code) {
@@ -1079,6 +1072,10 @@ void Assembler::OutCode(vector<uint16_t>& code) {
   if (name_to_address_.empty())
     return;
 
+  OutDebugInfo(code);
+}
+
+void Assembler::OutDebugInfo(std::vector<uint16_t>& code) {
   // try to add some 'debug' info into the end of file
   code.push_back(0);
   code.push_back(0);
@@ -1130,6 +1127,17 @@ void Assembler::OutOrgs() {
     cout << " empty" << endl;
   for (auto v : line_to_org_)
     cout << v.first << " " << v.second << endl;
+}
+
+void Assembler::OutStrings() {
+  cout << "STRINGS:" << endl;
+  if (string_consts_.empty())
+    cout << " empty" << endl;
+  for (auto& s : string_consts_) {
+    cout << s.first << endl;
+    s.second.Address();
+    s.second.OutCode();
+  }
 }
 
 void Assembler::OutDBs() {
