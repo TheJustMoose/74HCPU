@@ -775,7 +775,7 @@ void StringConst::OutCode(vector<uint16_t>& code) const {
 
   for (size_t i = 0; i < str_.size(); i++)
     code[address_ + i] = str_[i];
-  code[max_str_address] = 0;
+  code[max_str_address - 1] = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
