@@ -723,13 +723,6 @@ string CodeLine::FormattedCOP() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StringConst& StringConst::operator=(const StringConst& rval) {
-  this->str_ = rval.str_;
-  this->line_number_ = rval.line_number_;
-  this->address_ = rval.address_;
-  return *this;
-}
-
 uint16_t StringConst::GetSize() const {
   if (str_.size() >= numeric_limits<uint16_t>::max()) {
     ErrorCollector::GetInstance().err("String const is too long.", line_number_);

@@ -173,7 +173,6 @@ class StringConst {
  public:
   StringConst() = default;
   StringConst(const std::string& str, int line_number): str_(str), line_number_(line_number) {}
-  StringConst& operator=(const StringConst& rval);
 
   uint16_t GetSize() const;
   int LineNumber() const { return line_number_; }
