@@ -729,7 +729,7 @@ uint16_t StringConst::GetSize() const {
     return 0;
   }
 
-  return static_cast<uint16_t>(str_.size()) + 1;
+  return static_cast<uint16_t>(str_.size()) + 1;  // ASCII Z
 }
 
 void StringConst::SetAddress(uint16_t address) {
@@ -976,7 +976,7 @@ void Assembler::Pass2() {
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
 
   // now place strings after binary code
-  addr = max_addr;
+  addr = max_addr + 1;
   for (auto& s : string_consts_) {
     if (org_it != line_to_org_.end() &&
         s.second.LineNumber() > org_it->first) {  // if string is placed after .org
@@ -1047,7 +1047,9 @@ void Assembler::OutCode(vector<uint16_t>& code) {
   }
 
   if (max_addr) {
-    code.resize(max_addr, 0xFFFFU);
+    // if our code is stored in addresses 0, 1, 2, 3...
+    // it have size == addr + 1
+    code.resize(max_addr + 1, 0xFFFFU);
 
     vector<CodeLine>::iterator it;
     for (it = code_.begin(); it != code_.end(); it++)
