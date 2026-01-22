@@ -768,10 +768,10 @@ void StringConst::OutCode(vector<uint16_t>& code) const {
 
   // string with str_.size() == 1 will store char at address_
   // and trailing zero at address address_ + 1, so:
-  uint16_t max_str_address = address_ + static_cast<uint16_t>(str_.size());
+  uint16_t max_str_address = address_ + static_cast<uint16_t>(str_.size()) + 1;
 
-  if (max_str_address + 1 > code.size())
-    code.resize(max_str_address + 1, 0xFFFFU);
+  if (max_str_address > code.size())
+    code.resize(max_str_address, 0xFFFFU);
 
   for (size_t i = 0; i < str_.size(); i++)
     code[address_ + i] = str_[i];
@@ -794,8 +794,8 @@ void DBConsts::OutCode(vector<uint16_t>& code) const {
 
   uint16_t max_db_address = address_ + static_cast<uint16_t>(data_.size());
 
-  if (max_db_address + 1 > code.size())
-    code.resize(max_db_address + 1, 0xFFFFU);
+  if (max_db_address > code.size())
+    code.resize(max_db_address, 0xFFFFU);
 
   for (size_t i = 0; i < data_.size(); i++)
     code[address_ + i] = data_[i];
@@ -983,7 +983,7 @@ void Assembler::Pass2() {
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
 
   // now place strings after binary code
-  addr = max_addr + 1;
+  addr = max_addr;
   for (auto& s : string_consts_) {
     if (org_it != line_to_org_.end() &&
         s.second.LineNumber() > org_it->first) {  // if string is placed after .org
@@ -1061,8 +1061,7 @@ void Assembler::OutCode(vector<uint16_t>& code) {
   }
 
   if (max_addr) {
-    // numbers from 0 to 5 have 6 pcs (max + 1)
-    code.resize(max_addr + 1, 0xFFFFU);
+    code.resize(max_addr, 0xFFFFU);
 
     vector<CodeLine>::iterator it;
     for (it = code_.begin(); it != code_.end(); it++)
