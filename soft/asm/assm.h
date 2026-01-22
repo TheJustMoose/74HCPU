@@ -200,16 +200,19 @@ class Assembler {
   void PrintPreprocessed();
   void MergeCodeWithLabels();
   void ExtractOrgs();
-  void ExtractString();
+  void ExtractStrings();
   void ExtractDBs();
+
   void Pass1();  // generate machine code
   void Pass2();  // get real address of labels & string
   void Pass3();  // set real jump addresses
   uint16_t GetMaxAddress();
+
   void OutCode();
   void OutCode(std::vector<uint16_t>& code);
   void OutLabels();
   void OutOrgs();
+  void OutDBs();
 
  private:
   std::map<int, std::string> lines_ {};

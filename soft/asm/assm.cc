@@ -794,7 +794,7 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
 
   MergeCodeWithLabels();
   ExtractOrgs();
-  ExtractString();
+  ExtractStrings();
   ExtractDBs();
 
   if (show_preprocess_out)  // TODO: remove it after debug!
@@ -803,10 +803,11 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
   Pass1();
   Pass2();
   Pass3();
-  OutCode();
 
+  OutCode();
   OutLabels();
   OutOrgs();
+  OutDBs();
 
   return ErrorCollector::GetInstance().have_errors();
 }
@@ -855,7 +856,7 @@ void Assembler::ExtractOrgs() {
   }
 }
 
-void Assembler::ExtractString() {
+void Assembler::ExtractStrings() {
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end();) {
     string str = NormalizeLine(it->second);
@@ -1036,6 +1037,10 @@ void Assembler::OutCode(vector<uint16_t>& code) {
   for (auto& s : string_consts_)
     s.second.OutCode(code);
 
+  for (auto& db : db_consts_)
+    for (uint8_t b : db)
+      code[?] = b;
+
   if (name_to_address_.empty())
     return;
 
@@ -1090,6 +1095,14 @@ void Assembler::OutOrgs() {
     cout << " empty" << endl;
   for (auto v : line_to_org_)
     cout << v.first << " " << v.second << endl;
+}
+
+void Assembler::OutDBs() {
+  cout << "DBS:" << endl;
+  if (db_consts_.empty())
+    cout << " empty" << endl;
+  for (auto v : db_consts_)
+    cout << v.first << " " << JoinInt(v.second) << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
