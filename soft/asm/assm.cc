@@ -740,7 +740,7 @@ uint16_t StringConst::GetSize() const {
 }
 
 void StringConst::SetAddress(uint16_t address) {
-  if (address > 0xFFFF) {
+  if (address > 0xFFFF) {  // TODO: check it (probably max(address) is 0xFFFF)
     cout << "Address is too much: " << address;
     return;
   }
@@ -776,6 +776,33 @@ void StringConst::OutCode(vector<uint16_t>& code) const {
   for (size_t i = 0; i < str_.size(); i++)
     code[address_ + i] = str_[i];
   code[max_str_address] = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+uint16_t DBConsts::GetSize() const {
+  return static_cast<uint16_t>(data_.size());
+}
+
+void DBConsts::SetAddress(uint16_t address) {
+  address_ = address;
+}
+
+void DBConsts::OutCode(vector<uint16_t>& code) const {
+  if (!data_.size())
+    return;
+
+  uint16_t max_db_address = address_ + static_cast<uint16_t>(data_.size());
+
+  if (max_db_address + 1 > code.size())
+    code.resize(max_db_address + 1, 0xFFFFU);
+
+  for (size_t i = 0; i < data_.size(); i++)
+    code[address_ + i] = data_[i];
+}
+
+string DBConsts::Join() {
+  return JoinInt(data_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -893,7 +920,7 @@ void Assembler::ExtractDBs() {
       } else if (pos < str.size()) {
         string db_name = Trim(str.substr(0, pos));
         vector<string> db_vals = Split(str.substr(pos + 1));
-        DBConsts db_ints;
+        vector<uint8_t> db_ints;
         for (const auto& s : db_vals) {
           if (s == ",")
             continue;
@@ -901,12 +928,12 @@ void Assembler::ExtractDBs() {
           int val {0};
           string msg_err;
           if (StrToInt(ToUpper(s), &val, &msg_err))
-            db_ints.push_back(val);
+            db_ints.push_back(static_cast<uint8_t>(val));
           else
             cout << "Can't convert .db value to int" << endl << msg_err << endl;
         }
 
-        db_consts_[db_name] = db_ints;
+        db_consts_[db_name] = DBConsts(db_ints);
         cout << ".DB " << db_name << " = " << Join(db_vals, '|') << endl;
       }
       it = lines_.erase(it);  // now remove this directive from asm
@@ -927,20 +954,20 @@ void Assembler::Pass1() {
   }
 }
 
-// get real address of labels & string
+// get real addresses of labels, strings, db consts...
 void Assembler::Pass2() {
   uint16_t addr = 0;
   vector<CodeLine>::iterator it;
-  map<int, uint16_t>::iterator oit = line_to_org_.begin();
+  map<int, uint16_t>::iterator org_it = line_to_org_.begin();
   // for each line of code
   for (it = code_.begin(); it != code_.end(); it++, addr++) {
-    if (oit != line_to_org_.end() &&
-        it->LineNumber() > oit->first) {  // if line placed after .org
-      if (oit->second > addr) {
-        addr = oit->second;                // change line address to .org value
+    if (org_it != line_to_org_.end() &&
+        it->LineNumber() > org_it->first) {  // if line placed after .org
+      if (org_it->second > addr) {
+        addr = org_it->second;               // change line address to .org value
         cout << "move address to: " << addr << endl;
       }
-      oit++;  // this .org was used, we need new .org
+      org_it++;  // this .org was used, we need new .org
     }
 
     it->SetAddress(addr);  // change address of every line
@@ -951,20 +978,27 @@ void Assembler::Pass2() {
       name_to_address_[*lit] = addr;
   }
 
-  uint16_t max_addr = GetMaxAddress();
+  // TODO: fix it! binary code may be in the end of ROM
+  uint16_t max_addr = GetMaxCodeAddress();
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
 
   // now place strings after binary code
   addr = max_addr + 1;
   for (auto& s : string_consts_) {
-    if (oit != line_to_org_.end() &&
-        s.second.LineNumber() > oit->first) {  // if string is placed after .org
-      addr = oit->second;                // we have to change its addresses
-      oit++;  // probably we have more .orgs!
+    if (org_it != line_to_org_.end() &&
+        s.second.LineNumber() > org_it->first) {  // if string is placed after .org
+      addr = org_it->second;                      // we have to change its address
+      org_it++;  // probably we have more .orgs!
     }
     s.second.SetAddress(addr);
     name_to_address_[s.first] = addr;
     addr += s.second.GetSize();
+  }
+
+  // now place db consts after strings
+  for (auto& db : db_consts_) {
+    db.second.SetAddress(addr);
+    addr += db.second.GetSize();
   }
 }
 
@@ -975,7 +1009,7 @@ void Assembler::Pass3() {
     it->UpdateMachineCode(name_to_address_);
 }
 
-uint16_t Assembler::GetMaxAddress() {
+uint16_t Assembler::GetMaxCodeAddress() {
   uint16_t max_addr {0};
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
@@ -1008,7 +1042,7 @@ void Assembler::OutCode() {
   }
 
   cout << "STRINGS:" << endl;
-  if (string_consts_.empty())
+  if (string_consts_.empty())  // TODO: extract it to OutStrings()
     cout << " empty" << endl;
   for (auto& s : string_consts_) {
     cout << s.first << endl;
@@ -1020,26 +1054,28 @@ void Assembler::OutCode() {
 void Assembler::OutCode(vector<uint16_t>& code) {
   code.clear();
 
-  uint16_t max_addr = GetMaxAddress();
-  if (!max_addr) {
+  uint16_t max_addr = GetMaxCodeAddress();
+  if (!max_addr && string_consts_.empty() && db_consts_.empty()) {
     cout << "No code to output" << endl;
     return;
   }
 
-  // numbers from 0 to 5 have 6 pcs (max + 1)
-  code.resize(max_addr + 1, 0xFFFFU);
+  if (max_addr) {
+    // numbers from 0 to 5 have 6 pcs (max + 1)
+    code.resize(max_addr + 1, 0xFFFFU);
 
-  vector<CodeLine>::iterator it;
-  for (it = code_.begin(); it != code_.end(); it++)
-    code[it->Address()] = it->GenerateMachineCode();
+    vector<CodeLine>::iterator it;
+    for (it = code_.begin(); it != code_.end(); it++)
+      code[it->Address()] = it->GenerateMachineCode();
+  }
 
   // StringConst::out_code will resize 'code' if required
   for (auto& s : string_consts_)
     s.second.OutCode(code);
 
+  // Will place db consts after string consts
   for (auto& db : db_consts_)
-    for (uint8_t b : db)
-      code[?] = b;
+    db.second.OutCode(code);
 
   if (name_to_address_.empty())
     return;
@@ -1101,8 +1137,8 @@ void Assembler::OutDBs() {
   cout << "DBS:" << endl;
   if (db_consts_.empty())
     cout << " empty" << endl;
-  for (auto v : db_consts_)
-    cout << v.first << " " << JoinInt(v.second) << endl;
+  for (auto& db : db_consts_)
+    cout << db.first << " " << db.second.Join() << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

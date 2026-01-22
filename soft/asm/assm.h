@@ -189,7 +189,22 @@ class StringConst {
   uint16_t address_ {0};
 };
 
-typedef std::vector<uint8_t> DBConsts;
+class DBConsts {
+ public:
+  DBConsts() = default;
+  DBConsts(const std::vector<uint8_t>& data): data_(data) {}
+
+  uint16_t GetSize() const;
+  uint16_t Address() const { return address_; }
+  void SetAddress(uint16_t);
+  void OutCode(std::vector<uint16_t>& code) const;
+
+  std::string Join();
+
+ private:
+  std::vector<uint8_t> data_ {};
+  uint16_t address_ {0};
+};
 
 class Assembler {
  public:
@@ -206,7 +221,7 @@ class Assembler {
   void Pass1();  // generate machine code
   void Pass2();  // get real address of labels & string
   void Pass3();  // set real jump addresses
-  uint16_t GetMaxAddress();
+  uint16_t GetMaxCodeAddress();
 
   void OutCode();
   void OutCode(std::vector<uint16_t>& code);
