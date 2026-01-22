@@ -797,7 +797,7 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
   ExtractString();
   ExtractDBs();
 
-  if (show_preprocess_out)  // post process ;)
+  if (show_preprocess_out)  // TODO: remove it after debug!
     PrintPreprocessed();
 
   Pass1();
