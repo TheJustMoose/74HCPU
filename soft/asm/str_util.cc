@@ -183,3 +183,13 @@ string Join(vector<string> v, char del) {
   }
   return res;
 }
+
+string JoinInt(vector<uint8_t> v, char del) {
+  string res {};
+  for (size_t i = 0; i < v.size(); i++) {
+    res += to_string(v[i]);
+    if (i < v.size() - 1)
+      res += del;
+  }
+  return res;
+}

@@ -149,4 +149,9 @@ TEST_CASE("check Join") {
   CHECK(Join({"1"}) == "1");
   CHECK(Join({"1", "2"}) == "1|2");
   CHECK(Join({"1", "2"}, ',') == "1,2");
+
+  CHECK(JoinInt({}) == "");
+  CHECK(JoinInt({1}) == "1");
+  CHECK(JoinInt({1, 2}) == "1|2");
+  CHECK(JoinInt({1, 2}, ',') == "1,2");
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -20,3 +21,4 @@ std::string TrimLeft(std::string s);
 std::string Trim(std::string s);
 
 std::string Join(std::vector<std::string> v, char del = '|');
+std::string JoinInt(std::vector<uint8_t> v, char del = '|');
