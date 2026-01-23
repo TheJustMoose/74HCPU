@@ -105,10 +105,21 @@ TEST_CASE("check split command parts") {
   CHECK(t6[2] == "`'L(R1)+1");
 }
 
-TEST_CASE("check str_util") {
-  CHECK(NormalizeLine("  ADD   R0,   R1") == "ADD R0, R1");
+TEST_CASE("check NormalizeLine") {
+  CHECK_EQ(NormalizeLine("  ADD   R0,   R1"), "ADD R0, R1");
+  // Do not change string literals!
   CHECK(NormalizeLine("\"  ADD   R0,   R1\"") == "\"  ADD   R0,   R1\"");
+  CHECK_EQ(NormalizeLine("\"1\""), "\"1\"");
+  CHECK_EQ(NormalizeLine("   \"a  b  c\"   "),
+                            "\"a  b  c\"");
+  // Remove comments
+  CHECK_EQ(NormalizeLine("ADD R1, R2   ; cmt"), "ADD R1, R2");
+  // Do not remove comments if it is in string literal
+  CHECK_EQ(NormalizeLine(".str X \"str with ; which is not comment\""),
+                         ".str X \"str with ; which is not comment\"");
+}
 
+TEST_CASE("check str_util") {
   int val;
   CHECK(!StrToInt("", &val));
   CHECK(!StrToInt("test", &val));

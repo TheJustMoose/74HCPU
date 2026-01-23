@@ -11,8 +11,9 @@ string ToUpper(string s) {
   return s;
 }
 
-// will remove leading spaces
+// will remove leading and trailing spaces
 // also remove more than one space in a row
+// if this spaces are not in string literal
 string NormalizeLine(string s) {
   string res;
   bool skip_space {true};
@@ -30,9 +31,15 @@ string NormalizeLine(string s) {
       } else {
         skip_space = false;
       }
+
+      if (s[i] == ';')  // also remove comments
+        break;
     }
     res += s[i];
   }
+
+  while (res.size() && IsSpace(*res.rbegin()))
+    res.resize(res.size() - 1);
 
   return res;
 }
