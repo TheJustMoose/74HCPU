@@ -7,6 +7,13 @@
 
 using namespace std;
 
+TEST_CASE("check ToUpper") {
+  CHECK_EQ(ToUpper(""), "");
+  CHECK_EQ(ToUpper("AAA"), "AAA");
+  CHECK_EQ(ToUpper("aaa"), "AAA");
+  CHECK_EQ(ToUpper("aAa"), "AAA");
+}
+
 TEST_CASE("check IsSpace") {
   CHECK(IsSpace(' '));
   CHECK(IsSpace('\t'));
