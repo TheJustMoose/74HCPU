@@ -23,7 +23,7 @@ string NormalizeLine(string s) {
       in_string = !in_string;
 
     if (!in_string) {
-      if (s[i] == ' ') {
+      if (IsSpace(s[i])) {
         if (skip_space)
           continue;
         else

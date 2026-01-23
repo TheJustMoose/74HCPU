@@ -117,54 +117,49 @@ TEST_CASE("check NormalizeLine") {
   // Do not remove comments if it is in string literal
   CHECK_EQ(NormalizeLine(".str X \"str with ; which is not comment\""),
                          ".str X \"str with ; which is not comment\"");
-}
+  CHECK_EQ(NormalizeLine(".str X \"ab;cd\""), ".str X \"ab;cd\"");
 
-/*
   // check empty lines
-  CHECK(pre.StripLine("") == "");
-  CHECK(pre.StripLine(" ") == "");
-  CHECK(pre.StripLine("  ") == "");
-  CHECK(pre.StripLine("\n") == "");
+  CHECK(NormalizeLine("") == "");
+  CHECK(NormalizeLine(" ") == "");
+  CHECK(NormalizeLine("  ") == "");
+  CHECK(NormalizeLine("\n") == "");
 
   // check many spaces in many places
-  CHECK(pre.StripLine("a") == "a");
-  CHECK(pre.StripLine(" a") == "a");
-  CHECK(pre.StripLine("a ") == "a");
-  CHECK(pre.StripLine(" a ") == "a");
-  CHECK(pre.StripLine("  a  ") == "a");
+  CHECK(NormalizeLine("a") == "a");
+  CHECK(NormalizeLine(" a") == "a");
+  CHECK(NormalizeLine("a ") == "a");
+  CHECK(NormalizeLine(" a ") == "a");
+  CHECK(NormalizeLine("  a  ") == "a");
 
-  CHECK(pre.StripLine("a b") == "a b");
-  CHECK(pre.StripLine("a  b") == "a b");
-  CHECK(pre.StripLine("a   b") == "a b");
-  CHECK(pre.StripLine(" a b") == "a b");
-  CHECK(pre.StripLine("a b ") == "a b");
-  CHECK(pre.StripLine("  a b  ") == "a b");
+  CHECK(NormalizeLine("a b") == "a b");
+  CHECK(NormalizeLine("a  b") == "a b");
+  CHECK(NormalizeLine("a   b") == "a b");
+  CHECK(NormalizeLine(" a b") == "a b");
+  CHECK(NormalizeLine("a b ") == "a b");
+  CHECK(NormalizeLine("  a b  ") == "a b");
 
   // check comment removing
-  CHECK(pre.StripLine("LSR R0 ; comment ") == "LSR R0");
-  CHECK(pre.StripLine("LSR R0;comment ") == "LSR R0");
-  CHECK(pre.StripLine("; comment ") == "");
-  CHECK(pre.StripLine(";") == "");
-  CHECK(pre.StripLine("\n;") == "");
+  CHECK(NormalizeLine("LSR R0 ; comment ") == "LSR R0");
+  CHECK(NormalizeLine("LSR R0;comment ") == "LSR R0");
+  CHECK(NormalizeLine("; comment ") == "");
+  CHECK(NormalizeLine(";") == "");
+  CHECK(NormalizeLine("\n;") == "");
 
   // check labels
-  CHECK(pre.StripLine("label: mov  ax, bx  ; test cmd") == "label: mov ax, bx");
-  CHECK(pre.StripLine("  LSR   R0  ") == "LSR R0");
+  CHECK(NormalizeLine("label: mov  ax, bx  ; test cmd") == "label: mov ax, bx");
+  CHECK(NormalizeLine("  LSR   R0  ") == "LSR R0");
 
   // check directives
-  CHECK(pre.StripLine(".org 100h") == ".org 100h");
-  CHECK(pre.StripLine("  .org 100h ; comment") == ".org 100h");
+  CHECK(NormalizeLine(".org 100h") == ".org 100h");
+  CHECK(NormalizeLine("  .org 100h ; comment") == ".org 100h");
 
   // check different spaces
-  CHECK(pre.StripLine("\t\tLSR R0  \n") == "LSR R0");
-  CHECK(pre.StripLine("LSR\tR0") == "LSR\tR0");
+  CHECK(NormalizeLine("\t\tLSR R0  \n") == "LSR R0");
+  CHECK(NormalizeLine("LSR\tR0") == "LSR\tR0");
 
-  CHECK(pre.StripLine(";.org 1000h") == "");
-
-  // Have to store semicolon if it inside string literal
-  CHECK(pre.StripLine(".str X \"ab;cd\"") == ".str X \"ab;cd\"");
-
-*/
+  CHECK(NormalizeLine(";.org 1000h") == "");
+}
 
 TEST_CASE("check str_util") {
   int val;
