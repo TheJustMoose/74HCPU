@@ -10,7 +10,7 @@ using namespace std;
 
 void help() {
   const char* help_lines[] = {
-      "74HCPU assembler v 0.4\n",
+      "74HCPU assembler v 0.5\n",
       "Support next operations:\n",
       "arithmetic: ADD, ADDC, AND, OR, XOR, MUL, UNO (SWAP, INV, LSR, LSRC), MOV\n",
       "memory: LPM, LD, ST\n",
@@ -30,6 +30,11 @@ void help() {
       " MOV R0, `R1 - invert high nibble of R1 and copy both nibbles into R0\n"
       "Directives:\n.org 1000h\n.str S \"Some str\"\n.def FROM TO\n.def FROM(param) TO param, bla-bla\n",
       ".def push(r) ST SPD, r ; example for .def with param\n",
+      ".db NAME 123 ; one const in ROM\n",
+      ".db ARRAY 1, 2, 3 ; three consts in ROM\n"
+      ".db MULTILINE \\ ; const on many lines of source code\n"
+      "  1, 2, 3, \\\n",
+      "  4, 5, 6\n",
       "\nRun:\n",
       "74hc-asm.exe src.asm [-pre]\n",
       " -pre will print preprocessed src.asm\n",
