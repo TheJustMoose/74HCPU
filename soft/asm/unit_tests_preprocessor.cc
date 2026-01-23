@@ -45,3 +45,20 @@ TEST_CASE("check labels") {
   CHECK(lines[1] == "label:ST SPD , r0");
   CHECK(lines[2] == "lsr r0");
 }
+
+TEST_CASE("check multilines") {
+  Preprocessor pre;
+  CHECK(!pre.Preprocess(nullptr));
+
+  map<int, string> lines {
+    {1, "One line \\"},
+    {2, "or another...\\"}  // error
+  };
+  CHECK(!pre.Preprocess(&lines));  // and it have to detect it!
+
+  map<int, string> good_lines {
+    {1, "One line \\"},
+    {2, "or another..."}
+  };
+  CHECK(pre.Preprocess(&good_lines));
+}
