@@ -75,6 +75,27 @@ bool Preprocessor::Preprocess(map<int, string> *lines) {
   for (it = lines->begin(); it != lines->end(); it++)
     it->second = NormalizeLine(it->second);
 
+  // combine many lines into one
+  map<int, string>::reverse_iterator rit;
+  map<int, string>::reverse_iterator prev = lines->rend();
+  // I use reverse iterator, so I process lines from the end to beginning
+  for (rit = lines->rbegin(); rit != lines->rend(); rit++) {
+    // we have line with backslash
+    string line = rit->second;
+    if (!line.empty() && *line.rbegin() == '\\') {
+      if (prev != lines->rend()) {          // and we have previous line
+        line.resize(line.size() - 1);       // remove backslash
+        rit->second = line + prev->second;  // combine this line and next line
+        lines->erase(prev->first);          // remove by key 'next' line (I use reverse iterator!!!)
+      } else {
+        cout << "Error. This line has \\ but there is no more lines:" << endl;
+        cout << ">> " << rit->first << ": " << rit->second << endl;
+        return false;
+      }
+    }
+    prev = rit;
+  }
+
   // extract defines to another map
   for (it = lines->begin(); it != lines->end();) {
     vector<string> parts = Split(it->second);
