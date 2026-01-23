@@ -7,51 +7,6 @@
 
 using namespace std;
 
-TEST_CASE("check preprocessor cleaner") {
-  Preprocessor pre;
-
-  // check empty lines
-  CHECK(pre.StripLine("") == "");
-  CHECK(pre.StripLine(" ") == "");
-  CHECK(pre.StripLine("  ") == "");
-  CHECK(pre.StripLine("\n") == "");
-
-  // check many spaces in many places
-  CHECK(pre.StripLine("a") == "a");
-  CHECK(pre.StripLine(" a") == "a");
-  CHECK(pre.StripLine("a ") == "a");
-  CHECK(pre.StripLine(" a ") == "a");
-  CHECK(pre.StripLine("  a  ") == "a");
-
-  CHECK(pre.StripLine("a b") == "a b");
-  CHECK(pre.StripLine("a  b") == "a b");
-  CHECK(pre.StripLine("a   b") == "a b");
-  CHECK(pre.StripLine(" a b") == "a b");
-  CHECK(pre.StripLine("a b ") == "a b");
-  CHECK(pre.StripLine("  a b  ") == "a b");
-
-  // check comment removing
-  CHECK(pre.StripLine("LSR R0 ; comment ") == "LSR R0");
-  CHECK(pre.StripLine("LSR R0;comment ") == "LSR R0");
-  CHECK(pre.StripLine("; comment ") == "");
-  CHECK(pre.StripLine(";") == "");
-  CHECK(pre.StripLine("\n;") == "");
-
-  // check labels
-  CHECK(pre.StripLine("label: mov  ax, bx  ; test cmd") == "label: mov ax, bx");
-  CHECK(pre.StripLine("  LSR   R0  ") == "LSR R0");
-
-  // check directives
-  CHECK(pre.StripLine(".org 100h") == ".org 100h");
-  CHECK(pre.StripLine("  .org 100h ; comment") == ".org 100h");
-
-  // check different spaces
-  CHECK(pre.StripLine("\t\tLSR R0  \n") == "LSR R0");
-  CHECK(pre.StripLine("LSR\tR0") == "LSR\tR0");
-
-  CHECK(pre.StripLine(";.org 1000h") == "");
-}
-
 TEST_CASE("check .def detection & simple defines") {
   map<int, string> lines {
     {1, "add ACC, r1"},

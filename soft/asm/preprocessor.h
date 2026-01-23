@@ -31,8 +31,6 @@ class Preprocessor {
   Preprocessor() = default;
 
   bool Preprocess(std::map<int, std::string> *lines);
-  std::string StripLine(std::string);
-
   void AddDefineIntoMap(std::vector<std::string> parts);
   void ApplyDefines(std::map<int, std::string> *lines);
 
