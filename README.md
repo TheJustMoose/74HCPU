@@ -76,15 +76,6 @@ MUL R1, R2 will store result into R1:R0 pair.
 That is, R1:R0 := R1 * R2.
 ```
 
-### Flags
-```
-C - Low byte contains constant value (1) or flags (0).
-Z - Will reset high nibble of SRC before use.
-z - Will reset low nibble of SRC before use.
-I - Will invert high nibble of SRC before use.
-i - Will invert low nibble of SRC before use.
-```
-
 ### MUL Examples
 ```
 MUL R0, R1 -> R1:R0 := R0 * R1
@@ -102,6 +93,15 @@ R5:R4
 R7:R6
 ```
 
+### Flags
+```
+C - Low byte contains constant value (1) or flags (0).
+Z - Will reset high nibble of SRC before use.
+z - Will reset low nibble of SRC before use.
+I - Will invert high nibble of SRC before use.
+i - Will invert low nibble of SRC before use.
+```
+
 ### UNO - unary commands
 ```
 There are four unary commands: LSR, LSRC, INV, SWAP.
@@ -116,6 +116,7 @@ This command read data from ROM, not RAM.
 This command stores data in the same ROM that stores the commands themselves.
 
 ### LD, ST - Memory commands
+```
 LD - load data from memory
 ST - store date from memory
 V - 0 for RAM and 1 for Video RAM
@@ -132,3 +133,4 @@ ST YI, R1  ; write data and increment Y pointer
 ST YD, R1  ; write data and decrement Y pointer
 ST Y+5, R1 ; write data into memory address Y+5
 LDV R7, V  ; read data from Video RAM with address V and store it into R7 (R7:R6 pair)
+```
