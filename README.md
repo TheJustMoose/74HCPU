@@ -134,3 +134,14 @@ ST YD, R1  ; write data and decrement Y pointer
 ST Y+5, R1 ; write data into memory address Y+5
 LDV R7, V  ; read data from Video RAM with address V and store it into R7 (R7:R6 pair)
 ```
+
+### BRNCH - Branch commands
+```
+CALL - call a function by offset
+AFCALL - call a function to an absolute address
+RET - return to the address stored on the stack
+JMP - go by offset
+NOP - no operation (do nothing)
+STOP - the processor will stop executing the program
+JL, JE, JNE, JG, JZ, JNZ, JC, JNC, JHC, JNHC - conditional jump instructions
+```
