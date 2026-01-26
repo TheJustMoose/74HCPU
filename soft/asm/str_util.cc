@@ -56,6 +56,19 @@ string RemoveQuotes(string s) {
 
 bool StrToInt(string val, int* pout, string* err) {
   int res = 0;
+
+  // Also check chars (for example 'a')
+  if (val.size() >= 2 && *val.begin() == '\'' && *val.rbegin() == '\'') {
+    if (val.size() != 3) {
+      if (err)
+        *err = "Can parse only one character 'string' :)";
+      return false;
+    }
+    if (pout)
+      *pout = val[1];  // return ASCII code of char
+    return true;
+  }
+
   try {
     if (val.find("0X") == 0)
       res = stoi(&val[2], nullptr, 16);

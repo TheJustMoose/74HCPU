@@ -209,6 +209,18 @@ TEST_CASE("check str_util::StrToInt") {
 
   CHECK(StrToInt("0B1111", &val));
   CHECK(15 == val);
+
+  CHECK(!StrToInt("''", &val));
+  CHECK(!StrToInt("'ab'", &val));
+
+  CHECK(StrToInt("'0'", &val));
+  CHECK('0' == val);
+  CHECK(StrToInt("'A'", &val));
+  CHECK('A' == val);
+  CHECK(StrToInt("'a'", &val));
+  CHECK('a' == val);
+  CHECK(StrToInt("'?'", &val));
+  CHECK('?' == val);
 }
 
 TEST_CASE("check Join") {
