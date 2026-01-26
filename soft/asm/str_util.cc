@@ -47,6 +47,10 @@ string NormalizeLine(string s) {
 string RemoveQuotes(string s) {
   if (s.size() <= 2)
     return s;
+
+  if (*s.begin() != '\"' || *s.rbegin() != '\"')
+    return s;
+
   return s.substr(1, s.size() - 2);
 }
 

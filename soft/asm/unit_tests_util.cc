@@ -168,7 +168,14 @@ TEST_CASE("check NormalizeLine") {
   CHECK(NormalizeLine(";.org 1000h") == "");
 }
 
-TEST_CASE("check str_util") {
+TEST_CASE("check str_util::RemoveQuotes") {
+  CHECK_EQ(RemoveQuotes("\"abc\""), "abc");
+  CHECK_EQ(RemoveQuotes("abc"), "abc");
+  CHECK_EQ(RemoveQuotes("x"), "x");
+  CHECK_EQ(RemoveQuotes(""), "");
+}
+
+TEST_CASE("check str_util::StrToInt") {
   int val;
   CHECK(!StrToInt("", &val));
   CHECK(!StrToInt("test", &val));
