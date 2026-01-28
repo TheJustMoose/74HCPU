@@ -728,6 +728,7 @@ void Assembler::MergeCodeWithLabels() {
 }
 
 void Assembler::ExtractOrgs() {
+  int last_org_val {0};
   map<int, string>::iterator it;
   for (it = lines_.begin(); it != lines_.end();) {
     int line = it->first;
@@ -741,6 +742,10 @@ void Assembler::ExtractOrgs() {
       if (StrToInt(ToUpper(org), &val, &msg_err)) {
         line_to_org_[line] = val;
         cout << "now line " << line << " has address " << val << endl;
+        if (last_org_val >= val)
+          cout << "Warning! line " << line << " has .org " << val <<
+                  " which is less than previous org value " << last_org_val << endl;
+        last_org_val = val;
       } else
         cout << "Can't convert org value to int" << endl << msg_err << endl;
       it = lines_.erase(it);  // now remove this directive from asm
