@@ -668,7 +668,7 @@ void DBConsts::OutCode(vector<uint16_t>& code) const {
     code[address_ + i] = data_[i];
 }
 
-string DBConsts::Join() {
+string DBConsts::Join() const {
   return JoinInt(data_);
 }
 

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 
+#include "error_collector.h"
 #include "reg.h"
 #include "str_util.h"
 

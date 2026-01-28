@@ -192,7 +192,7 @@ class DBConsts {
   void SetAddress(uint16_t);
   void OutCode(std::vector<uint16_t>& code) const;
 
-  std::string Join();
+  std::string Join() const;
 
  private:
   std::vector<uint8_t> data_ {};
