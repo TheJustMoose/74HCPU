@@ -189,13 +189,30 @@ class DBConsts {
 
   uint16_t GetSize() const;
   uint16_t Address() const { return address_; }
-  void SetAddress(uint16_t);
+  void SetAddress(uint16_t address) { address_ = address; }
   void OutCode(std::vector<uint16_t>& code) const;
 
   std::string Join() const;
 
  private:
   std::vector<uint8_t> data_ {};
+  uint16_t address_ {0};
+};
+
+class DWConsts {
+ public:
+  DWConsts() = default;
+  DWConsts(const std::map<std::string, uint16_t>& data): data_(data) {}
+
+  uint16_t GetSize() const;
+  uint16_t Address() const { return address_; }
+  void SetAddress(uint16_t address) { address_ = address; }
+  void OutCode(std::vector<uint16_t>& code) const;
+
+  std::string Join() const;
+
+ private:
+  std::map<std::string, uint16_t> data_ {};
   uint16_t address_ {0};
 };
 
@@ -231,4 +248,5 @@ class Assembler {
   std::map<std::string, uint16_t> name_to_address_ {};
   std::map<std::string, StringConst> string_consts_ {};
   std::map<std::string, DBConsts> db_consts_ {};
+  std::map<std::string, DWConsts> dw_consts_ {};
 };

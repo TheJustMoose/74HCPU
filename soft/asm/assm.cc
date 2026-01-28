@@ -651,16 +651,11 @@ uint16_t DBConsts::GetSize() const {
   return static_cast<uint16_t>(data_.size());
 }
 
-void DBConsts::SetAddress(uint16_t address) {
-  address_ = address;
-}
-
 void DBConsts::OutCode(vector<uint16_t>& code) const {
   if (!data_.size())
     return;
 
-  uint16_t max_db_address = address_ + static_cast<uint16_t>(data_.size());
-
+  uint16_t max_db_address = address_ + GetSize();
   if (max_db_address > code.size())
     code.resize(max_db_address, 0xFFFFU);
 
@@ -669,7 +664,36 @@ void DBConsts::OutCode(vector<uint16_t>& code) const {
 }
 
 string DBConsts::Join() const {
-  return JoinInt(data_);
+  return JoinByte(data_);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+uint16_t DWConsts::GetSize() const {
+  return static_cast<uint16_t>(data_.size());
+}
+
+void DWConsts::OutCode(vector<uint16_t>& code) const {
+  if (!data_.size())
+    return;
+
+  uint16_t max_db_address = address_ + GetSize();
+  if (max_db_address > code.size())
+    code.resize(max_db_address, 0xFFFFU);
+
+  uint16_t addr { address_ };
+
+  map<string, uint16_t>::const_iterator it;
+  for (it = data_.begin(); it != data_.end(); it++, addr++)
+    code[addr] = it->second;
+}
+
+string DWConsts::Join() const {
+  vector<uint16_t> res;
+  map<string, uint16_t>::const_iterator it;
+  for (it = data_.begin(); it != data_.end(); it++)
+    res.push_back(it->second);
+  return JoinInt(res);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
