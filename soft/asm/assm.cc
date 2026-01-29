@@ -682,18 +682,23 @@ void DWConsts::OutCode(vector<uint16_t>& code) const {
     code.resize(max_db_address, 0xFFFFU);
 
   uint16_t addr { address_ };
-
-  map<string, uint16_t>::const_iterator it;
-  for (it = data_.begin(); it != data_.end(); it++, addr++)
-    code[addr] = it->second;
+  for (size_t i = 0; i < data_.size(); i++, addr++)
+    code[addr] = data_[i].Value;
 }
 
 string DWConsts::Join() const {
-  vector<uint16_t> res;
-  map<string, uint16_t>::const_iterator it;
-  for (it = data_.begin(); it != data_.end(); it++)
-    res.push_back(it->second);
+  vector<uint16_t> res(data_.size());
+  for (size_t i = 0; i < data_.size(); i++)
+    res[i] = data_[i].Value;
   return JoinInt(res);
+}
+
+void DWConsts::UpdateAddresses(const map<string, uint16_t>& new_addrs) {
+  for (size_t i = 0; i < data_.size(); i++) {
+    map<string, uint16_t>::const_iterator it = new_addrs.find(data_[i].Name);
+    if (it != new_addrs.end())
+      data_[i].Value = it->second;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -839,6 +844,9 @@ void Assembler::ExtractDBs() {
   }
 }
 
+void Assembler::ExtractDWs() {
+}
+
 // generate machine code
 void Assembler::Pass1() {
   map<int, string>::iterator it;
@@ -903,6 +911,16 @@ void Assembler::Pass3() {
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
     it->UpdateMachineCode(name_to_address_);
+
+  // dw_consts_ can store addresses of db_consts_
+  map<string, uint16_t> new_addrs;
+  map<string, DBConsts>::const_iterator db_it;
+  for (db_it = db_consts_.begin(); db_it != db_consts_.end(); db_it++)
+    new_addrs[db_it->first] = db_it->second.Address();
+
+  map<string, DWConsts>::iterator dw_it;
+  for (dw_it = dw_consts_.begin(); dw_it != dw_consts_.end(); dw_it++)
+    dw_it->second.UpdateAddresses(new_addrs);
 }
 
 uint16_t Assembler::GetMaxCodeAddress() {
@@ -967,13 +985,17 @@ void Assembler::OutCode(vector<uint16_t>& code) {
   for (auto& db : db_consts_)
     db.second.OutCode(code);
 
+  // Will place dw consts after db consts
+  for (auto& dw : dw_consts_)
+    dw.second.OutCode(code);
+
   if (name_to_address_.empty())
     return;
 
   OutDebugInfo(code);
 }
 
-void Assembler::OutDebugInfo(std::vector<uint16_t>& code) {
+void Assembler::OutDebugInfo(vector<uint16_t>& code) {
   // try to add some 'debug' info into the end of file
   code.push_back(0);
   code.push_back(0);
@@ -1044,6 +1066,9 @@ void Assembler::OutDBs() {
     cout << " empty" << endl;
   for (auto& db : db_consts_)
     cout << db.first << " " << db.second.Join() << endl;
+}
+
+void Assembler::OutDWs() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////

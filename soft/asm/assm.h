@@ -201,8 +201,13 @@ class DBConsts {
 
 class DWConsts {
  public:
+  struct Pair {
+    std::string Name {};
+    uint16_t Value {0};
+  };
+
   DWConsts() = default;
-  DWConsts(const std::map<std::string, uint16_t>& data): data_(data) {}
+  DWConsts(const std::vector<Pair>& data): data_(data) {}
 
   uint16_t GetSize() const;
   uint16_t Address() const { return address_; }
@@ -211,8 +216,10 @@ class DWConsts {
 
   std::string Join() const;
 
+  void UpdateAddresses(const std::map<std::string, uint16_t>& new_addrs);
+
  private:
-  std::map<std::string, uint16_t> data_ {};
+  std::vector<Pair> data_ {};
   uint16_t address_ {0};
 };
 
@@ -227,6 +234,7 @@ class Assembler {
   void ExtractOrgs();
   void ExtractStrings();
   void ExtractDBs();
+  void ExtractDWs();
 
   void Pass1();  // generate machine code
   void Pass2();  // get real address of labels & string
@@ -240,12 +248,15 @@ class Assembler {
   void OutOrgs();
   void OutStrings();
   void OutDBs();
+  void OutDWs();
 
  private:
   std::map<int, std::string> lines_ {};
   std::map<int, uint16_t> line_to_org_ {};
   std::vector<CodeLine> code_ {};
+  // name_to_address_ contains labels and strings addresses:
   std::map<std::string, uint16_t> name_to_address_ {};
+
   std::map<std::string, StringConst> string_consts_ {};
   std::map<std::string, DBConsts> db_consts_ {};
   std::map<std::string, DWConsts> dw_consts_ {};
