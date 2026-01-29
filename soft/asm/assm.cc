@@ -719,6 +719,7 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
   ExtractOrgs();
   ExtractStrings();
   ExtractDBs();
+  ExtractDWs();
 
   if (show_preprocess_out)  // TODO: remove it after debug!
     PrintPreprocessed();
@@ -731,6 +732,7 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
   OutLabels();
   OutOrgs();
   OutDBs();
+  OutDWs();
 
   return ErrorCollector::GetInstance().have_errors();
 }
@@ -845,6 +847,42 @@ void Assembler::ExtractDBs() {
 }
 
 void Assembler::ExtractDWs() {
+  map<int, string>::iterator it;
+  for (it = lines_.begin(); it != lines_.end();) {
+    string str = NormalizeLine(it->second);
+    if (str.find(".dw") == 0) {
+      str.erase(0, sizeof(".dw"));
+
+      size_t pos = str.find(" ");
+      if (pos == string::npos) {
+        cout << "Error in .dw const: '" << it->second << "'" << endl;
+        cout << "Line: " << it->first << ". .dw value not found" << endl;
+      } else if (pos < str.size()) {
+        string dw_name = Trim(str.substr(0, pos));
+        vector<string> dw_vals = Split(str.substr(pos + 1));
+        vector<DWConsts::Pair> dw_pairs;
+        for (const auto& s : dw_vals) {
+          if (s == ",")
+            continue;
+
+          DWConsts::Pair p;
+          int val {0};
+          string msg_err;
+          if (StrToInt(ToUpper(s), &val, &msg_err))
+            p.Value = static_cast<uint16_t>(val);
+          else
+            p.Name = s;
+          dw_pairs.push_back(p);
+        }
+
+        dw_consts_[dw_name] = DWConsts(dw_pairs);
+        cout << ".DW " << dw_name << " = " << Join(dw_vals, '|') << endl;
+      }
+      it = lines_.erase(it);  // now remove this directive from asm
+    }
+    else
+      it++;
+  }
 }
 
 // generate machine code
@@ -1033,7 +1071,7 @@ void Assembler::WriteBinary(string fname) {
 }
 
 void Assembler::OutLabels() {
-  cout << "LABELS:" << endl;
+  cout << "LABELs:" << endl;
   if (name_to_address_.empty())
     cout << " empty" << endl;
   for (auto v : name_to_address_)
@@ -1042,7 +1080,7 @@ void Assembler::OutLabels() {
 }
 
 void Assembler::OutOrgs() {
-  cout << "ORGS:" << endl;
+  cout << "ORGs:" << endl;
   if (line_to_org_.empty())
     cout << " empty" << endl;
   for (auto v : line_to_org_)
@@ -1050,7 +1088,7 @@ void Assembler::OutOrgs() {
 }
 
 void Assembler::OutStrings() {
-  cout << "STRINGS:" << endl;
+  cout << "STRINGs:" << endl;
   if (string_consts_.empty())
     cout << " empty" << endl;
   for (auto& s : string_consts_) {
@@ -1061,7 +1099,7 @@ void Assembler::OutStrings() {
 }
 
 void Assembler::OutDBs() {
-  cout << "DBS:" << endl;
+  cout << "DBs:" << endl;
   if (db_consts_.empty())
     cout << " empty" << endl;
   for (auto& db : db_consts_)
@@ -1069,6 +1107,11 @@ void Assembler::OutDBs() {
 }
 
 void Assembler::OutDWs() {
+  cout << "DWs:" << endl;
+  if (dw_consts_.empty())
+    cout << " empty" << endl;
+  for (auto& dw : dw_consts_)
+    cout << dw.first << " " << dw.second.Join() << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
