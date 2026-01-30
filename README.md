@@ -100,6 +100,19 @@ Z - Will reset high nibble of SRC before use.
 z - Will reset low nibble of SRC before use.
 I - Will invert high nibble of SRC before use.
 i - Will invert low nibble of SRC before use.
+F - Set CF flag to TRUE
+W - Operation will work with word, not byte
+V - Operation will work with Video RAM
+D - Down, decrease pointer after operation
+U - Up, increase pointer after operation
+OFFSET4 - 4 bit size int offset to current pointer
+O - Out will write to high nibble of port
+o - Out will write to low nibble of port
+SRC - Index of source register (0-7)
+DST - Index of destination register (0-7)
+TYP - Kind of unary operation (0-3)
+EXT - Index of pointer register (0-3)
+PORT + PRT - 5 bit of port index
 ```
 
 ### UNO - unary commands
