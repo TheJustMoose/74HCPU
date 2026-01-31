@@ -63,7 +63,7 @@ Not a very scary instruction set discrete logic processor.
 74HCPU has two register banks.
 First bank has 8 arithmetic registers.
 Second bank has 4 pointers (which can be used as 8 arithmetic registers).
-You can change the active bank by writing to the BF bit of the flags register.
+You can change the active bank by writing BF bit of the flags register.
 
 #### Bank0 (8 pcs 8 bits registers):
 |Name|Name|
@@ -75,6 +75,7 @@ You can change the active bank by writing to the BF bit of the flags register.
 
 #### Bank1 (4 pcs 16 bit registers):
 |Name|Usage|
+|---|---|
 |SP|Stack Pointer (16 bits)|
 |V|Video Pointer (17 bits)|
 |Y|Pointer 1 (16 bits), e.g. Destination|
