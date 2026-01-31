@@ -59,6 +59,12 @@ Not a very scary instruction set discrete logic processor.
 |----------------------------------------------|-|
 ```
 
+### Registers
+74HCPU has two register banks.
+First bank has 8 arithmetic registers.
+Second bank has 4 pointers (which can be used as 8 arithmetic registers).
+You can change the active bank by writing to the BF bit of the flags register.
+
 ### ADD, ADDC, AND, OR, XOR, MUL are binary commands
 ```
 You can use it:
