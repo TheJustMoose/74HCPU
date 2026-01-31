@@ -65,6 +65,22 @@ First bank has 8 arithmetic registers.
 Second bank has 4 pointers (which can be used as 8 arithmetic registers).
 You can change the active bank by writing to the BF bit of the flags register.
 
+####Bank0:
+|Name|Name|
+|---|---|
+|R1|R0|
+|R3|R2|
+|R5|R4|
+|R7|R6|
+
+####Bank1:
+|Name|
+|---|
+|SP|
+|V|
+|Y|
+|X|
+
 ### ADD, ADDC, AND, OR, XOR, MUL are binary commands
 ```
 You can use it:
