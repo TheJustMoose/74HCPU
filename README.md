@@ -8,9 +8,13 @@ Not a very scary instruction set discrete logic processor.
 * 8 data registers and 4 pointer registers in 2 banks
 * 1 flag register in IO port
 
+## Soft!
+[ASM]()
+[UEMUL]()
+
 ![CPU structure](./CPU2.1.png)
 
-## How CPU works?
+## How this CPU works?
 
 ![CPU tacts](./tacts.png)
 
@@ -21,10 +25,11 @@ Not a very scary instruction set discrete logic processor.
 ```
 |----------------------------------------------|f|
 |   HIGH BYTE    |    LOW BYTE   |  HIGH BYTE  |l|
-|0 1 2 3  4 5 6 7 8 9 A B C D E F|   (again)   |a|
+|F E D C  B A 9 8 7 6 5 4 3 2 1 0|   (again)   |a|
 |   4   +   3 + 1 + 3  +    5    = 16          |g|
 |----------------------------------------------|s|
-|   ADD |  DST |C| SRC |-|Z|z|I|i| 00 0000 0000|*|
+|   ADD |  DST |1|    CONST or   | 01 0000 0001|*|
+|   ADD |  DST |0| SRC |-|Z|z|I|i| 00 0000 0000|*|
 |  ADDC |  DST |C| SRC |F|Z|z|I|i| 10 0001 0000|*|
 |   AND |  DST |C| SRC |-|Z|z|I|i| 20 0010 0000|*|
 |    OR |  DST |C| SRC |-|Z|z|I|i| 30 0011 0000|*|
@@ -35,7 +40,7 @@ Not a very scary instruction set discrete logic processor.
 |   LPM |  DST |0|EXT|D|U|-|-|-|W| 80 1000 0000| |
 |    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| |
 |    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
-|--------------|7-8-9-A-B|-------|-------------|-|
+|--------------|8-7-6-5-4|-------|-------------|-|
 |   OUT | PORT |C| SRC |PRT|X|O|o| B0 1011 0000| |
 |    ST |  SRC |V|EXT|D|U|OFFSET4| C0 1100 0000| |
 |   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
@@ -84,6 +89,17 @@ You can change the active bank by writing BF bit of the flags register.
 Also, you can use the registers of bank 1 in the same way as bank 0: R0, R1, ... R7
 (R7 will store the high half of SP, R6 the low half).
 
+### Flags register
+|Bit|Flag Name|Usage|Reason|
+|7|-|reserved|-|
+|6|BF|Bank|You can write it|
+|5|GF|Greater|Compare (CMP)|
+|4|~EQ|Equal (inverted)|Compare (CMP)|
+|3|LF|Lower|Compare (CMP)|
+|2|ZF|Zero|Arithmetic|
+|1|CF|Carry|Arithmetic|
+|0|HCF|Half Carry|Arithmetic|
+
 ### ADD, ADDC, AND, OR, XOR, MUL are binary commands
 ```
 You can use it:
@@ -94,6 +110,9 @@ These commands work like this:
 Rd := Rd CMD Rs
 For example, ADD command does this:
 ADD R0, R1 -> R0 := R0 + R1
+Also you can use immediate value:
+CMD Rd, CONST
+(You can use CONST with any command: ADD, ADDC, AND, OR, XOR, MUL)
 There is only one exception, the MUL command.
 A pair of registers is needed to store the multiplication results.
 For example:
@@ -111,11 +130,12 @@ MUL R2, R7 -> R3:R2 := R2 * R7
 ```
 
 ```
-The MUL command uses the following register pairs:
+The MUL command uses the following register pairs to store result:
 R1:R0
 R3:R2
 R5:R4
 R7:R6
+Rd is used to select output register pair.
 ```
 
 ### Flags
