@@ -1,0 +1,3 @@
+add_llvm_library(LLVMx74HCPUInfo x74HCPUTargetInfo.cpp)
+
+target_link_libraries(LLVMx74HCPUInfo PRIVATE LLVMSupport)

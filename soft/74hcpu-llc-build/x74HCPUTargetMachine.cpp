@@ -1,6 +1,6 @@
 #include "x74HCPU.h"
 //#include "x74HCPUSubtarget.h"
-//#include "TargetInfo/x74HCPUTargetInfo.h"
+#include "TargetInfo/x74HCPUTargetInfo.h"
 //#include "llvm/CodeGen/TargetPassConfig.h"
 //#include "llvm/MC/TargetRegistry.h"
 
