@@ -9,7 +9,7 @@ Not a very scary instruction set discrete logic processor.
 * 1 flag register in IO port
 
 ## Soft!
-[ASM]()
+[ASM](./ASM.md)
 [UEMUL]()
 
 ![CPU structure](./CPU2.1.png)
@@ -91,6 +91,7 @@ Also, you can use the registers of bank 1 in the same way as bank 0: R0, R1, ...
 
 ### Flags register
 |Bit|Flag Name|Usage|Reason|
+|---|---|---|---|
 |7|-|reserved|-|
 |6|BF|Bank|You can write it|
 |5|GF|Greater|Compare (CMP)|
