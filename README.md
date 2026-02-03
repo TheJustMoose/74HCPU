@@ -193,7 +193,7 @@ ST YI, R1   ; write data and increment Y pointer
 ST YD, R1   ; write data and decrement Y pointer
 ST Y+5, R1  ; write data into memory address Y+5
 LDV R7, V   ; read data from Video RAM with address V and store it into R7 (R7:R6 pair)
-LDV R7, V+1 ; **disabled** command, you can use displacement only with X, Y and SP pointers
+LDV R7, V+1 ; <b>disabled</b> command, you can use displacement only with X, Y and SP pointers
 ```
 
 ### BRNCH - Branch commands
