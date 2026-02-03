@@ -96,7 +96,7 @@ Also, you can use the registers of bank 1 in the same way as bank 0: R0, R1, ...
 |6|BF|Bank|You can write it|
 |5|GF|Greater|Compare (CMP)|
 |4|~EQ|Equal (inverted)|Compare (CMP)|
-|3|LF|Lower|Compare (CMP)|
+|3|LF|Less|Compare (CMP)|
 |2|ZF|Zero|Arithmetic|
 |1|CF|Carry|Arithmetic|
 |0|HCF|Half Carry|Arithmetic|
@@ -146,7 +146,7 @@ Z - Will reset high nibble of SRC before use.
 z - Will reset low nibble of SRC before use.
 I - Will invert high nibble of SRC before use.
 i - Will invert low nibble of SRC before use.
-F - Set CF flag to TRUE
+F - Set CF flag to TRUE while executing command.
 W - Operation will work with word, not byte
 V - Operation will work with Video RAM
 D - Down, decrease pointer after operation
@@ -154,6 +154,7 @@ U - Up, increase pointer after operation
 OFFSET4 - 4 bit size int offset to current pointer
 O - Out will write to high nibble of port
 o - Out will write to low nibble of port
+X - Out will toggle bits of port by mask in register
 SRC - Index of source register (0-7)
 DST - Index of destination register (0-7)
 TYP - Kind of unary operation (0-3)
@@ -183,15 +184,16 @@ SRC/DST - register to read/write
 EXT - register pair which store pointer to memory
 D - decrement pointer after use
 U - increment pointer after use
-OFFSET4 - 4 bit integer offset
+OFFSET4 - 4 bit integer offset (-8...+7)
 (CPU whill read/write memory with address ptr(EXT) + OFFSET4)
-Example:
-LD R0, X   ; read memory data from X pointer into the R0 register
-ST Y, R1   ; write data from R1 into memory with address from Y pointer
-ST YI, R1  ; write data and increment Y pointer
-ST YD, R1  ; write data and decrement Y pointer
-ST Y+5, R1 ; write data into memory address Y+5
-LDV R7, V  ; read data from Video RAM with address V and store it into R7 (R7:R6 pair)
+Examples:
+LD R0, X    ; read memory data from X pointer into the R0 register
+ST Y, R1    ; write data from R1 into memory with address from Y pointer
+ST YI, R1   ; write data and increment Y pointer
+ST YD, R1   ; write data and decrement Y pointer
+ST Y+5, R1  ; write data into memory address Y+5
+LDV R7, V   ; read data from Video RAM with address V and store it into R7 (R7:R6 pair)
+LDV R7, V+1 ; **disabled** command, you can use displacement only with X, Y and SP pointers
 ```
 
 ### BRNCH - Branch commands
@@ -199,8 +201,19 @@ LDV R7, V  ; read data from Video RAM with address V and store it into R7 (R7:R6
 CALL - call a function by offset
 AFCALL - call a function to an absolute address
 RET - return to the address stored on the stack
+RETI - return from interrupt to the address stored on the stack
 JMP - go by offset
 NOP - no operation (do nothing)
 STOP - the processor will stop executing the program
 JL, JE, JNE, JG, JZ, JNZ, JC, JNC, JHC, JNHC - conditional jump instructions
+JL - jump if less
+JE - jump if equal
+JNE - jump if not equal
+JG - jump if greater
+JZ - jump if zero
+JNZ - jump if not zero
+JC - jump if carry
+JNC - jump if not carry
+JHC - jump if half carry
+JNHC - jump if not half carry
 ```
