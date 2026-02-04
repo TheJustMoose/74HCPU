@@ -25,6 +25,7 @@ add_executable(asm_unit_tests
 	preprocessor.cc
 	str_util.cc
 	unit_tests_cop.cc
+	unit_tests_dx_consts.cc
 	unit_tests_names.cc
 	unit_tests_preprocessor.cc
 	unit_tests_util.cc
