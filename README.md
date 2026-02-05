@@ -79,7 +79,8 @@ You can change the active bank by writing BF bit of the flags register.
 |R1|R0|
 
 #### Bank1 (4 pcs 16 bit registers):
-<table><tr><td>
+<table>
+<tr><td>
 
 |Name|Usage|
 |---|---|
@@ -88,7 +89,18 @@ You can change the active bank by writing BF bit of the flags register.
 |Y|Pointer 1 (16 bits), e.g. Destination|
 |X|Pointer 0 (16 bits), e.g. Source|
 
-</td></tr></table>
+</td></tr>
+<tr><td>
+
+|Name|Name|
+|---|---|
+|SPH|SPL|
+|VH|VL|
+|YH|YL|
+|XH|XL|
+
+</td></tr>
+</table>
 
 Also, you can use the registers of bank 1 in the same way as bank 0: R0, R1, ... R7
 (R7 will store the high half of SP, R6 the low half).
