@@ -24,6 +24,7 @@ add_executable(asm_unit_tests
 	file_reader.cc
 	preprocessor.cc
 	str_util.cc
+	unit_tests_assm.cc
 	unit_tests_cop.cc
 	unit_tests_dx_consts.cc
 	unit_tests_names.cc
