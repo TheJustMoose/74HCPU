@@ -36,7 +36,7 @@ TEST_CASE("check simple db consts class") {
 TEST_CASE("check db consts class with offset") {
   vector<uint8_t> data {1, 2, 3};
   vector<uint16_t> code;
-  // check simple DBConsts
+  // check DBConsts with offset
   DBConsts dbc(data);
   dbc.SetAddress(30);
   CHECK_EQ(dbc.GetSize(), 3);
