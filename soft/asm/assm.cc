@@ -704,10 +704,16 @@ void DWConsts::UpdateAddresses(const map<string, uint16_t>& new_addrs) {
 ///////////////////////////////////////////////////////////////////////////////
 
 int Assembler::Process(string fname, bool show_preprocess_out) {
+  std::map<int, std::string> lines {};
   FileReader fr;
-  int res = fr.read_file(fname, &lines_);
+  int res = fr.read_file(fname, &lines);
   if (res != 0)
     return res;
+  return Process(lines, show_preprocess_out);
+}
+
+int Assembler::Process(std::map<int, std::string> lines, bool show_preprocess_out) {
+  lines_ = lines;
 
   Preprocessor pre;
   pre.Preprocess(&lines_);

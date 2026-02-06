@@ -226,6 +226,7 @@ class DWConsts {
 class Assembler {
  public:
   int Process(std::string fname, bool show_preprocess_out = false);
+  int Process(std::map<int, std::string> lines, bool show_preprocess_out = false);
   void WriteBinary(std::string fname);
 
  protected:
