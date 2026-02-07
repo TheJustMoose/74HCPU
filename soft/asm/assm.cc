@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "assm.h"
 #include "error_collector.h"
@@ -655,12 +656,21 @@ void DBConsts::OutCode(vector<uint16_t>& code) const {
   if (!data_.size())
     return;
 
+  cout << "code.size() before adding .db data: " << code.size() << endl;
+
+  cout << "address_: " << address_ << endl;
+  cout << "data_.size(): " << data_.size() << endl;
+
   uint16_t max_db_address = address_ + GetSize();
+  cout << "max_db_address: " << max_db_address << endl;
+
   if (max_db_address > code.size())
     code.resize(max_db_address, 0xFFFFU);
 
   for (size_t i = 0; i < data_.size(); i++)
     code[address_ + i] = data_[i];
+
+  cout << "code.size() after adding .db data: " << code.size() << endl;
 }
 
 string DBConsts::Join() const {
@@ -734,11 +744,11 @@ int Assembler::Process(std::map<int, std::string> lines, bool show_preprocess_ou
   Pass2();
   Pass3();
 
-  OutCode();
-  OutLabels();
-  OutOrgs();
-  OutDBs();
-  OutDWs();
+  PrintCode();
+  PrintLabels();
+  PrintOrgs();
+  PrintDBs();
+  PrintDWs();
 
   return ErrorCollector::GetInstance().have_errors();
 }
@@ -927,12 +937,13 @@ void Assembler::Pass2() {
   }
 
   // TODO: fix it! binary code may be in the end of ROM
-  uint16_t max_addr = GetMaxCodeAddress();
+  bool occupied {false};
+  uint16_t max_addr = GetMaxCodeAddress(&occupied);
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
 
   // now place strings after binary code
-  addr = max_addr + 1;
-  for (auto& s : string_consts_) {
+  addr = max_addr + occupied;       // if we have no instructions then max_addr == 0 and
+  for (auto& s : string_consts_) {  // we have to increase code size only if this address is occupied
     if (org_it != line_to_org_.end() &&
         s.second.LineNumber() > org_it->first) {  // if string is placed after .org
       addr = org_it->second;                      // we have to change its address
@@ -967,16 +978,22 @@ void Assembler::Pass3() {
     dw_it->second.UpdateAddresses(new_addrs);
 }
 
-uint16_t Assembler::GetMaxCodeAddress() {
+uint16_t Assembler::GetMaxCodeAddress(bool* occupied) {
+  if (occupied)  // last address is not used until we find any code
+    *occupied = false;
+
   uint16_t max_addr {0};
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
-    if (max_addr < it->Address())
+    if (max_addr < it->Address()) {
       max_addr = it->Address();
+      if (occupied)
+        *occupied = true;
+    }
   return max_addr;
 }
 
-void Assembler::OutCode() {
+void Assembler::PrintCode() {
   cout << "STRINGS ADDR:" << endl;
   for (const auto& s : string_consts_)
     cout << s.first << ": " << s.second.Address() << endl;
@@ -999,22 +1016,26 @@ void Assembler::OutCode() {
       cout << "         > " << el << endl;
   }
 
-  OutStrings();
+  PrintStrings();
 }
 
 void Assembler::OutCode(vector<uint16_t>& code) {
   code.clear();
 
-  uint16_t max_addr = GetMaxCodeAddress();
-  if (!max_addr && string_consts_.empty() && db_consts_.empty()) {
+  bool occupied {false};
+  uint16_t max_addr = GetMaxCodeAddress(&occupied);
+  if ((max_addr == 0 && !occupied) &&  // if we have program with one instruction then max_addr will be zero
+      string_consts_.empty() && db_consts_.empty()) {
     cout << "No code to output" << endl;
     return;
   }
 
-  if (max_addr) {
+  if (max_addr || occupied) {
     // if our code is stored in addresses 0, 1, 2, 3...
     // it have size == addr + 1
-    code.resize(max_addr + 1, 0xFFFFU);
+    // but if it has only one byte it will be stored by address == 0
+    // and if no instructions at all address also be 0!
+    code.resize(max_addr + occupied, 0xFFFFU);
 
     vector<CodeLine>::iterator it;
     for (it = code_.begin(); it != code_.end(); it++)
@@ -1076,7 +1097,7 @@ void Assembler::WriteBinary(string fname) {
   f.close();
 }
 
-void Assembler::OutLabels() {
+void Assembler::PrintLabels() {
   cout << "LABELs:" << endl;
   if (name_to_address_.empty())
     cout << " empty" << endl;
@@ -1085,7 +1106,7 @@ void Assembler::OutLabels() {
     cout << v.first << " " << v.second << endl;
 }
 
-void Assembler::OutOrgs() {
+void Assembler::PrintOrgs() {
   cout << "ORGs:" << endl;
   if (line_to_org_.empty())
     cout << " empty" << endl;
@@ -1093,7 +1114,7 @@ void Assembler::OutOrgs() {
     cout << v.first << " " << v.second << endl;
 }
 
-void Assembler::OutStrings() {
+void Assembler::PrintStrings() {
   cout << "STRINGs:" << endl;
   if (string_consts_.empty())
     cout << " empty" << endl;
@@ -1104,7 +1125,7 @@ void Assembler::OutStrings() {
   }
 }
 
-void Assembler::OutDBs() {
+void Assembler::PrintDBs() {
   cout << "DBs:" << endl;
   if (db_consts_.empty())
     cout << " empty" << endl;
@@ -1112,7 +1133,7 @@ void Assembler::OutDBs() {
     cout << db.first << " " << db.second.Join() << endl;
 }
 
-void Assembler::OutDWs() {
+void Assembler::PrintDWs() {
   cout << "DWs:" << endl;
   if (dw_consts_.empty())
     cout << " empty" << endl;

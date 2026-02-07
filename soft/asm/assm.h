@@ -240,16 +240,16 @@ class Assembler {
   void Pass1();  // generate machine code
   void Pass2();  // get real address of labels & string
   void Pass3();  // set real jump addresses
-  uint16_t GetMaxCodeAddress();
+  uint16_t GetMaxCodeAddress(bool* occupied = nullptr);
 
-  void OutCode();
+  void PrintCode();
   void OutCode(std::vector<uint16_t>& code);
   void OutDebugInfo(std::vector<uint16_t>& code);
-  void OutLabels();
-  void OutOrgs();
-  void OutStrings();
-  void OutDBs();
-  void OutDWs();
+  void PrintLabels();
+  void PrintOrgs();
+  void PrintStrings();
+  void PrintDBs();
+  void PrintDWs();
 
  private:
   std::map<int, std::string> lines_ {};
