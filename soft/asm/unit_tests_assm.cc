@@ -87,3 +87,24 @@ TEST_CASE("check 1 byte .db directive + code") {
   CHECK_EQ(code[0], 0x7101);  // code
   CHECK_EQ(code[1], 10);  // data
 }
+
+TEST_CASE("check .str directive") {
+  std::map<int, std::string> lines {
+    {1, ".str S \"abc\""}
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  vector<uint16_t> code;
+  asmw.OutCodeWrapper(code);
+
+  //           0000 + DBGI + addr of str + 'S' + 0
+  size_t dbg_info_size = 8 + 1 + 1 + 1;
+
+  REQUIRE_EQ(code.size(), 4 + dbg_info_size);  // abc + 0 + dbg_info_size
+  CHECK_EQ(code[0], 'a');
+  CHECK_EQ(code[1], 'b');
+  CHECK_EQ(code[2], 'c');
+  CHECK_EQ(code[3], 0);
+}
