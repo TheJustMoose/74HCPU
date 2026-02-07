@@ -36,7 +36,7 @@ TEST_CASE("check assembler class") {
   bool occupied {false};
   CHECK_EQ(asmw.GetMaxCodeAddressWrapper(&occupied), 2);
 }
-/*
+
 TEST_CASE("check .db directive") {
   std::map<int, std::string> lines {
     {1, ".db ONE 10"}
@@ -48,7 +48,6 @@ TEST_CASE("check .db directive") {
   vector<uint16_t> code;
   asmw.OutCodeWrapper(code);
 
-  CHECK_EQ(code.size(), 1);
+  REQUIRE_EQ(code.size(), 1);
   CHECK_EQ(code[0], 10);
 }
-*/
