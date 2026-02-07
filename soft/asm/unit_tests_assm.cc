@@ -37,7 +37,7 @@ TEST_CASE("check assembler class") {
   CHECK_EQ(asmw.GetMaxCodeAddressWrapper(&occupied), 2);
 }
 
-TEST_CASE("check .db directive") {
+TEST_CASE("check 1 byte .db directive") {
   std::map<int, std::string> lines {
     {1, ".db ONE 10"}
   };
@@ -50,4 +50,40 @@ TEST_CASE("check .db directive") {
 
   REQUIRE_EQ(code.size(), 1);
   CHECK_EQ(code[0], 10);
+}
+
+TEST_CASE("check multi byte .db directive") {
+  std::map<int, std::string> lines {
+    {1, ".db MANY 1, 2, 3, 4, 5"}
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  vector<uint16_t> code;
+  asmw.OutCodeWrapper(code);
+
+  REQUIRE_EQ(code.size(), 5);
+  CHECK_EQ(code[0], 1);
+  CHECK_EQ(code[1], 2);
+  CHECK_EQ(code[2], 3);
+  CHECK_EQ(code[3], 4);
+  CHECK_EQ(code[4], 5);
+}
+
+TEST_CASE("check 1 byte .db directive + code") {
+  std::map<int, std::string> lines {
+    {1, "MOV R0, 1"},
+    {2, ".db ONE 10"}
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  vector<uint16_t> code;
+  asmw.OutCodeWrapper(code);
+
+  REQUIRE_EQ(code.size(), 2);
+  CHECK_EQ(code[0], 0x7101);  // code
+  CHECK_EQ(code[1], 10);  // data
 }

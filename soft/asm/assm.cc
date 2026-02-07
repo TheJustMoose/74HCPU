@@ -940,6 +940,7 @@ void Assembler::Pass2() {
   bool occupied {false};
   uint16_t max_addr = GetMaxCodeAddress(&occupied);
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
+  cout << "occupied: " << occupied << endl;
 
   // now place strings after binary code
   addr = max_addr + occupied;       // if we have no instructions then max_addr == 0 and
@@ -985,11 +986,15 @@ uint16_t Assembler::GetMaxCodeAddress(bool* occupied) {
   uint16_t max_addr {0};
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++)
-    if (max_addr < it->Address()) {
+    if (max_addr < it->Address()) {  // searching max_addr
       max_addr = it->Address();
       if (occupied)
         *occupied = true;
+    } else if (max_addr == it->Address()) {  // checking that last address is occupied
+      if (occupied)
+        *occupied = true;
     }
+
   return max_addr;
 }
 
