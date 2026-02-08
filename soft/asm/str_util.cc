@@ -148,7 +148,7 @@ vector<string> SplitToCmdParts(string text) {
     left += parts[i];  // R0 or XI or XI+5
   }
 
-  if (parts[i] == ",")
+  if (i < parts.size() && parts[i] == ",")
     i++;
 
   string right;
