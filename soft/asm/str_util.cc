@@ -57,6 +57,9 @@ string RemoveQuotes(string s) {
 bool StrToInt(string val, int* pout, string* err) {
   int res = 0;
 
+  if (!val.size())
+    return false;
+
   // Also check chars (for example 'a')
   if (val.size() >= 2 && *val.begin() == '\'' && *val.rbegin() == '\'') {
     if (val.size() != 3) {
