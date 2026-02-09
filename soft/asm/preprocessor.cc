@@ -78,15 +78,17 @@ bool Preprocessor::Preprocess(map<int, string> *lines) {
   // combine many lines into one
   map<int, string>::reverse_iterator rit;
   map<int, string>::reverse_iterator prev = lines->rend();
+  vector<int> keys_to_delete;
   // I use reverse iterator, so I process lines from the end to beginning
   for (rit = lines->rbegin(); rit != lines->rend(); rit++) {
     // we have line with backslash
     string line = rit->second;
     if (!line.empty() && *line.rbegin() == '\\') {
-      if (prev != lines->rend()) {          // and we have previous line
-        line.resize(line.size() - 1);       // remove backslash
-        rit->second = line + prev->second;  // combine this line and next line
-        lines->erase(prev->first);          // remove by key 'next' line (I use reverse iterator!!!)
+      if (prev != lines->rend()) {              // and we have previous line
+        line.resize(line.size() - 1);           // remove backslash
+        rit->second = line + prev->second;      // combine this line and next line
+        keys_to_delete.push_back(prev->first);  // have to remove by key 'next' line
+        prev->second = "";
       } else {
         cout << "Error. This line has \\ but there is no more lines:" << endl;
         cout << ">> " << rit->first << ": " << rit->second << endl;
@@ -95,6 +97,9 @@ bool Preprocessor::Preprocess(map<int, string> *lines) {
     }
     prev = rit;
   }
+
+  for (int key: keys_to_delete)
+     lines->erase(key);
 
   // extract defines to another map
   for (it = lines->begin(); it != lines->end();) {
