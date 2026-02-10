@@ -960,6 +960,12 @@ void Assembler::Pass2() {
     db.second.SetAddress(addr);
     addr += db.second.GetSize();
   }
+
+  // now place dw consts after strings
+  for (auto& dw : dw_consts_) {
+    dw.second.SetAddress(addr);
+    addr += dw.second.GetSize();
+  }
 }
 
 // set real jump addresses
