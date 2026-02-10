@@ -51,14 +51,16 @@ TEST_CASE("check multilines") {
   CHECK(!pre.Preprocess(nullptr));
 
   map<int, string> lines {
-    {1, "One line \\"},
-    {2, "or another...\\"}  // error
+    {1, "One way, \\"},
+    {2, "or another, \\"}  // error
   };
   CHECK(!pre.Preprocess(&lines));  // and it have to detect it!
 
   map<int, string> good_lines {
-    {1, "One line \\"},
-    {2, "or another..."}
+    {1, "One way, \\"},
+    {2, "or another, \\"},
+    {3, "I'm gonna find ya..."},
   };
   CHECK(pre.Preprocess(&good_lines));
+
 }

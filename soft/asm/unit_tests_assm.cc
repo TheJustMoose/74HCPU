@@ -35,6 +35,7 @@ TEST_CASE("check assembler class") {
   CHECK_EQ(code[2], 0xFFFE);
   bool occupied {false};
   CHECK_EQ(asmw.GetMaxCodeAddressWrapper(&occupied), 2);
+  CHECK(occupied);
 }
 
 TEST_CASE("check 1 byte .db directive") {
@@ -107,4 +108,19 @@ TEST_CASE("check .str directive") {
   CHECK_EQ(code[1], 'b');
   CHECK_EQ(code[2], 'c');
   CHECK_EQ(code[3], 0);
+}
+
+TEST_CASE("check .dw directive") {
+  std::map<int, std::string> lines {
+    {1, ".db CNSTS 1, 2, 3, 4"},
+    {2, ".dw PTR CNSTS"}
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  vector<uint16_t> code;
+  asmw.OutCodeWrapper(code);
+
+  REQUIRE_EQ(code.size(), 5);
 }
