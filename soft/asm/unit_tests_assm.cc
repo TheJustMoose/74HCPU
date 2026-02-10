@@ -123,4 +123,9 @@ TEST_CASE("check .dw directive") {
   asmw.OutCodeWrapper(code);
 
   REQUIRE_EQ(code.size(), 5);
+  CHECK_EQ(code[0], 1); // .db
+  CHECK_EQ(code[1], 2);
+  CHECK_EQ(code[2], 3);
+  CHECK_EQ(code[3], 4);
+  CHECK_EQ(code[4], 0); // .dw == address of .db
 }
