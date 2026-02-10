@@ -172,7 +172,7 @@ class StringConst {
   int LineNumber() const { return line_number_; }
   uint16_t Address() const { return address_; }
   void SetAddress(uint16_t);
-  void OutCode() const;
+  void PrintCode() const;
   void OutCode(std::vector<uint16_t>& code) const;
   std::string Str() const { return str_; }
 

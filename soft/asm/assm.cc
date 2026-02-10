@@ -616,7 +616,7 @@ void StringConst::SetAddress(uint16_t address) {
   address_ = address;
 }
 
-void StringConst::OutCode() const {
+void StringConst::PrintCode() const {
   uint16_t address = address_;
   for (size_t i = 0; i < str_.size(); i++)
     cout << "     " << hex
@@ -1132,7 +1132,7 @@ void Assembler::PrintStrings() {
   for (auto& s : string_consts_) {
     cout << s.first << endl;
     s.second.Address();
-    s.second.OutCode();
+    s.second.PrintCode();
   }
 }
 
