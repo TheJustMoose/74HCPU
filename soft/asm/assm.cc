@@ -558,7 +558,7 @@ CodeLine::CodeLine(int line_number, string line_text)
   OP_TYPE opt = CopToType(op);
 
   CodeGen* cg {nullptr};
-  switch (opt) {
+  switch (opt) {  // TODO: try to replace new to make_unique
     case tBINARY: cg = new BinaryCodeGen(line_number_, op, left, right); break;
     case tUNARY: cg = new UnaryCodeGen(line_number_, op_name, left); break;
     case tMEMORY: cg = new MemoryCodeGen(line_number_, op, left, right); break;
@@ -574,7 +574,8 @@ CodeLine::CodeLine(int line_number, string line_text)
       cout << "No operation is required" << endl;
   }
 
-  code_gen_.reset(cg);
+  if (cg)
+    code_gen_.reset(cg);
 }
 
 uint16_t CodeLine::GenerateMachineCode() {
@@ -656,11 +657,6 @@ void DBConsts::OutCode(vector<uint16_t>& code) const {
   if (!data_.size())
     return;
 
-  cout << "code.size() before adding .db data: " << code.size() << endl;
-
-  cout << "address_: " << address_ << endl;
-  cout << "data_.size(): " << data_.size() << endl;
-
   uint16_t max_db_address = address_ + GetSize();
   cout << "max_db_address: " << max_db_address << endl;
 
@@ -669,8 +665,6 @@ void DBConsts::OutCode(vector<uint16_t>& code) const {
 
   for (size_t i = 0; i < data_.size(); i++)
     code[address_ + i] = data_[i];
-
-  cout << "code.size() after adding .db data: " << code.size() << endl;
 }
 
 string DBConsts::Join() const {
