@@ -17,7 +17,7 @@ class AsmWrapper: public Assembler {
 };
 
 TEST_CASE("check assembler class") {
-  std::map<int, std::string> lines {
+  map<int, string> lines {
     {1, "MOV R0, 1"},
     {2, "MOV R1, R0"},
     {3, "STOP"},
@@ -39,7 +39,7 @@ TEST_CASE("check assembler class") {
 }
 
 TEST_CASE("check 1 byte .db directive") {
-  std::map<int, std::string> lines {
+  map<int, string> lines {
     {1, ".db ONE 10"}
   };
 
@@ -54,7 +54,7 @@ TEST_CASE("check 1 byte .db directive") {
 }
 
 TEST_CASE("check multi byte .db directive") {
-  std::map<int, std::string> lines {
+  map<int, string> lines {
     {1, ".db MANY 1, 2, 3, 4, 5"}
   };
 
@@ -73,7 +73,7 @@ TEST_CASE("check multi byte .db directive") {
 }
 
 TEST_CASE("check 1 byte .db directive + code") {
-  std::map<int, std::string> lines {
+  map<int, string> lines {
     {1, "MOV R0, 1"},
     {2, ".db ONE 10"}
   };
@@ -90,7 +90,7 @@ TEST_CASE("check 1 byte .db directive + code") {
 }
 
 TEST_CASE("check .str directive") {
-  std::map<int, std::string> lines {
+  map<int, string> lines {
     {1, ".str S \"abc\""}
   };
 
@@ -111,7 +111,7 @@ TEST_CASE("check .str directive") {
 }
 
 TEST_CASE("check .dw directive") {
-  std::map<int, std::string> lines {
+  map<int, string> lines {
     {1, ".db CNSTS 1, 2, 3, 4"},
     {2, ".dw PTR CNSTS"}
   };
@@ -128,4 +128,79 @@ TEST_CASE("check .dw directive") {
   CHECK_EQ(code[2], 3);
   CHECK_EQ(code[3], 4);
   CHECK_EQ(code[4], 0); // .dw == address of .db
+}
+
+TEST_CASE("check all") {
+  map<int, string> lines {
+    {1, "MOV R0, 1"},            // 1
+    {2, "MOV R1, R0"},           // 1
+    {3, ".str S \"abc\""},       // 3 + 1
+    {4, ".db CNSTS 1, 2, 3, 4"}, // 4
+    {5, ".dw PTR1 CNSTS"},       // 1
+    {6, ".dw PTR2 S"},           // 1
+  };                             // == 12
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  vector<uint16_t> code;
+  asmw.OutCodeWrapper(code);
+
+  //           0000 + DBGI + addr of str + 'S' + 0
+  size_t dbg_info_size = 8 + 1 + 1 + 1;
+
+  REQUIRE_EQ(code.size(), 12 + dbg_info_size);  // code size + dbg_info_size
+  // code
+  CHECK_EQ(code[0], 0x7101);
+  CHECK_EQ(code[1], 0x7200);
+  // data
+  CHECK_EQ(code[2], 'a');
+  CHECK_EQ(code[3], 'b');
+  CHECK_EQ(code[4], 'c');
+  CHECK_EQ(code[5], 0);   // ASCII Z
+  CHECK_EQ(code[6], 1);   // 1
+  CHECK_EQ(code[7], 2);   // 2
+  CHECK_EQ(code[8], 3);   // 3
+  CHECK_EQ(code[9], 4);   // 4
+  CHECK_EQ(code[10], 6);  // PTR1
+  CHECK_EQ(code[11], 0);  // PTR2
+  // dbg info prefix
+  CHECK_EQ(code[12], 0);
+  CHECK_EQ(code[13], 0);
+  CHECK_EQ(code[14], 0);
+  CHECK_EQ(code[15], 0);
+  CHECK_EQ(code[16], 'D');
+  CHECK_EQ(code[17], 'B');
+  CHECK_EQ(code[18], 'G');
+  CHECK_EQ(code[19], 'I');
+  // dbg info
+  CHECK_EQ(code[20], 2);
+  CHECK_EQ(code[21], 'S');
+  CHECK_EQ(code[22], 0);
+}
+
+TEST_CASE("check .org directive") {
+  map<int, string> lines {
+    {1, "MOV R0, 1"},
+    {2, "MOV R1, R0"},
+    {3, ".org 50h"},
+    {4, "STOP"},
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  vector<uint16_t> code;
+  asmw.OutCodeWrapper(code);
+
+  REQUIRE_EQ(code.size(), 0x51);  // length == 0x51
+  CHECK_EQ(code[0], 0x7101);      // min addr == 0
+  CHECK_EQ(code[1], 0x7200);
+  CHECK_EQ(code[0x50], 0xFFFE);   // max addr == 0x50
+
+  // .org 50h means that STOP cmd will be placed at address 50h
+  // so program length will be 51h
+  bool occupied {false};
+  CHECK_EQ(asmw.GetMaxCodeAddressWrapper(&occupied), 0x50);  // address, not length!
+  CHECK(occupied);  // yes, I have STOP cmd at address 50h
 }
