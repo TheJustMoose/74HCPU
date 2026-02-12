@@ -83,13 +83,15 @@ You can change the active bank by writing BF bit of the flags register.
 <tr>
 <td>
 
++----+-----+
 |Name|Usage|
-|---|---|
++----+-----+
 |SP|Stack Pointer (16 bits)|
 |V|Video Pointer (**17** bits)|
 |Y|Pointer 1 (16 bits), e.g. Destination|
 |X|Pointer 0 (16 bits), e.g. Source|
 |16 bit pointers|
++---------------+
 
 </td>
 <td>
