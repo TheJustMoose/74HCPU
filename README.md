@@ -89,7 +89,8 @@ You can change the active bank by writing BF bit of the flags register.
 |V|Video Pointer (**17** bits)|
 |Y|Pointer 1 (16 bits), e.g. Destination|
 |X|Pointer 0 (16 bits), e.g. Source|
-16 bit pointers
+|16 bit pointers|
+
 </td>
 <td>
 
@@ -99,7 +100,8 @@ You can change the active bank by writing BF bit of the flags register.
 |VH|VL|
 |YH|YL|
 |XH|XL|
-or 8 bit registers
+|or 8 bit registers|
+
 </td></tr>
 </table>
 
