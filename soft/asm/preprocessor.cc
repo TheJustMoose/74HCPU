@@ -115,9 +115,10 @@ bool Preprocessor::Preprocess(map<int, string> *lines) {
   }
 
   cout << "DEFINE LIST:" << endl;
-  map<string, Define>::iterator it2;
-  for (it2 = defines_.begin(); it2 != defines_.end(); it2++)
-    cout << it2->first << " == " << it2->second.Body() << endl;
+  if (defines_.empty())
+    cout << " empty" << endl;
+  for (auto& df : defines_)
+    cout << df.first << " == " << df.second.Body() << endl;
 
   ApplyDefines(lines);
 

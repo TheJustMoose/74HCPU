@@ -623,7 +623,7 @@ void StringConst::PrintCode() const {
     cout << "     " << hex
        << setw(4) << setfill('0') << right << address++ << ": "
        << setw(4) << setfill('0') << right << uint16_t(str_[i]) << " "
-       << str_[i] << endl;
+       << "'" << str_[i] << "'" << endl;
 
   cout << "     " << hex
        << setw(4) << setfill('0') << right << address++ << ": "
@@ -708,7 +708,7 @@ void DWConsts::UpdateAddresses(const map<string, uint16_t>& new_addrs) {
 ///////////////////////////////////////////////////////////////////////////////
 
 int Assembler::Process(string fname, bool show_preprocess_out) {
-  std::map<int, std::string> lines {};
+  map<int, string> lines {};
   FileReader fr;
   int res = fr.read_file(fname, &lines);
   if (res != 0)
@@ -716,7 +716,7 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
   return Process(lines, show_preprocess_out);
 }
 
-int Assembler::Process(std::map<int, std::string> lines, bool show_preprocess_out) {
+int Assembler::Process(map<int, string> lines, bool show_preprocess_out) {
   lines_ = lines;
 
   Preprocessor pre;
@@ -968,12 +968,20 @@ void Assembler::Pass3() {
   for (it = code_.begin(); it != code_.end(); it++)
     it->UpdateMachineCode(name_to_address_);
 
-  // dw_consts_ can store addresses of db_consts_
+  // dw_consts_ can store addresses of db_consts_ and StringConst
   map<string, uint16_t> new_addrs;
+
+  // get strings addresses
+  map<string, StringConst>::const_iterator str_it;
+  for (str_it = string_consts_.begin(); str_it != string_consts_.end(); str_it++)
+    new_addrs[str_it->first] = str_it->second.Address();
+
+  // get byte[s] addresses
   map<string, DBConsts>::const_iterator db_it;
   for (db_it = db_consts_.begin(); db_it != db_consts_.end(); db_it++)
     new_addrs[db_it->first] = db_it->second.Address();
 
+  // update .dw values
   map<string, DWConsts>::iterator dw_it;
   for (dw_it = dw_consts_.begin(); dw_it != dw_consts_.end(); dw_it++)
     dw_it->second.UpdateAddresses(new_addrs);
@@ -1103,7 +1111,9 @@ void Assembler::WriteBinary(string fname) {
 }
 
 void Assembler::PrintLabels() {
-  cout << "LABELs:" << endl;
+  // Is it Ok? Probably I should store labels
+  // and strings in different places
+  cout << "LABELs & STRINGs:" << endl;
   if (name_to_address_.empty())
     cout << " empty" << endl;
   for (auto v : name_to_address_)
@@ -1125,7 +1135,6 @@ void Assembler::PrintStrings() {
     cout << " empty" << endl;
   for (auto& s : string_consts_) {
     cout << s.first << endl;
-    s.second.Address();
     s.second.PrintCode();
   }
 }

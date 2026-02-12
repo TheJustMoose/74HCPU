@@ -163,7 +163,7 @@ TEST_CASE("check all") {
   CHECK_EQ(code[8], 3);   // 3
   CHECK_EQ(code[9], 4);   // 4
   CHECK_EQ(code[10], 6);  // PTR1
-  CHECK_EQ(code[11], 0);  // PTR2
+  CHECK_EQ(code[11], 2);  // PTR2 == string S address
   // dbg info prefix
   CHECK_EQ(code[12], 0);
   CHECK_EQ(code[13], 0);
