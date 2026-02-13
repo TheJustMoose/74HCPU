@@ -12,7 +12,7 @@ Not a very scary instruction set discrete logic processor.
 [ASM](./ASM.md)
 [UEMUL]()
 
-![CPU structure](./CPU2.1.png)
+![CPU structure](./CPU2.2.png)
 
 ## How this CPU works?
 
@@ -30,6 +30,7 @@ Not a very scary instruction set discrete logic processor.
 |----------------------------------------------|s|
 |   ADD |  DST |1|    CONST or   | 01 0000 0001|*|
 |   ADD |  DST |0| SRC |-|Z|z|I|i| 00 0000 0000|*|
+|----------------------------------------------| |
 |  ADDC |  DST |C| SRC |F|Z|z|I|i| 10 0001 0000|*|
 |   AND |  DST |C| SRC |-|Z|z|I|i| 20 0010 0000|*|
 |    OR |  DST |C| SRC |-|Z|z|I|i| 30 0011 0000|*|
@@ -41,7 +42,9 @@ Not a very scary instruction set discrete logic processor.
 |    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| |
 |    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
 |--------------|8-7-6-5-4|-------|-------------|-|
-|   OUT | PORT |C| SRC |PRT|X|O|o| B0 1011 0000| |
+|   OUT | PORT |1|    CONST or   | B0 1011 0000| |
+|   OUT | PORT |0| SRC |PRT|X|O|o| B0 1011 0000| |
+|----------------------------------------------| |
 |    ST |  SRC |V|EXT|D|U|OFFSET4| C0 1100 0000| |
 |   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+|
 |  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+|
