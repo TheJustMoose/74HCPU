@@ -3,7 +3,7 @@
 Not a very scary instruction set discrete logic processor.
 
 * 8 bit data
-* 16 bit address / 64KB RAM
+* 16 bit address / 64KB RAM / 128KW Dual Bank Video RAM
 * 16 instructions
 * 8 data registers and 4 pointer registers in 2 banks
 * 1 flag register in IO port
@@ -37,12 +37,12 @@ Not a very scary instruction set discrete logic processor.
 |   XOR |  DST |C| SRC |-|Z|z|I|i| 40 0100 0000|*|
 |   MUL |  DST |C| SRC |-|Z|z|I|i| 50 0101 0000|*|
 |   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*|
-|   MOV |  DST |0| SRC |*|Z|z|I|i| 70 0111 0000| |
+|   MOV |  DST |C| SRC |*|Z|z|I|i| 70 0111 0000| |
 |   LPM |  DST |0|EXT|D|U|-|-|-|W| 80 1000 0000| |
 |    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| |
 |    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
 |--------------|8-7-6-5-4|-------|-------------|-|
-|   OUT | PORT |1|    CONST or   | B0 1011 0000| |
+|   OUT | PORT |1|    CONST or   | B1 1011 0001| |
 |   OUT | PORT |0| SRC |PRT|X|O|o| B0 1011 0000| |
 |----------------------------------------------| |
 |    ST |  SRC |V|EXT|D|U|OFFSET4| C0 1100 0000| |
@@ -88,8 +88,8 @@ You can change the active bank by writing BF bit of the flags register.
 
 |Name|Usage|
 |---|---|
-|SP|Stack Pointer (16 bits)|
 |V|Video Pointer (**17** bits)|
+|SP|Stack Pointer (16 bits)|
 |Y|Pointer 1 (16 bits), e.g. Destination|
 |X|Pointer 0 (16 bits), e.g. Source|
 16 bit pointers
@@ -98,8 +98,8 @@ You can change the active bank by writing BF bit of the flags register.
 
 |Name|Name|
 |---|---|
-|SPH|SPL|
 |VH|VL|
+|SPH|SPL|
 |YH|YL|
 |XH|XL|
 or 8 bit registers
