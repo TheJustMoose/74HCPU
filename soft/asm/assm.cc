@@ -961,7 +961,6 @@ void Assembler::Pass2() {
 
     it->SetAddress(addr);  // change address of every line
     occupied_addresses_[addr] = true;  // occupy ROM address
-    //occupied_addresses_[code_.size() - 1] = true;
 
     // and every label of this line
     vector<string> labels = it->GetLabels();

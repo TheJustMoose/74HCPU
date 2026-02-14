@@ -257,15 +257,13 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   asmw.Process(lines);
   asmw.PrintAll();
 
-  for (uint16_t i = 0; i < 30; i++)
-    cout << hex << setw(4) << i << asmw.IsOccupiedWrapper(i) << endl;
-
   CHECK(asmw.IsOccupiedWrapper(0));
   CHECK(!asmw.IsOccupiedWrapper(1));
   CHECK(asmw.IsOccupiedWrapper(20));
+  CHECK(!asmw.IsOccupiedWrapper(21));
 
-  //uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
-  //CHECK_EQ(first, 4);
+  uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
+  CHECK_EQ(first, 1);  // addr 0 is occupied, add 1 is free
 }
 /*
 TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
