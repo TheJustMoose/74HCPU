@@ -23,3 +23,5 @@ std::string Trim(std::string s);
 std::string Join(std::vector<std::string> v, char del = '|');
 std::string JoinByte(std::vector<uint8_t> v, char del = '|');
 std::string JoinInt(std::vector<uint16_t> v, char del = '|');
+
+std::string ToHexString(int value);

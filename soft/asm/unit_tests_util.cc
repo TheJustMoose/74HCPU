@@ -234,3 +234,12 @@ TEST_CASE("check Join") {
   CHECK(JoinInt({1, 2}) == "1|2");
   CHECK(JoinInt({1, 2}, ',') == "1,2");
 }
+
+TEST_CASE("check Join") {
+  CHECK_EQ(ToHexString(0), "0");
+  CHECK_EQ(ToHexString(1), "1");
+  CHECK_EQ(ToHexString(10), "A");
+  CHECK_EQ(ToHexString(15), "F");
+  CHECK_EQ(ToHexString(16), "10");
+  CHECK_EQ(ToHexString(100), "64");
+}

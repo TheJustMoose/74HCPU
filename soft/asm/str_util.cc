@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <iomanip>
 #include <stdexcept>
 #include <string>
+#include <sstream>
 
 #include "str_util.h"
 
@@ -229,4 +231,10 @@ string JoinInt(vector<uint16_t> v, char del) {
       res += del;
   }
   return res;
+}
+
+string ToHexString(int value) {
+  std::stringstream ss;
+  ss << std::hex << value;
+  return ToUpper(ss.str());
 }
