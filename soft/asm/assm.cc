@@ -607,8 +607,15 @@ uint16_t StringConst::GetSize() const {
   return static_cast<uint16_t>(str_.size()) + 1;  // ASCII Z
 }
 
+bool StringConst::Address(uint16_t& address) const {
+  if (!address_.has_value())
+    return false;
+  address = address_.value();
+  return true;
+}
+
 void StringConst::SetAddress(uint16_t address) {
-  if (address > 0xFFFF) {  // TODO: check it (probably max(address) is 0xFFFF)
+  if (address_.has_value() && address > 0xFFFF) {  // TODO: check it (probably max(address) is 0xFFFF)
     cout << "Address is too much: " << address;
     return;
   }
@@ -617,7 +624,11 @@ void StringConst::SetAddress(uint16_t address) {
 }
 
 void StringConst::PrintCode() const {
-  uint16_t address = address_;
+  if (!address_.has_value()) {
+    cout << "Error. StringConst has no address." << endl;
+    return;
+  }
+  uint16_t address = address_.value();
   for (size_t i = 0; i < str_.size(); i++)
     cout << "     " << hex
        << setw(4) << setfill('0') << right << address++ << ": "
@@ -633,16 +644,20 @@ void StringConst::PrintCode() const {
 void StringConst::OutCode(vector<uint16_t>& code) const {
   if (!str_.size())
     return;
+  if (!address_.has_value()) {
+    cout << "Error. StringConst has no address." << endl;
+    return;
+  }
 
   // string with str_.size() == 1 will store char at address_
   // and trailing zero at address address_ + 1, so:
-  uint16_t max_str_address = address_ + static_cast<uint16_t>(str_.size()) + 1;
+  uint16_t max_str_address = address_.value() + static_cast<uint16_t>(str_.size()) + 1;
 
   if (max_str_address > code.size())
     code.resize(max_str_address, 0xFFFFU);
 
   for (size_t i = 0; i < str_.size(); i++)
-    code[address_ + i] = str_[i];
+    code[address_.value() + i] = str_[i];
   code[max_str_address - 1] = 0;
 }
 
@@ -945,7 +960,6 @@ void Assembler::Pass2() {
       org_it++;  // this .org was used, we need new .org
     }
 
-    occupied_addresses_[it->Address()] = false;  // free ROM address
     it->SetAddress(addr);  // change address of every line
     occupied_addresses_[addr] = true;  // occupy ROM address
 
@@ -977,16 +991,22 @@ void Assembler::Pass2() {
       addr = org_it->second;                      // we have to change its address
       org_it++;  // probably we have more .orgs!
     }
-    occupied_addresses_[s.second.Address()] = false;  // free ROM address
+    uint16_t dummy {0};
+    if (s.second.Address(dummy)) {
+      cout << "Error. You can't set address of StringConst cause it's already set." << endl;
+      break;
+    }
+
     s.second.SetAddress(addr);
-    occupied_addresses_[addr] = true;  // occupy ROM address
+    uint16_t sz = s.second.GetSize();
+    for (uint16_t i = 0; i < sz; i++)
+      occupied_addresses_[addr + i] = true;  // occupy ROM address
     name_to_address_[s.first] = addr;
     addr += s.second.GetSize();
   }
 
   // now place db consts after strings
   for (auto& db : db_consts_) {
-    uint16_t sz = db.second.GetSize();
     uint16_t dummy {0};
     if (db.second.Address(dummy)) {
       cout << "Error. You can't set address of DBConsts cause it's already set." << endl;
@@ -994,6 +1014,7 @@ void Assembler::Pass2() {
     }
 
     db.second.SetAddress(addr);
+    uint16_t sz = db.second.GetSize();
     for (uint16_t i = 0; i < sz; i++)
       occupied_addresses_[addr + i] = true;  // occupy ROM address
     addr += sz;
@@ -1001,13 +1022,13 @@ void Assembler::Pass2() {
 
   // now place dw consts after strings
   for (auto& dw : dw_consts_) {
-    uint16_t sz = dw.second.GetSize();
     uint16_t dummy {0};
     if (dw.second.Address(dummy)) {
       cout << "Error. You can't set address of DWConsts cause it's already set." << endl;
       break;
     }
 
+    uint16_t sz = dw.second.GetSize();
     dw.second.SetAddress(addr);
     occupied_addresses_[addr] = true;  // occupy ROM address
     addr += sz;
@@ -1023,12 +1044,17 @@ void Assembler::Pass3() {
   // dw_consts_ can store addresses of db_consts_ and StringConst
   map<string, uint16_t> new_addrs;
 
-  // get strings addresses
+  // get strings addresses:
   map<string, StringConst>::const_iterator str_it;
-  for (str_it = string_consts_.begin(); str_it != string_consts_.end(); str_it++)
-    new_addrs[str_it->first] = str_it->second.Address();
+  for (str_it = string_consts_.begin(); str_it != string_consts_.end(); str_it++) {
+    uint16_t addr {0};
+    if (str_it->second.Address(addr))
+      new_addrs[str_it->first] = addr;
+    else
+      cout << "Error. StringConst has no address." << endl;
+  }
 
-  // get byte[s] addresses
+  // get byte[s] addresses:
   map<string, DBConsts>::const_iterator db_it;
   for (db_it = db_consts_.begin(); db_it != db_consts_.end(); db_it++) {
     uint16_t addr {0};
@@ -1038,7 +1064,7 @@ void Assembler::Pass3() {
       cout << "Error. DBConsts has no address." << endl;
   }
 
-  // update .dw values
+  // Now update .dw values:
   map<string, DWConsts>::iterator dw_it;
   for (dw_it = dw_consts_.begin(); dw_it != dw_consts_.end(); dw_it++)
     dw_it->second.UpdateAddresses(new_addrs);
@@ -1065,16 +1091,24 @@ uint16_t Assembler::GetMaxCodeAddress(bool* occupied) {
 
 void Assembler::PrintCode() {
   cout << "STRINGS ADDR:" << endl;
-  for (const auto& s : string_consts_)
-    cout << s.first << ": " << s.second.Address() << endl;
+  for (const auto& s : string_consts_) {
+    uint16_t addr {0};
+    if (s.second.Address(addr))
+      cout << s.first << ": " << addr << endl;
+    else
+      cout << "Error. StringConst at line " << s.second.LineNumber() << " has no address." << endl;
+  }
 
-  cout << "LINE ADDR: COP   ASM                       LABELS          FORMATTED_COP" << endl;
+  cout << "LINE OCC ADDR: COP   ASM                       LABELS          FORMATTED_COP" << endl;
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++) {
+    uint16_t cmd_addr {it->Address()};
+    bool occ = occupied_addresses_[cmd_addr];
     cout << dec
          << setw(4) << setfill(' ') << right << it->LineNumber() << " "
+         << (occ ? "yes" : " no") << " "
          << hex
-         << setw(4) << setfill('0') << right << it->Address() << ": "
+         << setw(4) << setfill('0') << right << cmd_addr << ": "
          << setw(4) << setfill('0') << right << it->GenerateMachineCode() << "  "
          << setw(24) << setfill(' ') << left << it->GetLineText() << "  "
          << setw(16) << setfill(' ') << left << Join(it->GetLabels(), ' ')

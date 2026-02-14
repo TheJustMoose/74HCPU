@@ -171,7 +171,7 @@ class StringConst {
 
   uint16_t GetSize() const;
   int LineNumber() const { return line_number_; }
-  uint16_t Address() const { return address_; }
+  bool Address(uint16_t& address) const;
   void SetAddress(uint16_t);
   void PrintCode() const;
   void OutCode(std::vector<uint16_t>& code) const;
@@ -180,7 +180,7 @@ class StringConst {
  private:
   std::string str_ {};
   int line_number_ {0};
-  uint16_t address_ {0};
+  std::optional<uint16_t> address_;
 };
 
 class DBConsts {
