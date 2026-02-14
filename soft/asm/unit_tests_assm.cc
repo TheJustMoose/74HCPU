@@ -264,7 +264,11 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
 
   uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
   CHECK_EQ(first, 1);  // addr 0 is occupied, add 1 is free
+
+  first = asmw.GetFirstEmptyWindowWithSizeWrapper(30);
+  CHECK_EQ(first, 21);  // addr 20 is occupied, add 21 is free
 }
+
 /*
 TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   map<int, string> lines {

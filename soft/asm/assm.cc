@@ -1250,22 +1250,31 @@ bool Assembler::IsOccupied(uint16_t addr) {
 }
 
 uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
+  cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
+
   uint16_t cnt {0};
-  uint16_t beg {0};
-  uint32_t end {2^16};
-  for (uint16_t i = 0; i < end; i++) {
+  optional<uint16_t> beg;
+  uint32_t end {1 << 16};
+  for (uint32_t i = 0; i < end; i++) {
     if (IsOccupied(i)) {
+      cout << hex << setw(2) << i << "h is occupied" << endl;
       cnt = 0;
-      beg = end - 1;  // mark addr as not valid
+      beg = std::nullopt;  // mark addr as empty
     } else {
+      cout << hex << setw(2) << i << "h is free" << endl;
       cnt++;
-      if (beg == end - 1)
+      if (!beg.has_value()) {
         beg = i;  // okay, first empty place was found
+        cout << hex << "now beg == " << i << "h" << endl;
+      }
     }
-    if (cnt >= size)
-      return beg;
+    if (cnt >= size) {
+      cout << "Okay, will return address == " << hex << beg.value() << "h" << endl;
+      return beg.value();
+    }
   }
 
+  cout << "Just return end - 1: " << hex << end - 1 << "h" << endl;
   return end - 1;
 }
 
