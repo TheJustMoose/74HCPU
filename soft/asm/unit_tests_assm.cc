@@ -265,6 +265,12 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
   CHECK_EQ(first, 1);  // addr 0 is occupied, add 1 is free
 
+  first = asmw.GetFirstEmptyWindowWithSizeWrapper(19);
+  CHECK_EQ(first, 1);  // addr 0 is occupied, add 1 is free
+
+  first = asmw.GetFirstEmptyWindowWithSizeWrapper(20);
+  CHECK_EQ(first, 21);  // we can find 20 free cells at address 21
+
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(30);
   CHECK_EQ(first, 21);  // addr 20 is occupied, add 21 is free
 }
