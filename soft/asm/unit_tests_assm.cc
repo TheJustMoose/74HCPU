@@ -14,6 +14,22 @@ class AsmWrapper: public Assembler {
   uint16_t GetMaxCodeAddressWrapper(bool* occupied) {
     return GetMaxCodeAddress(occupied);
   }
+
+  bool IsOccupiedWrapper(uint16_t addr) {
+    return IsOccupied(addr);
+  }
+
+  uint16_t GetFirstEmptyWindowWithSizeWrapper(uint16_t size) {
+    return GetFirstEmptyWindowWithSize(size);
+  }
+
+  void PrintAll() {
+    PrintCode();
+    PrintLabels();
+    PrintOrgs();
+    PrintDBs();
+    PrintDWs();
+  }
 };
 
 TEST_CASE("check assembler class") {
@@ -203,4 +219,44 @@ TEST_CASE("check .org directive") {
   bool occupied {false};
   CHECK_EQ(asmw.GetMaxCodeAddressWrapper(&occupied), 0x50);  // address, not length!
   CHECK(occupied);  // yes, I have STOP cmd at address 50h
+}
+
+TEST_CASE("check occupied_addresses_ bitset (empty)") {
+  map<int, string> lines {
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(1);
+  CHECK_EQ(first, 0);
+}
+
+TEST_CASE("check occupied_addresses_ bitset (one block at addr 0)") {
+  map<int, string> lines {
+    {1, ".db BLOCK 1, 2, 3, 4"},
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(1);
+  CHECK_EQ(first, 4);
+}
+
+TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
+  map<int, string> lines {
+    {1, "STOP"},
+    {2, ".org 20"},
+    {3, ".db BLOCK 1, 2, 3, 4"},
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  asmw.PrintAll();
+
+  CHECK(asmw.IsOccupiedWrapper(0));
+
+  //uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
+  //CHECK_EQ(first, 4);
 }

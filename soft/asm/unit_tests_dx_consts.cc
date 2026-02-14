@@ -24,6 +24,7 @@ TEST_CASE("check simple db consts class") {
   vector<uint16_t> code;
   // check simple DBConsts
   DBConsts dbc(data);
+  dbc.SetAddress(0);
   CHECK_EQ(dbc.GetSize(), 3);
   dbc.OutCode(code);
   CHECK_EQ(code.size(), 3);

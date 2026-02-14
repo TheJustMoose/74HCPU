@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -188,7 +189,7 @@ class DBConsts {
   DBConsts(const std::vector<uint8_t>& data): data_(data) {}
 
   uint16_t GetSize() const;
-  uint16_t Address() const { return address_; }
+  bool Address(uint16_t& address) const;
   void SetAddress(uint16_t address) { address_ = address; }
   void OutCode(std::vector<uint16_t>& code) const;
 
@@ -196,7 +197,7 @@ class DBConsts {
 
  private:
   std::vector<uint8_t> data_ {};
-  uint16_t address_ {0};
+  std::optional<uint16_t> address_;
 };
 
 class DWConsts {
@@ -210,7 +211,7 @@ class DWConsts {
   DWConsts(const std::vector<Pair>& data): data_(data) {}
 
   uint16_t GetSize() const;
-  uint16_t Address() const { return address_; }
+  bool Address(uint16_t& address) const;
   void SetAddress(uint16_t address) { address_ = address; }
   void OutCode(std::vector<uint16_t>& code) const;
 
@@ -220,7 +221,7 @@ class DWConsts {
 
  private:
   std::vector<Pair> data_ {};
-  uint16_t address_ {0};
+  std::optional<uint16_t> address_;
 };
 
 class Assembler {
@@ -251,12 +252,17 @@ class Assembler {
   void PrintDBs();
   void PrintDWs();
 
+  bool IsOccupied(uint16_t addr);
+  uint16_t GetFirstEmptyWindowWithSize(uint16_t size);
+
  private:
   std::map<int, std::string> lines_ {};
   std::map<int, uint16_t> line_to_org_ {};
   std::vector<CodeLine> code_ {};
   // name_to_address_ contains labels and strings addresses:
   std::map<std::string, uint16_t> name_to_address_ {};
+
+  std::bitset<65536> occupied_addresses_ {};
 
   std::map<std::string, StringConst> string_consts_ {};
   std::map<std::string, DBConsts> db_consts_ {};

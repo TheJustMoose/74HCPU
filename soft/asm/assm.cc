@@ -581,7 +581,6 @@ CodeLine::CodeLine(int line_number, string line_text)
 uint16_t CodeLine::GenerateMachineCode() {
   if (!code_gen_)
     return bNOP | 0xFF;
-
   return code_gen_->Emit();
 }
 
@@ -653,18 +652,29 @@ uint16_t DBConsts::GetSize() const {
   return static_cast<uint16_t>(data_.size());
 }
 
+bool DBConsts::Address(uint16_t& address) const {
+  if (!address_.has_value())
+    return false;
+  address = address_.value();
+  return true;
+}
+
 void DBConsts::OutCode(vector<uint16_t>& code) const {
   if (!data_.size())
     return;
+  if (!address_.has_value()) {
+    cout << "Error. DBConsts has no address." << endl;
+    return;
+  }
 
-  uint16_t max_db_address = address_ + GetSize();
+  uint16_t max_db_address = address_.value() + GetSize();
   cout << "max_db_address: " << max_db_address << endl;
 
   if (max_db_address > code.size())
     code.resize(max_db_address, 0xFFFFU);
 
   for (size_t i = 0; i < data_.size(); i++)
-    code[address_ + i] = data_[i];
+    code[address_.value() + i] = data_[i];
 }
 
 string DBConsts::Join() const {
@@ -677,15 +687,26 @@ uint16_t DWConsts::GetSize() const {
   return static_cast<uint16_t>(data_.size());
 }
 
+bool DWConsts::Address(uint16_t& address) const {
+  if (!address_.has_value())
+    return false;
+  address = address_.value();
+  return true;
+}
+
 void DWConsts::OutCode(vector<uint16_t>& code) const {
   if (!data_.size())
     return;
+  if (!address_.has_value()) {
+    cout << "Error. DWConsts has no address." << endl;
+    return;
+  }
 
-  uint16_t max_db_address = address_ + GetSize();
+  uint16_t max_db_address = address_.value() + GetSize();
   if (max_db_address > code.size())
     code.resize(max_db_address, 0xFFFFU);
 
-  uint16_t addr { address_ };
+  uint16_t addr { address_.value() };
   for (size_t i = 0; i < data_.size(); i++, addr++)
     code[addr] = data_[i].Value;
 }
@@ -903,6 +924,8 @@ void Assembler::Pass1() {
     if (nl.size() == 0)
       continue;
     code_.push_back(CodeLine(it->first, nl));
+    occupied_addresses_[code_.size() - 1] = true;
+    cout << "Now " << code_.size() - 1 << " is occupied" << endl;
   }
 }
 
@@ -922,7 +945,10 @@ void Assembler::Pass2() {
       org_it++;  // this .org was used, we need new .org
     }
 
+    occupied_addresses_[it->Address()] = false;  // free ROM address
     it->SetAddress(addr);  // change address of every line
+    occupied_addresses_[addr] = true;  // occupy ROM address
+
     // and every label of this line
     vector<string> labels = it->GetLabels();
     vector<string>::iterator lit;
@@ -936,6 +962,13 @@ void Assembler::Pass2() {
   cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
   cout << "occupied: " << occupied << endl;
 
+  // TODO: try to calculate sizes of strings, db, and dw
+  // try to find empty windows in ROM
+  // try to place strings, db, and dw in this windows
+  // but how??!!
+  // replace GetMaxCodeAddress to uint16_t GetFirstEmptyWindowWithSize(uint16_t size);
+  // make class from vector<pair<addr, size>> windows; and GetFirstEmptyWindowWithSize!
+
   // now place strings after binary code
   addr = max_addr + occupied;       // if we have no instructions then max_addr == 0 and
   for (auto& s : string_consts_) {  // we have to increase code size only if this address is occupied
@@ -944,21 +977,40 @@ void Assembler::Pass2() {
       addr = org_it->second;                      // we have to change its address
       org_it++;  // probably we have more .orgs!
     }
+    occupied_addresses_[s.second.Address()] = false;  // free ROM address
     s.second.SetAddress(addr);
+    occupied_addresses_[addr] = true;  // occupy ROM address
     name_to_address_[s.first] = addr;
     addr += s.second.GetSize();
   }
 
   // now place db consts after strings
   for (auto& db : db_consts_) {
+    uint16_t sz = db.second.GetSize();
+    uint16_t dummy {0};
+    if (db.second.Address(dummy)) {
+      cout << "Error. You can't set address of DBConsts cause it's already set." << endl;
+      break;
+    }
+
     db.second.SetAddress(addr);
-    addr += db.second.GetSize();
+    for (uint16_t i = 0; i < sz; i++)
+      occupied_addresses_[addr + i] = true;  // occupy ROM address
+    addr += sz;
   }
 
   // now place dw consts after strings
   for (auto& dw : dw_consts_) {
+    uint16_t sz = dw.second.GetSize();
+    uint16_t dummy {0};
+    if (dw.second.Address(dummy)) {
+      cout << "Error. You can't set address of DWConsts cause it's already set." << endl;
+      break;
+    }
+
     dw.second.SetAddress(addr);
-    addr += dw.second.GetSize();
+    occupied_addresses_[addr] = true;  // occupy ROM address
+    addr += sz;
   }
 }
 
@@ -978,8 +1030,13 @@ void Assembler::Pass3() {
 
   // get byte[s] addresses
   map<string, DBConsts>::const_iterator db_it;
-  for (db_it = db_consts_.begin(); db_it != db_consts_.end(); db_it++)
-    new_addrs[db_it->first] = db_it->second.Address();
+  for (db_it = db_consts_.begin(); db_it != db_consts_.end(); db_it++) {
+    uint16_t addr {0};
+    if (db_it->second.Address(addr))
+      new_addrs[db_it->first] = addr;
+    else
+      cout << "Error. DBConsts has no address." << endl;
+  }
 
   // update .dw values
   map<string, DWConsts>::iterator dw_it;
@@ -1153,6 +1210,30 @@ void Assembler::PrintDWs() {
     cout << " empty" << endl;
   for (auto& dw : dw_consts_)
     cout << dw.first << " " << dw.second.Join() << endl;
+}
+
+bool Assembler::IsOccupied(uint16_t addr) {
+  return occupied_addresses_[addr];
+}
+
+uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
+  uint16_t cnt {0};
+  uint16_t beg {0};
+  uint32_t end {2^16};
+  for (uint16_t i = 0; i < end; i++) {
+    if (IsOccupied(i)) {
+      cnt = 0;
+      beg = end - 1;  // mark addr as not valid
+    } else {
+      cnt++;
+      if (beg == end - 1)
+        beg = i;  // okay, first empty place was found
+    }
+    if (cnt >= size)
+      return beg;
+  }
+
+  return end - 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
