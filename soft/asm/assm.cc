@@ -628,6 +628,7 @@ void StringConst::PrintCode() const {
     cout << "Error. StringConst has no address." << endl;
     return;
   }
+
   uint16_t address = address_.value();
   for (size_t i = 0; i < str_.size(); i++)
     cout << "     " << hex
@@ -939,8 +940,6 @@ void Assembler::Pass1() {
     if (nl.size() == 0)
       continue;
     code_.push_back(CodeLine(it->first, nl));
-    occupied_addresses_[code_.size() - 1] = true;
-    cout << "Now " << code_.size() - 1 << " is occupied" << endl;
   }
 }
 
@@ -962,6 +961,7 @@ void Assembler::Pass2() {
 
     it->SetAddress(addr);  // change address of every line
     occupied_addresses_[addr] = true;  // occupy ROM address
+    //occupied_addresses_[code_.size() - 1] = true;
 
     // and every label of this line
     vector<string> labels = it->GetLabels();

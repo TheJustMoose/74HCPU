@@ -1,4 +1,6 @@
 #include <doctest.h>
+#include <iomanip>
+#include <iostream>
 
 #include "assm.h"
 
@@ -248,15 +250,29 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   map<int, string> lines {
     {1, "STOP"},
     {2, ".org 20"},
-    {3, ".db BLOCK 1, 2, 3, 4"},
+    {3, "STOP"},
   };
 
   AsmWrapper asmw;
   asmw.Process(lines);
   asmw.PrintAll();
 
+  for (uint16_t i = 0; i < 30; i++)
+    cout << hex << setw(4) << i << asmw.IsOccupiedWrapper(i) << endl;
+
   CHECK(asmw.IsOccupiedWrapper(0));
+  CHECK(!asmw.IsOccupiedWrapper(1));
+  CHECK(asmw.IsOccupiedWrapper(20));
 
   //uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
   //CHECK_EQ(first, 4);
 }
+/*
+TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
+  map<int, string> lines {
+    {1, "STOP"},
+    {2, ".org 20"},
+    {3, ".db BLOCK 1, 2, 3, 4"},
+  };
+}
+*/
