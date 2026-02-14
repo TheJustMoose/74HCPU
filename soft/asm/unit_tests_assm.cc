@@ -274,13 +274,3 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(30);
   CHECK_EQ(first, 21);  // addr 20 is occupied, add 21 is free
 }
-
-/*
-TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
-  map<int, string> lines {
-    {1, "STOP"},
-    {2, ".org 20"},
-    {3, ".db BLOCK 1, 2, 3, 4"},
-  };
-}
-*/
