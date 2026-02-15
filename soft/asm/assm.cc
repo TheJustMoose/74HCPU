@@ -754,26 +754,38 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
 }
 
 int Assembler::Process(map<int, string> lines, bool show_preprocess_out) {
+  cout << "Assembler::Process" << endl;
+
   lines_ = lines;
 
   Preprocessor pre;
   pre.Preprocess(&lines_);
 
+  cout << "pre.Preprocess finished" << endl;
+
   if (show_preprocess_out)
     PrintPreprocessed();
 
   MergeCodeWithLabels();
+  cout << "MergeCodeWithLabels finished" << endl;
   ExtractOrgs();
+  cout << "ExtractOrgs finished" << endl;
   ExtractStrings();
+  cout << "ExtractStrings finished" << endl;
   ExtractDBs();
+  cout << "ExtractDBs finished" << endl;
   ExtractDWs();
+  cout << "ExtractDWs finished" << endl;
 
   if (show_preprocess_out)  // TODO: remove it after debug!
     PrintPreprocessed();
 
   Pass1();
+  cout << "Pass1 finished" << endl;
   Pass2();
+  cout << "Pass2 finished" << endl;
   Pass3();
+  cout << "Pass3 finished" << endl;
 
   PrintCode();
   PrintLabels();
@@ -781,6 +793,7 @@ int Assembler::Process(map<int, string> lines, bool show_preprocess_out) {
   PrintDBs();
   PrintDWs();
 
+  cout << "Assembler::Process finished" << endl;
   return ErrorCollector::GetInstance().have_errors();
 }
 
@@ -969,6 +982,7 @@ void Assembler::Pass1() {
 
 // get real addresses of labels, strings, db consts...
 void Assembler::Pass2() {
+  cout << "Pass2 in" << endl;
   uint16_t addr = 0;
   vector<CodeLine>::iterator it;
   map<int, uint16_t>::iterator org_it = line_to_org_.begin();
@@ -993,20 +1007,74 @@ void Assembler::Pass2() {
       name_to_address_[*lit] = addr;
   }
 
-  // TODO: fix it! binary code may be in the end of ROM
-  bool occupied {false};
-  uint16_t max_addr = GetMaxCodeAddress(&occupied);
-  cout << "max_addr: " << max_addr << " (" << hex << max_addr << "h)" << endl;
-  cout << "occupied: " << occupied << endl;
-
   // TODO: try to calculate sizes of strings, db, and dw
   // try to find empty windows in ROM
   // try to place strings, db, and dw in this windows
-  // but how??!!
   // replace GetMaxCodeAddress to uint16_t GetFirstEmptyWindowWithSize(uint16_t size);
-  // make class from vector<pair<addr, size>> windows; and GetFirstEmptyWindowWithSize!
 
-  // now place strings after binary code
+  uint16_t str_size = GetTotalSizeOfStringConsts();
+  cout << "Pass2 str size: " << str_size << endl;
+  if (str_size > 0) {
+    addr = GetFirstEmptyWindowWithSize(str_size);
+    cout << "Pass2 str addr: " << addr << endl;
+
+    for (auto& s : string_consts_) {
+      uint16_t dummy {0};
+      if (s.second.Address(dummy)) {
+        cout << "Error. You can't set address of StringConst cause it's already set." << endl;
+        break;
+      }
+
+      s.second.SetAddress(addr);
+      uint16_t sz = s.second.GetSize();
+      for (uint16_t i = 0; i < sz; i++)
+        occupied_addresses_[addr + i] = true;  // occupy ROM address
+      name_to_address_[s.first] = addr;
+      addr += sz;
+    }
+  }
+
+  uint16_t db_size = GetTotalSizeOfDBConsts();
+  cout << "Pass2 .db size: " << db_size << endl;
+  if (db_size > 0) {
+    addr = GetFirstEmptyWindowWithSize(db_size);
+    for (auto& db : db_consts_) {
+      uint16_t dummy {0};
+      if (db.second.Address(dummy)) {
+        cout << "Error. You can't set address of DBConsts cause it's already set." << endl;
+        break;
+      }
+
+      db.second.SetAddress(addr);
+      uint16_t sz = db.second.GetSize();
+      for (uint16_t i = 0; i < sz; i++)
+        occupied_addresses_[addr + i] = true;  // occupy ROM address
+      addr += sz;
+    }
+  }
+
+  uint16_t dw_size = GetTotalSizeOfDWConsts();
+  cout << "Pass2 .dw size: " << dw_size << endl;
+  if (dw_size) {
+    addr = GetFirstEmptyWindowWithSize(dw_size);
+    for (auto& dw : dw_consts_) {
+      uint16_t dummy {0};
+      if (dw.second.Address(dummy)) {
+        cout << "Error. You can't set address of DWConsts cause it's already set." << endl;
+        break;
+      }
+
+      uint16_t sz = dw.second.GetSize();
+      dw.second.SetAddress(addr);
+      for (uint16_t i = 0; i < sz; i++)
+        occupied_addresses_[addr + i] = true;  // occupy ROM address
+      addr += sz;
+    }
+  }
+
+  cout << "Pass2 out" << endl;
+
+/*
   addr = max_addr + occupied;       // if we have no instructions then max_addr == 0 and
   for (auto& s : string_consts_) {  // we have to increase code size only if this address is occupied
     if (org_it != line_to_org_.end() &&
@@ -1019,16 +1087,10 @@ void Assembler::Pass2() {
       cout << "Error. You can't set address of StringConst cause it's already set." << endl;
       break;
     }
-
-    s.second.SetAddress(addr);
-    uint16_t sz = s.second.GetSize();
-    for (uint16_t i = 0; i < sz; i++)
-      occupied_addresses_[addr + i] = true;  // occupy ROM address
-    name_to_address_[s.first] = addr;
-    addr += s.second.GetSize();
   }
-
+*/
   // now place db consts after strings
+/*
   for (auto& db : db_consts_) {
     uint16_t dummy {0};
     if (db.second.Address(dummy)) {
@@ -1042,8 +1104,9 @@ void Assembler::Pass2() {
       occupied_addresses_[addr + i] = true;  // occupy ROM address
     addr += sz;
   }
-
+*/
   // now place dw consts after strings
+/*
   for (auto& dw : dw_consts_) {
     uint16_t dummy {0};
     if (dw.second.Address(dummy)) {
@@ -1056,6 +1119,7 @@ void Assembler::Pass2() {
     occupied_addresses_[addr] = true;  // occupy ROM address
     addr += sz;
   }
+*/
 }
 
 // set real jump addresses
@@ -1274,31 +1338,31 @@ bool Assembler::IsOccupied(uint16_t addr) {
 }
 
 uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
-  //cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
+  cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
 
   uint16_t cnt {0};
   optional<uint16_t> beg;
   uint32_t end {1 << 16};
-  for (uint32_t i = 0; i < end; i++) {
-    if (IsOccupied(i)) {
-      //cout << hex << setw(2) << i << "h is occupied" << endl;
+  for (uint32_t addr = 0; addr < end; addr++) {
+    if (IsOccupied(addr)) {
+      cout << hex << setw(2) << addr << "h is occupied" << endl;
       cnt = 0;
       beg = std::nullopt;  // mark addr as empty
     } else {
-      //cout << hex << setw(2) << i << "h is free" << endl;
+      cout << hex << setw(2) << addr << "h is free" << endl;
       cnt++;
       if (!beg.has_value()) {
-        beg = i;  // okay, first empty place was found
-        //cout << hex << "now beg == " << i << "h" << endl;
+        beg = addr;  // okay, first empty place was found
+        cout << hex << "now beg == " << addr << "h" << endl;
       }
-    }
-    if (cnt >= size) {
-      //cout << "Okay, will return address == " << hex << beg.value() << "h" << endl;
-      return beg.value();
+      if (cnt >= size) {
+        cout << "Okay, will return address == " << hex << beg.value() << "h" << endl;
+        return beg.value();
+      }
     }
   }
 
-  //cout << "Just return end - 1: " << hex << end - 1 << "h" << endl;
+  cout << "Just return end - 1: " << hex << end - 1 << "h" << endl;
   return end - 1;
 }
 
