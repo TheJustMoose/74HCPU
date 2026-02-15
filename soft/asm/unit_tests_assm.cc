@@ -25,6 +25,18 @@ class AsmWrapper: public Assembler {
     return GetFirstEmptyWindowWithSize(size);
   }
 
+  uint16_t GetTotalSizeOfStringConstsWrapper() {
+    return GetTotalSizeOfStringConsts();
+  }
+
+  uint16_t GetTotalSizeOfDBConstsWrapper() {
+    return GetTotalSizeOfDBConsts();
+  }
+
+  uint16_t GetTotalSizeOfDWConstsWrapper() {
+    return GetTotalSizeOfDWConsts();
+  }
+
   void PrintAll() {
     PrintCode();
     PrintLabels();
@@ -273,4 +285,95 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
 
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(30);
   CHECK_EQ(first, 21);  // addr 20 is occupied, add 21 is free
+}
+
+TEST_CASE("check GetTotalSizeOfStringConsts") {
+  map<int, string> lines {
+    {1, ".str TEST \"abc\""},
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  uint16_t sz = asmw.GetTotalSizeOfStringConstsWrapper();
+  CHECK_EQ(sz, 4);
+}
+
+TEST_CASE("check GetTotalSizeOfStringConsts * MANY STRINGS") {
+  map<int, string> lines {
+    {1, ".str TEST \"test\""},   // 5
+    {2, ".str ONE \"one\""},     // 4
+    {3, ".str TWO \"two\""},     // 4
+    {4, ".str THREE \"three\""}, // 6
+  };                             // == 19
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  uint16_t sz = asmw.GetTotalSizeOfStringConstsWrapper();
+  CHECK_EQ(sz, 19);
+}
+
+TEST_CASE("check GetTotalSizeOfDBConsts") {
+  map<int, string> lines {
+    {1, ".db TEST 123"},
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  uint16_t sz = asmw.GetTotalSizeOfDBConstsWrapper();
+  CHECK_EQ(sz, 1);
+}
+
+TEST_CASE("check GetTotalSizeOfDBConsts * MANY DB CONSTS") {
+  map<int, string> lines {
+    {1, ".db TEST 123"},       // 1 word
+    {2, ".db T1 1, 2, 3, 4"},  // 4 words
+    {3, ".db T2 3, 2"},        // 2 words
+  };                           // 7 words
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  uint16_t sz = asmw.GetTotalSizeOfDBConstsWrapper();
+  CHECK_EQ(sz, 7);
+}
+
+TEST_CASE("check GetTotalSizeOfDWConsts") {
+  map<int, string> lines {
+    {1, ".dw TEST 123"},       // 1
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  uint16_t sz = asmw.GetTotalSizeOfDWConstsWrapper();
+  CHECK_EQ(sz, 1);
+}
+
+
+TEST_CASE("check GetTotalSizeOfDWConsts * MANY DW CONSTS") {
+  map<int, string> lines {
+    {1, ".dw TEST 123"},       // 1
+    {2, ".dw W1 1024, 2048"},  // 2
+    {3, ".dw W2 32768, 2"},    // 2
+  };                           // 5
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  uint16_t sz = asmw.GetTotalSizeOfDWConstsWrapper();
+  CHECK_EQ(sz, 5);
+}
+
+TEST_CASE("check GetTotalSizeOf**Consts") {
+  map<int, string> lines {
+    {1, ".str S1 \"test string\""},  // 12
+    {2, ".db B1 111, 222, 33"},      // 3
+    {3, ".dw W2 32768, 2"},          // 2
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+  uint16_t sz1 = asmw.GetTotalSizeOfStringConstsWrapper();
+  CHECK_EQ(sz1, 12);
+  uint16_t sz2 = asmw.GetTotalSizeOfDBConstsWrapper();
+  CHECK_EQ(sz2, 3);
+  uint16_t sz3 = asmw.GetTotalSizeOfDWConstsWrapper();
+  CHECK_EQ(sz3, 2);
 }

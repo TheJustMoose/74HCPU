@@ -933,15 +933,27 @@ void Assembler::ExtractDWs() {
 }
 
 uint16_t Assembler::GetTotalSizeOfStringConsts() {
-  return 0;
+  uint16_t res {0};
+  for (auto& s : string_consts_)
+    res += s.second.GetSize();
+
+  return res;
 }
 
 uint16_t Assembler::GetTotalSizeOfDBConsts() {
-  return 0;
+  uint16_t res {0};
+  for (auto& b : db_consts_)
+    res += b.second.GetSize();
+
+  return res;
 }
 
 uint16_t Assembler::GetTotalSizeOfDWConsts() {
-  return 0;
+  uint16_t res {0};
+  for (auto& w : dw_consts_)
+    res += w.second.GetSize();
+
+  return res;
 }
 
 // generate machine code
