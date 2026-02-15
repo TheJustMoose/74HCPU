@@ -1246,16 +1246,24 @@ void Assembler::PrintDBs() {
   cout << "DBs:" << endl;
   if (db_consts_.empty())
     cout << " empty" << endl;
-  for (auto& db : db_consts_)
-    cout << db.first << " " << db.second.Join() << endl;
+  for (auto& db : db_consts_) {
+    uint16_t addr {0};
+    bool occ = db.second.Address(addr);
+    cout << "     " << setw(4) << setfill('0') << (occ ? ToHexString(addr) : "errr")
+         << " " << db.first << " " << db.second.Join() << endl;
+  }
 }
 
 void Assembler::PrintDWs() {
   cout << "DWs:" << endl;
   if (dw_consts_.empty())
     cout << " empty" << endl;
-  for (auto& dw : dw_consts_)
-    cout << dw.first << " " << dw.second.Join() << endl;
+  for (auto& dw : dw_consts_) {
+    uint16_t addr {0};
+    bool occ = dw.second.Address(addr);
+    cout << "     " << setw(4) << setfill('0') << (occ ? ToHexString(addr) : "errr")
+         << " " << dw.first << " " << dw.second.Join() << endl;
+  }
 }
 
 bool Assembler::IsOccupied(uint16_t addr) {
@@ -1263,18 +1271,18 @@ bool Assembler::IsOccupied(uint16_t addr) {
 }
 
 uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
-  cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
+  //cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
 
   uint16_t cnt {0};
   optional<uint16_t> beg;
   uint32_t end {1 << 16};
   for (uint32_t addr = 0; addr < end; addr++) {
     if (IsOccupied(addr)) {
-      cout << hex << setw(2) << addr << "h is occupied" << endl;
+      //cout << hex << setw(2) << addr << "h is occupied" << endl;
       cnt = 0;
       beg = std::nullopt;  // mark addr as empty
     } else {
-      cout << hex << setw(2) << addr << "h is free" << endl;
+      //cout << hex << setw(2) << addr << "h is free" << endl;
       cnt++;
       if (!beg.has_value()) {
         beg = addr;  // okay, first empty place was found
