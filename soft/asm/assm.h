@@ -129,8 +129,10 @@ class CodeLine {
     return line_text_;
   }
 
-  uint16_t Address() {
-    return code_gen_ ? code_gen_->Address() : 0;
+  std::optional<uint16_t> Address() {
+    if (!code_gen_)
+      return std::nullopt;
+    return code_gen_->Address();
   }
 
   void SetAddress(uint16_t addr) {
@@ -228,7 +230,6 @@ class Assembler {
   void Pass1();  // generate machine code
   void Pass2();  // get real address of labels & string
   void Pass3();  // set real jump addresses
-  uint16_t GetMaxCodeAddress(bool* occupied = nullptr);
 
   void PrintCode();
   void OutCode(std::vector<uint16_t>& code);

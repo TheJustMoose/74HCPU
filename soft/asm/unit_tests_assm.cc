@@ -13,10 +13,6 @@ class AsmWrapper: public Assembler {
     OutCode(code);
   }
 
-  uint16_t GetMaxCodeAddressWrapper(bool* occupied) {
-    return GetMaxCodeAddress(occupied);
-  }
-
   bool IsOccupiedWrapper(uint16_t addr) {
     return IsOccupied(addr);
   }
@@ -63,9 +59,6 @@ TEST_CASE("check assembler class") {
   CHECK_EQ(code[0], 0x7101);
   CHECK_EQ(code[1], 0x7200);
   CHECK_EQ(code[2], 0xFFFE);
-  bool occupied {false};
-  CHECK_EQ(asmw.GetMaxCodeAddressWrapper(&occupied), 2);
-  CHECK(occupied);
 }
 
 TEST_CASE("check 1 byte .db directive") {
@@ -227,12 +220,6 @@ TEST_CASE("check .org directive") {
   CHECK_EQ(code[0], 0x7101);      // min addr == 0
   CHECK_EQ(code[1], 0x7200);
   CHECK_EQ(code[0x50], 0xFFFE);   // max addr == 0x50
-
-  // .org 50h means that STOP cmd will be placed at address 50h
-  // so program length will be 51h
-  bool occupied {false};
-  CHECK_EQ(asmw.GetMaxCodeAddressWrapper(&occupied), 0x50);  // address, not length!
-  CHECK(occupied);  // yes, I have STOP cmd at address 50h
 }
 
 TEST_CASE("check occupied_addresses_ bitset (empty)") {

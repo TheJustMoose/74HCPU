@@ -755,37 +755,26 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
 
 int Assembler::Process(map<int, string> lines, bool show_preprocess_out) {
   cout << "Assembler::Process" << endl;
-
   lines_ = lines;
 
   Preprocessor pre;
   pre.Preprocess(&lines_);
 
-  cout << "pre.Preprocess finished" << endl;
-
   if (show_preprocess_out)
     PrintPreprocessed();
 
   MergeCodeWithLabels();
-  cout << "MergeCodeWithLabels finished" << endl;
   ExtractOrgs();
-  cout << "ExtractOrgs finished" << endl;
   ExtractStrings();
-  cout << "ExtractStrings finished" << endl;
   ExtractDBs();
-  cout << "ExtractDBs finished" << endl;
   ExtractDWs();
-  cout << "ExtractDWs finished" << endl;
 
   if (show_preprocess_out)  // TODO: remove it after debug!
     PrintPreprocessed();
 
   Pass1();
-  cout << "Pass1 finished" << endl;
   Pass2();
-  cout << "Pass2 finished" << endl;
   Pass3();
-  cout << "Pass3 finished" << endl;
 
   PrintCode();
   PrintLabels();
@@ -1007,11 +996,6 @@ void Assembler::Pass2() {
       name_to_address_[*lit] = addr;
   }
 
-  // TODO: try to calculate sizes of strings, db, and dw
-  // try to find empty windows in ROM
-  // try to place strings, db, and dw in this windows
-  // replace GetMaxCodeAddress to uint16_t GetFirstEmptyWindowWithSize(uint16_t size);
-
   uint16_t str_size = GetTotalSizeOfStringConsts();
   cout << "Pass2 str size: " << str_size << endl;
   if (str_size > 0) {
@@ -1073,53 +1057,6 @@ void Assembler::Pass2() {
   }
 
   cout << "Pass2 out" << endl;
-
-/*
-  addr = max_addr + occupied;       // if we have no instructions then max_addr == 0 and
-  for (auto& s : string_consts_) {  // we have to increase code size only if this address is occupied
-    if (org_it != line_to_org_.end() &&
-        s.second.LineNumber() > org_it->first) {  // if string is placed after .org
-      addr = org_it->second;                      // we have to change its address
-      org_it++;  // probably we have more .orgs!
-    }
-    uint16_t dummy {0};
-    if (s.second.Address(dummy)) {
-      cout << "Error. You can't set address of StringConst cause it's already set." << endl;
-      break;
-    }
-  }
-*/
-  // now place db consts after strings
-/*
-  for (auto& db : db_consts_) {
-    uint16_t dummy {0};
-    if (db.second.Address(dummy)) {
-      cout << "Error. You can't set address of DBConsts cause it's already set." << endl;
-      break;
-    }
-
-    db.second.SetAddress(addr);
-    uint16_t sz = db.second.GetSize();
-    for (uint16_t i = 0; i < sz; i++)
-      occupied_addresses_[addr + i] = true;  // occupy ROM address
-    addr += sz;
-  }
-*/
-  // now place dw consts after strings
-/*
-  for (auto& dw : dw_consts_) {
-    uint16_t dummy {0};
-    if (dw.second.Address(dummy)) {
-      cout << "Error. You can't set address of DWConsts cause it's already set." << endl;
-      break;
-    }
-
-    uint16_t sz = dw.second.GetSize();
-    dw.second.SetAddress(addr);
-    occupied_addresses_[addr] = true;  // occupy ROM address
-    addr += sz;
-  }
-*/
 }
 
 // set real jump addresses
@@ -1157,25 +1094,6 @@ void Assembler::Pass3() {
     dw_it->second.UpdateAddresses(new_addrs);
 }
 
-uint16_t Assembler::GetMaxCodeAddress(bool* occupied) {
-  if (occupied)  // last address is not used until we find any code
-    *occupied = false;
-
-  uint16_t max_addr {0};
-  vector<CodeLine>::iterator it;
-  for (it = code_.begin(); it != code_.end(); it++)
-    if (max_addr < it->Address()) {  // searching max_addr
-      max_addr = it->Address();
-      if (occupied)
-        *occupied = true;
-    } else if (max_addr == it->Address()) {  // checking that last address is occupied
-      if (occupied)
-        *occupied = true;
-    }
-
-  return max_addr;
-}
-
 void Assembler::PrintCode() {
   cout << "STRINGS ADDR:" << endl;
   for (const auto& s : string_consts_) {
@@ -1186,16 +1104,26 @@ void Assembler::PrintCode() {
       cout << "Error. StringConst at line " << s.second.LineNumber() << " has no address." << endl;
   }
 
-  cout << "LINE OCC ADDR: COP   ASM                       LABELS          FORMATTED_COP" << endl;
+  cout << "LINE ADDR: COP   ASM                       LABELS          FORMATTED_COP" << endl;
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++) {
-    uint16_t cmd_addr {it->Address()};
-    bool occ = occupied_addresses_[cmd_addr];
+    optional<uint16_t> cmd_addr {it->Address()};
+    if (!cmd_addr.has_value()) {
+      cout << "Error! cmd_addr.has_value == false" << endl;
+      continue;
+    }
+
+    bool occ = occupied_addresses_[cmd_addr.value()];
+    if (cmd_addr.has_value() != occ) {
+      cout << "Error! cmd_addr.has_value and occupied_addresses_ have different values" << endl;
+      cout << dec << "At line : " << it->LineNumber() << endl;
+      continue;
+    }
+
     cout << dec
          << setw(4) << setfill(' ') << right << it->LineNumber() << " "
-         << (occ ? "yes" : " no") << " "
          << hex
-         << setw(4) << setfill('0') << right << cmd_addr << ": "
+         << setw(4) << setfill('0') << right << cmd_addr.value() << ": "
          << setw(4) << setfill('0') << right << it->GenerateMachineCode() << "  "
          << setw(24) << setfill(' ') << left << it->GetLineText() << "  "
          << setw(16) << setfill(' ') << left << Join(it->GetLabels(), ' ')
@@ -1213,24 +1141,21 @@ void Assembler::PrintCode() {
 void Assembler::OutCode(vector<uint16_t>& code) {
   code.clear();
 
-  bool occupied {false};
-  uint16_t max_addr = GetMaxCodeAddress(&occupied);
-  if ((max_addr == 0 && !occupied) &&  // if we have program with one instruction then max_addr will be zero
-      string_consts_.empty() && db_consts_.empty()) {
+  if (code_.empty() && string_consts_.empty() &&
+      db_consts_.empty() && dw_consts_.empty()) {
     cout << "No code to output" << endl;
     return;
   }
 
-  if (max_addr || occupied) {
-    // if our code is stored in addresses 0, 1, 2, 3...
-    // it have size == addr + 1
-    // but if it has only one byte it will be stored by address == 0
-    // and if no instructions at all address also be 0!
-    code.resize(max_addr + occupied, 0xFFFFU);
+  code.reserve(65536);
 
-    vector<CodeLine>::iterator it;
-    for (it = code_.begin(); it != code_.end(); it++)
-      code[it->Address()] = it->GenerateMachineCode();
+  vector<CodeLine>::iterator it;
+  for (it = code_.begin(); it != code_.end(); it++) {
+    optional<uint16_t> cmd_addr {it->Address()};
+    if (cmd_addr.has_value()) {
+      code.resize(cmd_addr.value() + 1, 0xFFFFU);
+      code[cmd_addr.value()] = it->GenerateMachineCode();
+    }
   }
 
   // StringConst::out_code will resize 'code' if required
