@@ -242,6 +242,10 @@ class Assembler {
   bool IsOccupied(uint16_t addr);
   uint16_t GetFirstEmptyWindowWithSize(uint16_t size);
 
+  uint16_t GetTotalSizeOfStringConsts();
+  uint16_t GetTotalSizeOfDBConsts();
+  uint16_t GetTotalSizeOfDWConsts();
+
  private:
   std::map<int, std::string> lines_ {};
   std::map<int, uint16_t> line_to_org_ {};

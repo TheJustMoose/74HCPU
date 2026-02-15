@@ -226,7 +226,7 @@ class BinaryCodeGen: public CodeGen {
     right_val_.update_val(rv);
 
     ErrorCollector::GetInstance().rep(
-      "Replace " + it->first + " to " + to_string(rv), LineNumber());
+      "Replace " + it->first + " to " + ToHexString(rv) + "h", LineNumber());
   }
 
   vector<int> GetBlocks() {
@@ -930,6 +930,18 @@ void Assembler::ExtractDWs() {
     else
       it++;
   }
+}
+
+uint16_t Assembler::GetTotalSizeOfStringConsts() {
+  return 0;
+}
+
+uint16_t Assembler::GetTotalSizeOfDBConsts() {
+  return 0;
+}
+
+uint16_t Assembler::GetTotalSizeOfDWConsts() {
+  return 0;
 }
 
 // generate machine code
