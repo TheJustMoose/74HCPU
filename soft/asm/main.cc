@@ -43,10 +43,10 @@ void help() {
       "\nRun:\n",
       "74hc-asm.exe src.asm [-pre]\n",
       " -pre will print preprocessed src.asm\n",
-      "74hc-asm.exe src.asm out.hex\n",
-      " will create result binary out.hex\n",
-      "74hc-asm.exe src.asm -v\n",
+      "74hc-asm.exe src.asm [-v]\n",
       " -v print more verbose information about src.asm\n",
+      "74hc-asm.exe src.asm [out.hex]\n",
+      " will create result binary out.hex\n",
       nullptr
   };
 
@@ -62,69 +62,49 @@ int main(int argc, char* argv[]) {
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  if (argc < 2) {
+  bool show_pre {false};
+  bool verbose {false};
+
+  // fill vector
+  vector<string> args;
+  for (int i = 0; i < argc; i++) {
+    if (argv[i] == nullptr)
+      continue;
+
+    string arg = argv[i];
+    if (arg.size() && arg[0] != '-')
+      args.push_back(arg);
+    if (arg == "-pre")
+      show_pre = true;
+    if (arg == "-v")
+      verbose = true;
+  }
+
+  if (args.size() < 2 || args[1] == "help") {
     help();
     return 0;
   }
 
-  // fill vector
-  vector<string> args;
-  for (int i = 0; i < argc; i++)
-    if (argv[i] != nullptr)
-      args.push_back(argv[i]);
-
-  bool show_pre {false};
-  bool verbose {false};
-
-  vector<size_t> to_delete;
-  // check keys
-  // args[0] is always process name
-  for (size_t i = 1; i < args.size(); i++) {
-    string arg = args[i];
-    if (arg == "help") {
-      help();
-      return 0;
-    }
-
-    if (arg == "-pre") {
-      show_pre = true;
-      to_delete.push_back(i);
-    }
-    if (arg == "-v") {
-      verbose = true;
-      cout << "verbose - on" << endl;
-      to_delete.push_back(i);
-    }
-  }
-
-  // remove keys
-  for (int i = to_delete.size() - 1; i >= 0; i--) {
-    cout << "try to remove: " << i << ", with value: " << *(args.begin() + i) << endl;
-    if (verbose)
-      cout << "remove " << *(args.begin() + i) << endl;
-    args.erase(args.begin() + i);  // will invalidate all iterators after current
-  }
-
-  if (verbose)
+  if (verbose) {
+    cout << "verbose - on" << endl;
     cout << "remaining args: " << args.size() << endl;
+  }
 
-  if (args.size() > 3 || args.size() == 1) {
-    cout << "Error! asm require only 3 args: asm_name [asm_file] [hex_file] (and -v, -pre, help in any place)" << endl;
+  if (args.size() > 3) {
+    cout << "Error! asm require only 3 args: asm_name [asm_file] [hex_file] (and -v, -pre in any place)" << endl;
     return 1;
   }
 
-  if (args.size() >= 2) {
-    try {
-      Assembler assm;
-      bool res = assm.Process(args[1], show_pre, verbose);
-      if (args.size() > 2 && !show_pre && !res)
-        assm.WriteBinary(args[2]);
-      return res;
-    } catch (const char* e) {
-      cout << "Error: " << e << endl;
-    } catch (std::exception e) {
-      cout << "Error: " << e.what() << endl;
-    }
+  try {  // Now args.size() may be equal 2 or 3
+    Assembler assm;
+    bool res = assm.Process(args[1], show_pre, verbose);
+    if (args.size() > 2 && !show_pre && !res)
+      assm.WriteBinary(args[2]);
+    return res;
+  } catch (const char* e) {
+    cout << "Error: " << e << endl;
+  } catch (std::exception e) {
+    cout << "Error: " << e.what() << endl;
   }
 
   return 0;
