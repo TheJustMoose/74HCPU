@@ -242,4 +242,11 @@ TEST_CASE("check Join") {
   CHECK_EQ(ToHexString(15), "F");
   CHECK_EQ(ToHexString(16), "10");
   CHECK_EQ(ToHexString(100), "64");
+
+  CHECK_EQ(ToHexString(0, 4), "0000");
+  CHECK_EQ(ToHexString(1, 4), "0001");
+  CHECK_EQ(ToHexString(10, 4), "000A");
+  CHECK_EQ(ToHexString(15, 4), "000F");
+  CHECK_EQ(ToHexString(16, 4), "0010");
+  CHECK_EQ(ToHexString(100, 4), "0064");
 }

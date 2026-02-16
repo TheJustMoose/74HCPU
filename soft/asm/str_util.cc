@@ -233,8 +233,11 @@ string JoinInt(vector<uint16_t> v, char del) {
   return res;
 }
 
-string ToHexString(int value) {
+string ToHexString(int value, int width) {
   std::stringstream ss;
   ss << std::hex << value;
-  return ToUpper(ss.str());
+  string res = ToUpper(ss.str());
+  while (res.size() < width)
+    res = "0" + res;
+  return res;
 }
