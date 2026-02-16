@@ -12,6 +12,7 @@ Not a very scary instruction set discrete logic processor.
 [ASM](./ASM.md)
 [UEMUL]()
 
+## CPU structure
 ![CPU structure](./CPU2.2.png)
 
 ## How this CPU works?
