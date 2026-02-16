@@ -1,4 +1,6 @@
+#include <cstdint>
 #include <iostream>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -37,6 +39,7 @@ void help() {
       "  1, 2, 3, \\\n",
       "  4, 5, 6\n",
       ".dw PTR NAME ; address of .db NAME 123 (see above)\n",
+      "; <- this is comment",
       "\nRun:\n",
       "74hc-asm.exe src.asm [-pre]\n",
       " -pre will print preprocessed src.asm\n",
@@ -64,29 +67,58 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  if (argc >= 2 && argv[1]) {
-    string cmd(argv[1]);
-    if (cmd == "help") {
+  // fill vector
+  vector<string> args;
+  for (int i = 0; i < argc; i++)
+    if (argv[i] != nullptr)
+      args.push_back(argv[i]);
+
+  bool show_pre {false};
+  bool verbose {false};
+
+  vector<size_t> to_delete;
+  // check keys
+  // args[0] is always process name
+  for (size_t i = 1; i < args.size(); i++) {
+    string arg = args[i];
+    if (arg == "help") {
       help();
       return 0;
     }
 
-    bool show_pre {false};
-    if (argc > 2 && string(argv[2]) == "-pre")
+    if (arg == "-pre") {
       show_pre = true;
-
-    bool verbose {false};
-    if (argc > 2 && string(argv[2]) == "-v") {
+      to_delete.push_back(i);
+    }
+    if (arg == "-v") {
       verbose = true;
       cout << "verbose - on" << endl;
+      to_delete.push_back(i);
     }
+  }
 
-    // okay, probably cmd is file name ;)
+  // remove keys
+  for (int i = to_delete.size() - 1; i >= 0; i--) {
+    cout << "try to remove: " << i << ", with value: " << *(args.begin() + i) << endl;
+    if (verbose)
+      cout << "remove " << *(args.begin() + i) << endl;
+    args.erase(args.begin() + i);  // will invalidate all iterators after current
+  }
+
+  if (verbose)
+    cout << "remaining args: " << args.size() << endl;
+
+  if (args.size() > 3 || args.size() == 1) {
+    cout << "Error! asm require only 3 args: asm_name [asm_file] [hex_file] (and -v, -pre, help in any place)" << endl;
+    return 1;
+  }
+
+  if (args.size() >= 2) {
     try {
       Assembler assm;
-      bool res = assm.Process(cmd, show_pre, verbose);
-      if (argc > 2 && argv[2] && !show_pre && !res)
-        assm.WriteBinary(argv[2]);
+      bool res = assm.Process(args[1], show_pre, verbose);
+      if (args.size() > 2 && !show_pre && !res)
+        assm.WriteBinary(args[2]);
       return res;
     } catch (const char* e) {
       cout << "Error: " << e << endl;
@@ -95,6 +127,5 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  cout << "argc: " << argc << endl;
   return 0;
 }
