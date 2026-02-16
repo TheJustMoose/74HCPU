@@ -1261,8 +1261,8 @@ void Assembler::PrintDBs() {
   for (auto& db : db_consts_) {
     uint16_t addr {0};
     bool occ = db.second.Address(addr);
-    cout << "     " << setw(4) << setfill('0') << (occ ? ToHexString(addr) : "errr")
-         << " " << db.first << " " << db.second.Join() << endl;
+    cout << "     " << (occ ? ToHexString(addr, 4) : "errr")
+         << ": " << db.first << " " << db.second.Join() << endl;
   }
 }
 
@@ -1273,8 +1273,8 @@ void Assembler::PrintDWs() {
   for (auto& dw : dw_consts_) {
     uint16_t addr {0};
     bool occ = dw.second.Address(addr);
-    cout << "     " << setw(4) << setfill('0') << (occ ? ToHexString(addr) : "errr")
-         << " " << dw.first << " " << dw.second.Join() << endl;
+    cout << "     " << (occ ? ToHexString(addr, 4) : "errr")
+         << ": " << dw.first << " " << dw.second.Join() << endl;
   }
 }
 
