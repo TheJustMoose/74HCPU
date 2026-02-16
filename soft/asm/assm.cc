@@ -675,7 +675,7 @@ bool DBConsts::Address(uint16_t& address) const {
   return true;
 }
 
-void DBConsts::OutCode(vector<uint16_t>& code) const {
+void DBConsts::OutCode(vector<uint16_t>& code, bool verbose) const {
   if (!data_.size())
     return;
   if (!address_.has_value()) {
@@ -684,7 +684,8 @@ void DBConsts::OutCode(vector<uint16_t>& code) const {
   }
 
   uint16_t max_db_address = address_.value() + GetSize();
-  cout << "max_db_address: " << max_db_address << endl;
+  if (verbose)
+    cout << "max_db_address: " << ToHexString(max_db_address) << "h" << endl;
 
   if (max_db_address > code.size())
     code.resize(max_db_address, 0xFFFFU);
@@ -824,7 +825,8 @@ void Assembler::ExtractOrgs() {
       string msg_err;
       if (StrToInt(ToUpper(org), &val, &msg_err)) {
         line_to_org_[line] = val;
-        cout << "now line " << line << " has address " << val << endl;
+        if (verbose_)
+          cout << "now line " << line << " has address " << val << endl;
         if (last_org_val >= val)
           cout << "Warning! line " << line << " has .org " << val <<
                   " which is less than previous org value " << last_org_val << endl;
@@ -985,7 +987,8 @@ void Assembler::Pass2() {
         it->LineNumber() > org_it->first) {  // if line placed after .org
       if (org_it->second > addr) {
         addr = org_it->second;               // change line address to .org value
-        cout << "move address to: " << addr << endl;
+        if (verbose_)
+          cout << "move address to: " << addr << endl;
       }
       org_it++;  // this .org was used, we need new .org
     }
@@ -1173,7 +1176,7 @@ void Assembler::OutCode(vector<uint16_t>& code) {
 
   // Will place db consts after string consts
   for (auto& db : db_consts_)
-    db.second.OutCode(code);
+    db.second.OutCode(code, verbose_);
 
   // Will place dw consts after db consts
   for (auto& dw : dw_consts_)
@@ -1296,10 +1299,12 @@ uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
       cnt++;
       if (!beg.has_value()) {
         beg = addr;  // okay, first empty place was found
-        cout << hex << "now beg == " << addr << "h" << endl;
+        if (verbose_)
+          cout << hex << "now beg == " << addr << "h" << endl;
       }
       if (cnt >= size) {
-        cout << "Okay, will return address == " << hex << beg.value() << "h" << endl;
+        if (verbose_)
+          cout << "Okay, will return address == " << hex << beg.value() << "h" << endl;
         return beg.value();
       }
     }

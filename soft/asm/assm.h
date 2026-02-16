@@ -180,7 +180,7 @@ class DBConsts {
   uint16_t GetSize() const;
   bool Address(uint16_t& address) const;
   void SetAddress(uint16_t address) { address_ = address; }
-  void OutCode(std::vector<uint16_t>& code) const;
+  void OutCode(std::vector<uint16_t>& code, bool verbose = false) const;
 
   std::string Join() const;
 
