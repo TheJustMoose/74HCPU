@@ -15,7 +15,7 @@ void help() {
       "arithmetic: ADD, ADDC, AND, OR, XOR, MUL, UNO (SWAP, INV, LSR, LSRC), MOV\n",
       "memory: LPM, LD, ST\n",
       "video memory: LDV, STV\n",
-      "port: IN, OUT\n",
+      "port: IN, OUT, TOGL\n",
       "compare: CMP, CMPC\n",
       "jmp: CALL, JMP, RET, JZ, JL, JNE, JE, JG, JC, JNZ, JNC, JHC, JNHC, STOP, AFCALL, NOP\n",
       "Registers: R0, R1, R2, R3, R4, R5, R6, R7\n",
@@ -24,22 +24,26 @@ void help() {
       "Auto-decrement pointers: Xd, Yd, Vd, SPd\n",
       "PORTS: PORT0-31, PIN0-31\n",
       "Macro: LO()/HI() for pointers, for example:\n mov YL, LO(StringName)\n",
-      "Macro: L()/H()/~/'/` for registers, for example:\n ` - invert high nibble, ' - invert low nibble, ~ - invert whole byte\n",
-      " L() - use low nibble, H() - use high nibble\n"
-      " MOV R0, L(R1) - copy low nibble of R1 into R0\n"
-      " MOV R0, `R1 - invert high nibble of R1 and copy both nibbles into R0\n"
+      "Macro: L()/H()/~/'/` for registers, for example:\n",
+      " ` - invert high nibble, ' - invert low nibble, ~ - invert whole byte\n",
+      " L() - use low nibble, H() - use high nibble\n",
+      " MOV R0, L(R1) - copy low nibble of R1 into R0\n",
+      " MOV R0, `R1 - invert high nibble of R1 and copy both nibbles into R0\n",
       "Directives:\n.org 1000h\n.str S \"Some str\"\n.def FROM TO\n.def FROM(param) TO param, bla-bla\n",
       ".def push(r) ST SPD, r ; example for .def with param\n",
       ".db NAME 123 ; one const in ROM\n",
-      ".db ARRAY 1, 2, 3 ; three consts in ROM\n"
-      ".db MULTILINE \\ ; const on many lines of source code\n"
+      ".db ARRAY 1, 2, 3 ; three consts in ROM\n",
+      ".db MULTILINE \\ ; const on many lines of source code\n",
       "  1, 2, 3, \\\n",
       "  4, 5, 6\n",
+      ".dw PTR NAME ; address of .db NAME 123 (see above)\n",
       "\nRun:\n",
       "74hc-asm.exe src.asm [-pre]\n",
       " -pre will print preprocessed src.asm\n",
       "74hc-asm.exe src.asm out.hex\n",
       " will create result binary out.hex\n",
+      "74hc-asm.exe src.asm -v\n",
+      " -v print more verbose information about src.asm\n",
       nullptr
   };
 
@@ -71,10 +75,16 @@ int main(int argc, char* argv[]) {
     if (argc > 2 && string(argv[2]) == "-pre")
       show_pre = true;
 
+    bool verbose {false};
+    if (argc > 2 && string(argv[2]) == "-v") {
+      verbose = true;
+      cout << "verbose - on" << endl;
+    }
+
     // okay, probably cmd is file name ;)
     try {
       Assembler assm;
-      bool res = assm.Process(cmd, show_pre);
+      bool res = assm.Process(cmd, show_pre, verbose);
       if (argc > 2 && argv[2] && !show_pre && !res)
         assm.WriteBinary(argv[2]);
       return res;

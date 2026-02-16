@@ -215,8 +215,8 @@ class DWConsts {
 
 class Assembler {
  public:
-  int Process(std::string fname, bool show_preprocess_out = false);
-  int Process(std::map<int, std::string> lines, bool show_preprocess_out = false);
+  int Process(std::string fname, bool show_preprocess_out = false, bool verbose = false);
+  int Process(std::map<int, std::string> lines, bool show_preprocess_out = false, bool verbose = false);
   void WriteBinary(std::string fname);
 
  protected:
@@ -259,4 +259,6 @@ class Assembler {
   std::map<std::string, StringConst> string_consts_ {};
   std::map<std::string, DBConsts> db_consts_ {};
   std::map<std::string, DWConsts> dw_consts_ {};
+
+  bool verbose_ {false};
 };

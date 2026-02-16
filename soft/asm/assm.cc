@@ -744,7 +744,7 @@ void DWConsts::UpdateAddresses(const map<string, uint16_t>& new_addrs) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int Assembler::Process(string fname, bool show_preprocess_out) {
+int Assembler::Process(string fname, bool show_preprocess_out, bool verbose) {
   map<int, string> lines {};
   FileReader fr;
   int res = fr.read_file(fname, &lines);
@@ -753,8 +753,10 @@ int Assembler::Process(string fname, bool show_preprocess_out) {
   return Process(lines, show_preprocess_out);
 }
 
-int Assembler::Process(map<int, string> lines, bool show_preprocess_out) {
-  cout << "Assembler::Process" << endl;
+int Assembler::Process(map<int, string> lines, bool show_preprocess_out, bool verbose) {
+  verbose_ = verbose;
+  if (verbose_)
+    cout << "Assembler::Process" << endl;
   lines_ = lines;
 
   Preprocessor pre;
@@ -782,7 +784,8 @@ int Assembler::Process(map<int, string> lines, bool show_preprocess_out) {
   PrintDBs();
   PrintDWs();
 
-  cout << "Assembler::Process finished" << endl;
+  if (verbose_)
+    cout << "Assembler::Process finished" << endl;
   return ErrorCollector::GetInstance().have_errors();
 }
 
@@ -971,7 +974,8 @@ void Assembler::Pass1() {
 
 // get real addresses of labels, strings, db consts...
 void Assembler::Pass2() {
-  cout << "Pass2 in" << endl;
+  if (verbose_)
+    cout << "Pass2 in" << endl;
   uint16_t addr = 0;
   vector<CodeLine>::iterator it;
   map<int, uint16_t>::iterator org_it = line_to_org_.begin();
@@ -997,10 +1001,12 @@ void Assembler::Pass2() {
   }
 
   uint16_t str_size = GetTotalSizeOfStringConsts();
-  cout << "Pass2 str size: " << str_size << endl;
+  if (verbose_)
+    cout << "Pass2 str size: " << str_size << endl;
   if (str_size > 0) {
     addr = GetFirstEmptyWindowWithSize(str_size);
-    cout << "Pass2 str addr: " << addr << endl;
+    if (verbose_)
+      cout << "Pass2 str addr: " << addr << endl;
 
     for (auto& s : string_consts_) {
       uint16_t dummy {0};
@@ -1019,7 +1025,8 @@ void Assembler::Pass2() {
   }
 
   uint16_t db_size = GetTotalSizeOfDBConsts();
-  cout << "Pass2 .db size: " << db_size << endl;
+  if (verbose_)
+    cout << "Pass2 .db size: " << db_size << endl;
   if (db_size > 0) {
     addr = GetFirstEmptyWindowWithSize(db_size);
     for (auto& db : db_consts_) {
@@ -1038,7 +1045,8 @@ void Assembler::Pass2() {
   }
 
   uint16_t dw_size = GetTotalSizeOfDWConsts();
-  cout << "Pass2 .dw size: " << dw_size << endl;
+  if (verbose_)
+    cout << "Pass2 .dw size: " << dw_size << endl;
   if (dw_size) {
     addr = GetFirstEmptyWindowWithSize(dw_size);
     for (auto& dw : dw_consts_) {
@@ -1056,7 +1064,8 @@ void Assembler::Pass2() {
     }
   }
 
-  cout << "Pass2 out" << endl;
+  if (verbose_)
+    cout << "Pass2 out" << endl;
 }
 
 // set real jump addresses
@@ -1271,7 +1280,8 @@ bool Assembler::IsOccupied(uint16_t addr) {
 }
 
 uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
-  //cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
+  if (verbose_)
+    cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
 
   uint16_t cnt {0};
   optional<uint16_t> beg;
@@ -1295,7 +1305,8 @@ uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
     }
   }
 
-  cout << "Just return end - 1: " << hex << end - 1 << "h" << endl;
+  if (verbose_)
+    cout << "Just return end - 1: " << hex << end - 1 << "h" << endl;
   return end - 1;
 }
 
