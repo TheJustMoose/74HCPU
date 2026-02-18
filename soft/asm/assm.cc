@@ -1043,6 +1043,7 @@ void Assembler::Pass2() {
       uint16_t sz = db.second.GetSize();
       for (uint16_t i = 0; i < sz; i++)
         occupied_addresses_[addr + i] = true;  // occupy ROM address
+      name_to_address_[db.first] = addr;
       addr += sz;
     }
   }
@@ -1063,6 +1064,7 @@ void Assembler::Pass2() {
       dw.second.SetAddress(addr);
       for (uint16_t i = 0; i < sz; i++)
         occupied_addresses_[addr + i] = true;  // occupy ROM address
+      name_to_address_[dw.first] = addr;
       addr += sz;
     }
   }
