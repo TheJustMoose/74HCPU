@@ -7,4 +7,4 @@ You can find it [here](https://github.com/TheJustMoose/74HCPU/tree/master/soft/a
 
 74HCPU assembler is similar to Intel assembler.
 
-![CPU tacts](./asm.png)
+![CPU asm console](./asm.png)
