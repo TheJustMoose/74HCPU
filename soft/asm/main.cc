@@ -12,7 +12,7 @@ using namespace std;
 
 void help() {
   const char* help_lines[] = {
-      "74HCPU assembler v 0.5\n",
+      "74HCPU assembler v 0.6\n",
       "Support next operations:\n",
       "arithmetic: ADD, ADDC, AND, OR, XOR, MUL, UNO (SWAP, INV, LSR, LSRC), MOV\n",
       "memory: LPM, LD, ST\n",
@@ -21,9 +21,9 @@ void help() {
       "compare: CMP, CMPC\n",
       "jmp: CALL, JMP, RET, JZ, JL, JNE, JE, JG, JC, JNZ, JNC, JHC, JNHC, STOP, AFCALL, NOP\n",
       "Registers: R0, R1, R2, R3, R4, R5, R6, R7\n",
-      "Register pointers: X(XL+XH), Y(YL+YH), V(VL+VH), SP(SPL+SPH)\n",
-      "Auto-increment pointers: Xi, Yi, Vi, SPi\n",
-      "Auto-decrement pointers: Xd, Yd, Vd, SPd\n",
+      "Register pointers: X(XL+XH), Y(YL+YH), SP(SPL+SPH), V(VL+VH)\n",
+      "Auto-increment pointers: Xi, Yi, SPi, Vi\n",
+      "Auto-decrement pointers: Xd, Yd, SPd, Vd\n",
       "PORTS: PORT0-31, PIN0-31\n",
       "Macro: LO()/HI() for pointers, for example:\n mov YL, LO(StringName)\n",
       "Macro: L()/H()/~/'/` for registers, for example:\n",

@@ -114,37 +114,37 @@ TEST_CASE("check ROM COPs") {
   CodeLine cl3(1, "LPM R0, Y");
   CHECK(cl3.GenerateMachineCode() == 0x8040);
 
-  // 1000 000 0 10 00 0000
-  CodeLine cl4(1, "LPM R0, V");  // R0 = *Z;
-  CHECK(cl4.GenerateMachineCode() == 0x8080);
-
   // 1000 000 0 11 00 0000
+  CodeLine cl4(1, "LPM R0, V");  // R0 = *Z;
+  CHECK(cl4.GenerateMachineCode() == 0x80C0);
+
+  // 1000 000 0 10 00 0000
   CodeLine cl5(1, "LPM R0, SP");
-  CHECK(cl5.GenerateMachineCode() == 0x80C0);
+  CHECK(cl5.GenerateMachineCode() == 0x8080);
 
-  // 1000 110 0 11 00 0001
+  // 1000 110 0 10 00 0001
   CodeLine cl6(1, "LPM R6, SP+1");  // R6 = *(SP + 1);
-  CHECK(cl6.GenerateMachineCode() == 0x8CC1);
+  CHECK(cl6.GenerateMachineCode() == 0x8C81);
 
-  // 1000 110 0 11 00 0111
+  // 1000 110 0 10 00 0111
   CodeLine cl7(1, "LPM R6, SP+7");  // R6 = *(SP + 7);
-  CHECK(cl7.GenerateMachineCode() == 0x8CC7);
+  CHECK(cl7.GenerateMachineCode() == 0x8C87);
 
-  // 1000 110 0 11 00 1111
+  // 1000 110 0 10 00 1111
   CodeLine cl8(1, "LPM R6, SP-1");
-  CHECK(cl8.GenerateMachineCode() == 0x8CCF);
+  CHECK(cl8.GenerateMachineCode() == 0x8C8F);
 
-  // 1000 110 0 11 00 1110
+  // 1000 110 0 10 00 1110
   CodeLine cl9(1, "LPM R6, SP-2");
-  CHECK(cl9.GenerateMachineCode() == 0x8CCE);
+  CHECK(cl9.GenerateMachineCode() == 0x8C8E);
 
-  // 1000 110 0 11 00 1001
+  // 1000 110 0 10 00 1001
   CodeLine clA(1, "LPM R6, SP-7");
-  CHECK(clA.GenerateMachineCode() == 0x8CC9);
+  CHECK(clA.GenerateMachineCode() == 0x8C89);
 
-  // 1000 110 0 11 00 1000
+  // 1000 110 0 10 00 1000
   CodeLine clB(1, "LPM R6, SP-8");
-  CHECK(clB.GenerateMachineCode() == 0x8CC8);
+  CHECK(clB.GenerateMachineCode() == 0x8C88);
 
   // LPM  DST W SR DU OFST
   // 1000 101 0 00 01 0000
@@ -187,14 +187,14 @@ TEST_CASE("check RAM COPs") {
 TEST_CASE("check stack COPs") {
   //.def push(r) ST SPD, r
   // ST   SRC - DS DU OFST
-  // 1100 001 0 11 10 0000
+  // 1100 001 0 10 10 0000
   CodeLine cl1(1, "ST SPD, R1");
-  CHECK(cl1.GenerateMachineCode() == 0xC2E0);
+  CHECK(cl1.GenerateMachineCode() == 0xC2A0);
   //.def pop(r)  LD r, SPI+1
   // LD   DST - SR DU OFST
-  // 1001 001 0 11 01 0001
+  // 1001 001 0 10 01 0001
   CodeLine cl2(2, "LD R1, SPI+1");
-  CHECK(cl2.GenerateMachineCode() == 0x92D1);
+  CHECK(cl2.GenerateMachineCode() == 0x9291);
 }
 
 TEST_CASE("check I/O COPs") {
