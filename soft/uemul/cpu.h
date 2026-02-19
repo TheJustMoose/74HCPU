@@ -12,7 +12,7 @@ constexpr int _32K = 32768;
 constexpr int _64K = 65536;
 
 enum PTR_NAMES {
-  X_PTR = 0, Y_PTR = 1, V_PTR = 2, SP_PTR = 3
+  X_PTR = 0, Y_PTR = 1, SP_PTR = 2, V_PTR = 3
 };
 
 class CPU {

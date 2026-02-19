@@ -298,14 +298,14 @@ TEST_CASE("test WriteRAM/ReadRAM/Video RAM") {
 
 TEST_CASE("test Stack Cmds") {
   CPU cpu;
-  cpu.regs_bank1[6] = 0xFF;              // MOV SPL, 0xFF
-  cpu.regs_bank1[7] = 0x7F;              // MOV SPH, 0x7F
+  cpu.regs_bank1[4] = 0xFF;              // MOV SPL, 0xFF
+  cpu.regs_bank1[5] = 0x7F;              // MOV SPH, 0x7F
 
   cpu.regs_bank0[1] = 0x55;              // MOV R1, 0x55
   //.def push(r) ST SPD, r
   // ST   SRC - DS DU OFST
-  // 1100 001 0 11 10 0000
-  StoreToMemoryCmd cmd1(0xC2E0, &cpu);   // ST SPD, R1
+  // 1100 001 0 10 10 0000
+  StoreToMemoryCmd cmd1(0xC2A0, &cpu);   // ST SPD, R1
   cmd1.Execute();
   CHECK( cpu.ReadRAM(0x7FFF) == 0x55 );  // *0x7FFF == 0x55
 
@@ -316,8 +316,8 @@ TEST_CASE("test Stack Cmds") {
 
   //.def pop(r)  LD r, SPI+1
   // LD   DST - SR DU OFST
-  // 1001 001 0 11 01 0001
-  LoadFromMemoryCmd cmd2(0x92D1, &cpu);  // LD R1, SPI+1
+  // 1001 001 0 10 01 0001
+  LoadFromMemoryCmd cmd2(0x9291, &cpu);  // LD R1, SPI+1
   cout << cmd2.Params() << endl;
   cpu.regs_bank0[1] = 0;                 // MOV R1, 0
   cmd2.Execute();                        // R1 := SP+1; SP++;
@@ -325,8 +325,8 @@ TEST_CASE("test Stack Cmds") {
   cmd2.Execute();                        // R1 := SP+1; SP++;
   CHECK( cpu.regs_bank0[1] == 0x55 );
 
-  CHECK( cpu.regs_bank1[6] == 0xFF );    // SPL == 0xFF
-  CHECK( cpu.regs_bank1[7] == 0x7F );    // SPH == 0xFF
+  CHECK( cpu.regs_bank1[4] == 0xFF );    // SPL == 0xFF
+  CHECK( cpu.regs_bank1[5] == 0x7F );    // SPH == 0xFF
 }
 
 TEST_CASE("test Ports Cmds") {
