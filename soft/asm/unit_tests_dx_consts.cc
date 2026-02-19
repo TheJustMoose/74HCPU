@@ -14,7 +14,7 @@ TEST_CASE("check empty db consts class") {
   // check empty DBConsts
   DBConsts dbc(data);
   CHECK_EQ(dbc.GetSize(), 0);
-  dbc.OutCode(code);
+  dbc.OutCode(code, true);
   CHECK_EQ(code.size(), 0);
   CHECK_EQ(dbc.Join().size(), 0);
 }
@@ -26,7 +26,7 @@ TEST_CASE("check simple db consts class") {
   DBConsts dbc(data);
   dbc.SetAddress(0);
   CHECK_EQ(dbc.GetSize(), 3);
-  dbc.OutCode(code);
+  dbc.OutCode(code, true);
   CHECK_EQ(code.size(), 3);
   CHECK_EQ(code[0], 1);
   CHECK_EQ(code[1], 2);
@@ -41,7 +41,7 @@ TEST_CASE("check db consts class with offset") {
   DBConsts dbc(data);
   dbc.SetAddress(30);
   CHECK_EQ(dbc.GetSize(), 3);
-  dbc.OutCode(code);
+  dbc.OutCode(code, true);
   CHECK_EQ(code.size(), 33);
   CHECK_EQ(code[0], 0xFFFF);
   CHECK_EQ(code[30], 1);

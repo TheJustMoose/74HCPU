@@ -10,6 +10,10 @@ class AsmWrapper: public Assembler {
  public:
   AsmWrapper() = default;
   void OutCodeWrapper(vector<uint16_t>& code) {
+    OutCode(code, true);
+  }
+
+  void OutCodeAndDebugInfoWrapper(vector<uint16_t>& code) {
     OutCode(code);
   }
 
@@ -123,10 +127,7 @@ TEST_CASE("check .str directive") {
   vector<uint16_t> code;
   asmw.OutCodeWrapper(code);
 
-  //           0000 + DBGI + addr of str + 'S' + 0
-  size_t dbg_info_size = 8 + 1 + 1 + 1;
-
-  REQUIRE_EQ(code.size(), 4 + dbg_info_size);  // abc + 0 + dbg_info_size
+  REQUIRE_EQ(code.size(), 4);
   CHECK_EQ(code[0], 'a');
   CHECK_EQ(code[1], 'b');
   CHECK_EQ(code[2], 'c');
@@ -167,10 +168,12 @@ TEST_CASE("check all") {
   asmw.Process(lines);
 
   vector<uint16_t> code;
-  asmw.OutCodeWrapper(code);
+  asmw.OutCodeAndDebugInfoWrapper(code);
 
-  //           0000 + DBGI + addr of str + 'S' + 0
-  size_t dbg_info_size = 8 + 1 + 1 + 1;
+  //           0000 + DBGI + addr of str + 'S' + 0 +
+  //           addr + 'CNSTS' + 0 + addr + 'PTR1' + 0 + addr + 'PTR2' + 0
+  size_t dbg_info_size = 4 + 4 + 1 + 1 + 1 +
+                         1 + 5 + 1 + 1 + 4 + 1 + 1 + 4 + 1;
 
   REQUIRE_EQ(code.size(), 12 + dbg_info_size);  // code size + dbg_info_size
   // code
@@ -197,9 +200,31 @@ TEST_CASE("check all") {
   CHECK_EQ(code[18], 'G');
   CHECK_EQ(code[19], 'I');
   // dbg info
-  CHECK_EQ(code[20], 2);
-  CHECK_EQ(code[21], 'S');
-  CHECK_EQ(code[22], 0);
+  CHECK_EQ(code[20], 6);  // addr of CNSTS
+  CHECK_EQ(code[21], 'C');
+  CHECK_EQ(code[22], 'N');
+  CHECK_EQ(code[23], 'S');
+  CHECK_EQ(code[24], 'T');
+  CHECK_EQ(code[25], 'S');
+  CHECK_EQ(code[26], 0);  // ASCII Z
+
+  CHECK_EQ(code[27], 10); // addr of PTR1
+  CHECK_EQ(code[28], 'P');
+  CHECK_EQ(code[29], 'T');
+  CHECK_EQ(code[30], 'R');
+  CHECK_EQ(code[31], '1');
+  CHECK_EQ(code[32], 0);  // ASCII Z
+
+  CHECK_EQ(code[33], 11); // addr of PTR2
+  CHECK_EQ(code[34], 'P');
+  CHECK_EQ(code[35], 'T');
+  CHECK_EQ(code[36], 'R');
+  CHECK_EQ(code[37], '2');
+  CHECK_EQ(code[38], 0);  // ASCII Z
+
+  CHECK_EQ(code[39], 2);
+  CHECK_EQ(code[40], 'S');
+  CHECK_EQ(code[41], 0);
 }
 
 TEST_CASE("check .org directive") {

@@ -217,7 +217,7 @@ class Assembler {
  public:
   int Process(std::string fname, bool show_preprocess_out = false, bool verbose = false);
   int Process(std::map<int, std::string> lines, bool show_preprocess_out = false, bool verbose = false);
-  void WriteBinary(std::string fname);
+  void WriteBinary(std::string fname, bool strip_debug_info = false);
 
  protected:
   void PrintPreprocessed();
@@ -232,7 +232,7 @@ class Assembler {
   void Pass3();  // set real jump addresses
 
   void PrintCode();
-  void OutCode(std::vector<uint16_t>& code);
+  void OutCode(std::vector<uint16_t>& code, bool strip_debug_info = false);
   void OutDebugInfo(std::vector<uint16_t>& code);
   void PrintLabels();
   void PrintOrgs();

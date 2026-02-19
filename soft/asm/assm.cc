@@ -1152,7 +1152,7 @@ void Assembler::PrintCode() {
   PrintStrings();
 }
 
-void Assembler::OutCode(vector<uint16_t>& code) {
+void Assembler::OutCode(vector<uint16_t>& code, bool strip_debug_info) {
   code.clear();
 
   if (code_.empty() && string_consts_.empty() &&
@@ -1172,7 +1172,7 @@ void Assembler::OutCode(vector<uint16_t>& code) {
     }
   }
 
-  // StringConst::out_code will resize 'code' if required
+  // StringConst::OutCode will resize 'code' if required
   for (auto& s : string_consts_)
     s.second.OutCode(code);
 
@@ -1187,7 +1187,8 @@ void Assembler::OutCode(vector<uint16_t>& code) {
   if (name_to_address_.empty())
     return;
 
-  OutDebugInfo(code);
+  if (!strip_debug_info)
+    OutDebugInfo(code);
 }
 
 void Assembler::OutDebugInfo(vector<uint16_t>& code) {
@@ -1209,9 +1210,9 @@ void Assembler::OutDebugInfo(vector<uint16_t>& code) {
   }
 }
 
-void Assembler::WriteBinary(string fname) {
+void Assembler::WriteBinary(string fname, bool strip_debug_info) {
   vector<uint16_t> code;
-  OutCode(code);
+  OutCode(code, strip_debug_info);
   if (!code.size())
     return;
 
