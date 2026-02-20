@@ -29,13 +29,16 @@ class ErrorCollector {
     return errors_;
   }
 
-  std::string get(int line) {
-    if (errors_.find(line) != errors_.end())
+  std::string get(int line, bool& err) {
+    err = false;
+    if (errors_.find(line) != errors_.end()) {
+      err = true;
       return errors_[line];
-    else if (msgs_.find(line) != msgs_.end())
+    } else if (msgs_.find(line) != msgs_.end()) {
       return msgs_[line];
-    else
+    } else {
       return "";
+    }
   }
 
   bool have_errors() {

@@ -489,7 +489,7 @@ class BranchCodeGen: public CodeGen {
           offset -= address_;         // offset from current address
           if (offset > 127 || offset < -128)
             ErrorCollector::GetInstance().err(
-                "Error: Label " + label_ + " is too far from this instruction: "
+                "Error. Label " + label_ + " is too far from this instruction: "
                 + to_string(offset), LineNumber());
           else
             target_addr_ = offset & 0xFF;
@@ -551,7 +551,7 @@ CodeLine::CodeLine(int line_number, string line_text)
 
   COP op = Names::CopFromName(op_name);
   if (op == bERROR) {
-    ErrorCollector::GetInstance().err("Unknown operation: " + op_name, line_number);
+    ErrorCollector::GetInstance().err("Error. Unknown operation: " + op_name, line_number);
     return;
   }
 
@@ -1151,6 +1151,20 @@ void Assembler::PrintCode() {
   cout << "LINE ADDR: COP   ASM                       LABELS          FORMATTED_COP" << endl;
   vector<CodeLine>::iterator it;
   for (it = code_.begin(); it != code_.end(); it++) {
+    bool fatal {false};
+    string el = ErrorCollector::GetInstance().get(it->LineNumber(), fatal);
+    if (fatal) {  // for (auto& e : el)
+      cout << dec
+           << setw(4) << setfill(' ') << right << it->LineNumber() << " "
+           << "????: "
+           << it->GetLineText() << endl;
+      if (el.size())
+        cout << "         > " << el << endl;
+      else
+        cout << "Text of error is not found" << endl;
+      continue;
+    }
+
     optional<uint16_t> cmd_addr {it->Address()};
     if (!cmd_addr.has_value()) {
       cout << "Error! cmd_addr.has_value == false" << endl;
@@ -1173,10 +1187,6 @@ void Assembler::PrintCode() {
          << setw(16) << setfill(' ') << left << Join(it->GetLabels(), ' ')
          << setw(16) << setfill(' ') << left << it->FormattedCOP()
          << endl;
-
-    string el = ErrorCollector::GetInstance().get(it->LineNumber());
-    if (el.size())  // for (auto& e : el)
-      cout << "         > " << el << endl;
   }
 
   PrintStrings();
@@ -1199,6 +1209,10 @@ void Assembler::OutCode(vector<uint16_t>& code, bool strip_debug_info) {
     if (cmd_addr.has_value()) {
       code.resize(cmd_addr.value() + 1, 0xFFFFU);
       code[cmd_addr.value()] = it->GenerateMachineCode();
+    } else {
+      cout << "Instruction: " << it->GetLineText()
+           << " at line: " << it->LineNumber()
+           << " has no address" << endl;
     }
   }
 

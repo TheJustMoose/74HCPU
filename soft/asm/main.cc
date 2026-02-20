@@ -98,7 +98,9 @@ int main(int argc, char* argv[]) {
   try {  // Now args.size() may be equal 2 or 3
     Assembler assm;
     bool res = assm.Process(args[1], show_pre, verbose);
-    if (args.size() > 2 && !show_pre && !res)
+    if (res)
+      cout << "*** Can't write code because some errors was found ***" << endl;
+    else if (args.size() > 2 && !show_pre)
       assm.WriteBinary(args[2]);
     return res;
   } catch (const char* e) {
