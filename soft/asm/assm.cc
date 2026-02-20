@@ -939,28 +939,25 @@ void Assembler::ExtractDWs() {
   }
 }
 
-uint16_t Assembler::GetTotalSizeOfStringConsts() const {
+template<typename T>
+uint16_t GetTotalSizeOf(const map<string, T>& cont) {
   uint16_t res {0};
-  for (auto& s : string_consts_)
-    res += s.second.GetSize();
+  for (const auto& v : cont)
+    res += v.second.GetSize();
 
   return res;
+}
+
+uint16_t Assembler::GetTotalSizeOfStringConsts() const {
+  return GetTotalSizeOf(string_consts_);
 }
 
 uint16_t Assembler::GetTotalSizeOfDBConsts() const {
-  uint16_t res {0};
-  for (auto& b : db_consts_)
-    res += b.second.GetSize();
-
-  return res;
+  return GetTotalSizeOf(db_consts_);
 }
 
 uint16_t Assembler::GetTotalSizeOfDWConsts() const {
-  uint16_t res {0};
-  for (auto& w : dw_consts_)
-    res += w.second.GetSize();
-
-  return res;
+  return GetTotalSizeOf(dw_consts_);
 }
 
 // generate machine code
