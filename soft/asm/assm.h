@@ -241,7 +241,7 @@ class Assembler {
   void PrintDWs();
 
   bool IsOccupied(uint16_t addr);
-  uint16_t GetFirstEmptyWindowWithSize(uint16_t size);
+  std::optional<uint16_t> GetFirstEmptyWindowWithSize(uint16_t size);
 
   uint16_t GetTotalSizeOfStringConsts();
   uint16_t GetTotalSizeOfDBConsts();

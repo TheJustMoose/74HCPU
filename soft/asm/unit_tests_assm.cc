@@ -1,6 +1,7 @@
 #include <doctest.h>
 #include <iomanip>
 #include <iostream>
+#include <optional>
 
 #include "assm.h"
 
@@ -21,7 +22,7 @@ class AsmWrapper: public Assembler {
     return IsOccupied(addr);
   }
 
-  uint16_t GetFirstEmptyWindowWithSizeWrapper(uint16_t size) {
+  optional<uint16_t> GetFirstEmptyWindowWithSizeWrapper(uint16_t size) {
     return GetFirstEmptyWindowWithSize(size);
   }
 
@@ -254,8 +255,9 @@ TEST_CASE("check occupied_addresses_ bitset (empty)") {
   AsmWrapper asmw;
   asmw.Process(lines);
 
-  uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(1);
-  CHECK_EQ(first, 0);
+  optional<uint16_t> first = asmw.GetFirstEmptyWindowWithSizeWrapper(1);
+  CHECK(first.has_value());
+  CHECK_EQ(first.value(), 0);
 }
 
 TEST_CASE("check occupied_addresses_ bitset (one block at addr 0)") {
@@ -266,8 +268,9 @@ TEST_CASE("check occupied_addresses_ bitset (one block at addr 0)") {
   AsmWrapper asmw;
   asmw.Process(lines);
 
-  uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(1);
-  CHECK_EQ(first, 4);
+  optional<uint16_t> first = asmw.GetFirstEmptyWindowWithSizeWrapper(1);
+  CHECK(first.has_value());
+  CHECK_EQ(first.value(), 4);
 }
 
 TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
@@ -286,17 +289,24 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   CHECK(asmw.IsOccupiedWrapper(20));
   CHECK(!asmw.IsOccupiedWrapper(21));
 
-  uint16_t first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
-  CHECK_EQ(first, 1);  // addr 0 is occupied, add 1 is free
+  optional<uint16_t> first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
+  CHECK(first.has_value());
+  CHECK_EQ(first.value(), 1);  // addr 0 is occupied, add 1 is free
 
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(19);
-  CHECK_EQ(first, 1);  // addr 0 is occupied, add 1 is free
+  CHECK(first.has_value());
+  CHECK_EQ(first.value(), 1);  // addr 0 is occupied, add 1 is free
 
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(20);
-  CHECK_EQ(first, 21);  // we can find 20 free cells at address 21
+  CHECK(first.has_value());
+  CHECK_EQ(first.value(), 21);  // we can find 20 free cells at address 21
 
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(30);
-  CHECK_EQ(first, 21);  // addr 20 is occupied, add 21 is free
+  CHECK(first.has_value());
+  CHECK_EQ(first.value(), 21);  // addr 20 is occupied, add 21 is free
+
+  first = asmw.GetFirstEmptyWindowWithSizeWrapper(65535);
+  CHECK(!first.has_value());  // we should get nullopt
 }
 
 TEST_CASE("check GetTotalSizeOfStringConsts") {

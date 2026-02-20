@@ -978,38 +978,54 @@ void Assembler::Pass1() {
 void Assembler::Pass2() {
   if (verbose_)
     cout << "Pass2 in" << endl;
-  uint16_t addr = 0;
+
   vector<CodeLine>::iterator it;
   map<int, uint16_t>::iterator org_it = line_to_org_.begin();
   // for each line of code
-  for (it = code_.begin(); it != code_.end(); it++, addr++) {
+  int max_line {0};
+  uint16_t max_addr {0};
+  for (it = code_.begin(); it != code_.end(); it++, max_addr++) {
+    if (max_line < it->LineNumber())
+      max_line = it->LineNumber();
+
     if (org_it != line_to_org_.end() &&
         it->LineNumber() > org_it->first) {  // if line placed after .org
-      if (org_it->second > addr) {
-        addr = org_it->second;               // change line address to .org value
+      if (org_it->second > max_addr) {
+        max_addr = org_it->second;               // change line address to .org value
         if (verbose_)
-          cout << "move address to: " << addr << endl;
+          cout << "move address to: " << max_addr << endl;
       }
       org_it++;  // this .org was used, we need new .org
     }
 
-    it->SetAddress(addr);  // change address of every line
-    occupied_addresses_[addr] = true;  // occupy ROM address
+    it->SetAddress(max_addr);  // change address of every line
+    occupied_addresses_[max_addr] = true;  // occupy ROM address
 
     // and every label of this line
     vector<string> labels = it->GetLabels();
     vector<string>::iterator lit;
     for (lit = labels.begin(); lit != labels.end(); lit++)
-      name_to_address_[*lit] = addr;
+      name_to_address_[*lit] = max_addr;
   }
+
+  auto conv = [](optional<uint16_t> val){
+    return val ? static_cast<int>(*val) : -1;
+  };
 
   uint16_t str_size = GetTotalSizeOfStringConsts();
   if (verbose_)
     cout << "Pass2 str size: " << str_size << endl;
   if (str_size > 0) {
-    addr = GetFirstEmptyWindowWithSize(str_size);
+    optional<uint16_t> addr = GetFirstEmptyWindowWithSize(str_size);
     if (verbose_)
-      cout << "Pass2 str addr: " << addr << endl;
+      cout << "Pass2 str addr: " << conv(addr) << endl;
+
+    if (!addr) {
+      ErrorCollector::GetInstance().err(
+        "Can't find " + to_string(str_size) + " word of free space in ROM",
+        max_line);
+      return;
+    }
 
     for (auto& s : string_consts_) {
       uint16_t dummy {0};
@@ -1018,12 +1034,12 @@ void Assembler::Pass2() {
         break;
       }
 
-      s.second.SetAddress(addr);
+      s.second.SetAddress(*addr);
       uint16_t sz = s.second.GetSize();
       for (uint16_t i = 0; i < sz; i++)
-        occupied_addresses_[addr + i] = true;  // occupy ROM address
-      name_to_address_[s.first] = addr;
-      addr += sz;
+        occupied_addresses_[*addr + i] = true;  // occupy ROM address
+      name_to_address_[s.first] = *addr;
+      *addr += sz;
     }
   }
 
@@ -1031,7 +1047,14 @@ void Assembler::Pass2() {
   if (verbose_)
     cout << "Pass2 .db size: " << db_size << endl;
   if (db_size > 0) {
-    addr = GetFirstEmptyWindowWithSize(db_size);
+    optional<uint16_t> addr = GetFirstEmptyWindowWithSize(db_size);
+    if (!addr) {
+      ErrorCollector::GetInstance().err(
+        "Can't find " + to_string(db_size) + " word of free space in ROM",
+        max_line);
+      return;
+    }
+
     for (auto& db : db_consts_) {
       uint16_t dummy {0};
       if (db.second.Address(dummy)) {
@@ -1039,12 +1062,12 @@ void Assembler::Pass2() {
         break;
       }
 
-      db.second.SetAddress(addr);
+      db.second.SetAddress(*addr);
       uint16_t sz = db.second.GetSize();
       for (uint16_t i = 0; i < sz; i++)
-        occupied_addresses_[addr + i] = true;  // occupy ROM address
-      name_to_address_[db.first] = addr;
-      addr += sz;
+        occupied_addresses_[*addr + i] = true;  // occupy ROM address
+      name_to_address_[db.first] = *addr;
+      *addr += sz;
     }
   }
 
@@ -1052,7 +1075,14 @@ void Assembler::Pass2() {
   if (verbose_)
     cout << "Pass2 .dw size: " << dw_size << endl;
   if (dw_size) {
-    addr = GetFirstEmptyWindowWithSize(dw_size);
+    optional<uint16_t> addr = GetFirstEmptyWindowWithSize(dw_size);
+    if (!addr) {
+      ErrorCollector::GetInstance().err(
+        "Can't find " + to_string(dw_size) + " word of free space in ROM",
+        max_line);
+      return;
+    }
+
     for (auto& dw : dw_consts_) {
       uint16_t dummy {0};
       if (dw.second.Address(dummy)) {
@@ -1061,11 +1091,11 @@ void Assembler::Pass2() {
       }
 
       uint16_t sz = dw.second.GetSize();
-      dw.second.SetAddress(addr);
+      dw.second.SetAddress(*addr);
       for (uint16_t i = 0; i < sz; i++)
-        occupied_addresses_[addr + i] = true;  // occupy ROM address
-      name_to_address_[dw.first] = addr;
-      addr += sz;
+        occupied_addresses_[*addr + i] = true;  // occupy ROM address
+      name_to_address_[dw.first] = *addr;
+      *addr += sz;
     }
   }
 
@@ -1285,7 +1315,7 @@ bool Assembler::IsOccupied(uint16_t addr) {
   return occupied_addresses_[addr];
 }
 
-uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
+optional<uint16_t> Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
   if (verbose_)
     cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
 
@@ -1296,7 +1326,7 @@ uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
     if (IsOccupied(addr)) {
       //cout << hex << setw(2) << addr << "h is occupied" << endl;
       cnt = 0;
-      beg = std::nullopt;  // mark addr as empty
+      beg = nullopt;  // mark addr as empty
     } else {
       //cout << hex << setw(2) << addr << "h is free" << endl;
       cnt++;
@@ -1314,8 +1344,8 @@ uint16_t Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
   }
 
   if (verbose_)
-    cout << "Just return end - 1: " << hex << end - 1 << "h" << endl;
-  return end - 1;
+    cout << "Sufficient free space not found." << endl;
+  return nullopt;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
