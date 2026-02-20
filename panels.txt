@@ -2,7 +2,7 @@
 cmp + mov + and
 inv + swap + lsl + lsr + inv-b
 
-список мелких плат:
+СЃРїРёСЃРѕРє РјРµР»РєРёС… РїР»Р°С‚:
 273		20x28	5
 273wLED		26x28
 ALU		99x99
@@ -38,7 +38,7 @@ STACK1		34x25	8
 Toggle		53x24	2
 
 
-платы:
+РїР»Р°С‚С‹:
 MUX+REG  ALU(1)+MUL(2)+INV   RAM+Ports+Toggle
  Jmps(4)      Flags(3)      CMD_DEC(5)
 OSC(6)  ADDR_CNT+STACK+MUX   ROM
