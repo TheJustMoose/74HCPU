@@ -1181,6 +1181,11 @@ void Assembler::PrintCode() {
          << setw(16) << setfill(' ') << left << Join(it->GetLabels(), ' ')
          << setw(16) << setfill(' ') << left << it->FormattedCOP()
          << endl;
+
+    // Okay, try to check warnings and messages!
+    el = ErrorCollector::GetInstance().get(it->LineNumber(), fatal);
+    if (el.size())  // for (auto& e : el)
+      cout << "         > " << el << endl;
   }
 
   PrintStrings();
