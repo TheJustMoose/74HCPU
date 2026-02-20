@@ -12,6 +12,7 @@ add_executable(74hc-asm
 	file_reader.cc
 	main.cc
 	preprocessor.cc
+	slot_allocator.cc
 	str_util.cc
 )
 
@@ -23,6 +24,7 @@ add_executable(asm_unit_tests
 	error_collector.cc
 	file_reader.cc
 	preprocessor.cc
+	slot_allocator.cc
 	str_util.cc
 	unit_tests_assm.cc
 	unit_tests_cop.cc
