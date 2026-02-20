@@ -939,7 +939,7 @@ void Assembler::ExtractDWs() {
   }
 }
 
-uint16_t Assembler::GetTotalSizeOfStringConsts() {
+uint16_t Assembler::GetTotalSizeOfStringConsts() const {
   uint16_t res {0};
   for (auto& s : string_consts_)
     res += s.second.GetSize();
@@ -947,7 +947,7 @@ uint16_t Assembler::GetTotalSizeOfStringConsts() {
   return res;
 }
 
-uint16_t Assembler::GetTotalSizeOfDBConsts() {
+uint16_t Assembler::GetTotalSizeOfDBConsts() const {
   uint16_t res {0};
   for (auto& b : db_consts_)
     res += b.second.GetSize();
@@ -955,7 +955,7 @@ uint16_t Assembler::GetTotalSizeOfDBConsts() {
   return res;
 }
 
-uint16_t Assembler::GetTotalSizeOfDWConsts() {
+uint16_t Assembler::GetTotalSizeOfDWConsts() const {
   uint16_t res {0};
   for (auto& w : dw_consts_)
     res += w.second.GetSize();
