@@ -751,7 +751,7 @@ int Assembler::Process(string fname, bool show_preprocess_out, bool verbose) {
   int res = fr.read_file(fname, &lines);
   if (res != 0)
     return res;
-  return Process(lines, show_preprocess_out);
+  return Process(lines, show_preprocess_out, verbose);
 }
 
 int Assembler::Process(map<int, string> lines, bool show_preprocess_out, bool verbose) {
@@ -1014,9 +1014,6 @@ void Assembler::Pass2() {
     cout << "Pass2 str size: " << str_size << endl;
   if (str_size > 0) {
     optional<uint16_t> addr = GetFirstEmptyWindowWithSize(str_size);
-    if (verbose_)
-      cout << "Pass2 str addr: " << conv(addr) << endl;
-
     if (!addr) {
       ErrorCollector::GetInstance().err(
         "Can't find " + to_string(str_size) + " word of free space in ROM",
@@ -1087,8 +1084,8 @@ void Assembler::Pass2() {
         break;
       }
 
-      uint16_t sz = dw.second.GetSize();
       dw.second.SetAddress(*addr);
+      uint16_t sz = dw.second.GetSize();
       for (uint16_t i = 0; i < sz; i++)
         occupied_addresses_[*addr + i] = true;  // occupy ROM address
       name_to_address_[dw.first] = *addr;
