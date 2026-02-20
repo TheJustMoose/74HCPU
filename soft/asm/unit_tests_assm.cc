@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "assm.h"
+#include "error_collector.h"
 
 using namespace std;
 
@@ -398,4 +399,25 @@ TEST_CASE("check GetTotalSizeOf**Consts") {
   CHECK_EQ(sz2, 3);
   uint16_t sz3 = asmw.GetTotalSizeOfDWConstsWrapper();
   CHECK_EQ(sz3, 2);
+}
+
+TEST_CASE("check first word of binary") {
+  map<int, string> lines {
+    {1, "entry: clr  r0"},
+    {2, "mov  YL, LO(Hello)"},
+    {3, "mov  YH, HI(Hello)"},
+    {4, ".str Hello \"Test string!\""},
+  };
+
+  AsmWrapper asmw;
+  asmw.Process(lines);
+
+  bool fatal {false};
+  string el = ErrorCollector::GetInstance().get(1, fatal);
+  CHECK(fatal);
+  CHECK_EQ(el.find("Error"), 0);
+
+  el = ErrorCollector::GetInstance().get(2, fatal);
+  CHECK(!fatal);  // just message, no fatal error
+  CHECK_EQ(el.find("Error"), string::npos);
 }
