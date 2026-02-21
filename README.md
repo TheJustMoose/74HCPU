@@ -5,9 +5,10 @@ Not a very scary instruction set discrete logic processor.
 * 8 bit data
 * 16 bit address / 64KB RAM
 * 17 bit address (in V register) / 128KW Dual Bank Video RAM
-* 16 instructions
-* 8 data registers and 4 pointer registers in 2 banks
+* 16 [instructions](#instruction-list)
+* 8 data [registers](#registers) and 4 pointer registers in 2 banks
 * 1 [flags register](#flags-register) in IO port
+* 32 input ports and 32 output ports
 * Assembled from 74HCxx series ICs!
 
 ## Soft!
@@ -69,6 +70,8 @@ Not a very scary instruction set discrete logic processor.
 | BRNCH |NOP/STOP|   1111 111x   | FF 1111 1111| |
 |----------------------------------------------|-|
 ```
+* - means ZF, CF, HCF flags
++ - means GF, EQ, LF flags
 
 ### Registers
 74HCPU has two register banks.
@@ -146,19 +149,23 @@ That is, R1:R0 := R1 * R2.
 
 ### MUL Examples
 ```
+  Rd select output Pair:
+      _________
+  Rd /         \ Pair  Rd   Rs
+     |         \/
 MUL R0, R1 -> R1:R0 := R0 * R1
+MUL R1, R0 -> R1:R0 := R1 * R0
 MUL R1, R2 -> R1:R0 := R1 * R2
+MUL R1, R7 -> R1:R0 := R1 * R7
 MUL R2, R3 -> R3:R2 := R2 * R3
 MUL R2, R7 -> R3:R2 := R2 * R7
 ....
-```
 
-```
 The MUL command uses the following register pairs to store result:
-R1:R0
-R3:R2
-R5:R4
-R7:R6
+R1:R0 (when Rd is R0 or R1)
+R3:R2 (when Rd is R2 or R3)
+R5:R4 (when Rd is R4 or R5)
+R7:R6 (when Rd is R6 or R7)
 Rd is used to select output register pair.
 ```
 
@@ -200,13 +207,13 @@ This command stores data in the same ROM that stores the commands themselves.
 
 ### LD, ST - Memory commands
 ```
-LD - load data from memory
-ST - store date from memory
+LD - LoaD data from memory
+ST - STore date to memory
 V - 0 for RAM and 1 for Video RAM
-SRC/DST - register to read/write
+SRC/DST - register to read(SRC)/write(DST)
 EXT - register pair which store pointer to memory
-D - decrement pointer after use
-U - increment pointer after use
+D - Decrement pointer after use
+U - Increment pointer after use
 OFFSET4 - 4 bit integer offset (-8...+7)
 (CPU whill read/write memory with address ptr(EXT) + OFFSET4)
 Examples:
