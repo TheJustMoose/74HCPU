@@ -8,7 +8,7 @@ Not a very scary instruction set discrete logic processor.
 * 16 [instructions](#instruction-list)
 * 8 data [registers](#registers) and 4 pointer registers in 2 banks
 * 1 [flags register](#flags-register) in IO port
-* 32 input ports and 32 output ports
+* 32 input ports and 32 output ports (You can write a constant to the first 8 ports. Only registers can be written to the remaining ports.)
 * Assembled from 74HCxx series ICs!
 
 ## Soft!
@@ -70,7 +70,7 @@ Not a very scary instruction set discrete logic processor.
 | BRNCH |NOP/STOP|   1111 111x   | FF 1111 1111| |
 |----------------------------------------------|-|
 ```
-\* - means ZF, CF, HCF flags, \+ - means GF, EQ, LF flags
+\* - means ZF, CF, HCF [flags](#flags-register), \+ - means GF, EQ, LF flags
 
 ### Registers
 74HCPU has two register banks.
@@ -150,14 +150,14 @@ That is, R1:R0 := R1 * R2.
 ```
   Rd select output Pair:
       _________
-  Rd /         \ Pair  Rd   Rs
+  Rd /         \ Pair   Rd   Rs
      |         \/
-MUL R0, R1 -> R1:R0 := R0 * R1
-MUL R1, R0 -> R1:R0 := R1 * R0
-MUL R1, R2 -> R1:R0 := R1 * R2
-MUL R1, R7 -> R1:R0 := R1 * R7
-MUL R2, R3 -> R3:R2 := R2 * R3
-MUL R2, R7 -> R3:R2 := R2 * R7
+MUL R0, R1 -> R1:R0  := R0 * R1
+MUL R1, R0 -> R1:R0  := R1 * R0
+MUL R1, R2 -> R1:R0  := R1 * R2
+MUL R1, R7 -> R1:R0  := R1 * R7
+MUL R2, R3 -> R3:R2  := R2 * R3
+MUL R2, R7 -> R3:R2  := R2 * R7
 ....
 
 The MUL command uses the following register pairs to store result:
@@ -222,7 +222,7 @@ ST YI, R1   ; write data and increment Y pointer
 ST YD, R1   ; write data and decrement Y pointer
 ST Y+5, R1  ; write data into memory address Y+5
 LDV R7, V   ; read data from Video RAM with address V and store it into R7 (R7:R6 pair)
-LDV R7, V+1 ; <b>disabled</b> command, you can use displacement only with X, Y and SP pointers
+LDV R7, V+1 ; /<b/>disabled</b> command, you can use displacement only with X, Y and SP pointers
 ```
 
 ### BRNCH - Branch commands
