@@ -970,7 +970,7 @@ void Assembler::SetAddressesOf(map<string, T>& cont, string cont_name,
     cout << "Pass2 " << cont_name <<  "size: " << cont_size << endl;
 
   if (cont_size == 0) {
-    cout << "Container " << cont_name <<  "is empty." << endl;
+    cout << "Container " << cont_name <<  " is empty." << endl;
     return;
   }
 
@@ -993,9 +993,8 @@ void Assembler::SetAddressesOf(map<string, T>& cont, string cont_name,
 
     c.second.SetAddress(*addr);
     uint16_t sz = c.second.GetSize();
-    for (uint16_t i = 0; i < sz; i++)
-      OccupyIt(*addr + i);    // occupy ROM address
-    name_to_address[c.first] = *addr;
+    OccupyIt(*addr, sz);  // occupy ROM addresses
+    name_to_address_[c.first] = *addr;
     *addr += sz;
   }
 }
@@ -1049,116 +1048,9 @@ void Assembler::Pass2() {
     return val ? static_cast<int>(*val) : -1;
   };
 
-  uint16_t str_size = GetTotalSizeOfStringConsts();
-  if (verbose_)
-    cout << "Pass2 str size: " << str_size << endl;
-  if (str_size > 0) {
-    optional<uint16_t> addr = GetFirstEmptyWindowWithSize(str_size);
-    if (!addr) {
-      ErrorCollector::GetInstance().err(
-        "Can't find " + to_string(str_size) + " word of free space in ROM",
-        max_line);
-      return;
-    }
-
-    for (auto& s : string_consts_) {
-      uint16_t dummy {0};
-      if (s.second.Address(dummy)) {
-        cout << "Error. You can't set address of StringConst cause it's already set." << endl;
-        break;
-      }
-
-      s.second.SetAddress(*addr);
-      uint16_t sz = s.second.GetSize();
-      OccupyIt(*addr, sz);  // occupy ROM addresses
-      name_to_address_[s.first] = *addr;
-      *addr += sz;
-    }
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  uint16_t db_size = GetTotalSizeOfDBConsts();
-  if (verbose_)
-    cout << "Pass2 .db size: " << db_size << endl;
-  if (db_size > 0) {
-    optional<uint16_t> addr = GetFirstEmptyWindowWithSize(db_size);
-    if (!addr) {
-      ErrorCollector::GetInstance().err(
-        "Can't find " + to_string(db_size) + " word of free space in ROM",
-        max_line);
-      return;
-    }
-
-    for (auto& db : db_consts_) {
-      uint16_t dummy {0};
-      if (db.second.Address(dummy)) {
-        cout << "Error. You can't set address of DBConsts cause it's already set." << endl;
-        break;
-      }
-
-      db.second.SetAddress(*addr);
-      uint16_t sz = db.second.GetSize();
-      OccupyIt(*addr, sz);  // occupy ROM addresses
-      name_to_address_[db.first] = *addr;
-      *addr += sz;
-    }
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  uint16_t dw_size = GetTotalSizeOfDWConsts();
-  if (verbose_)
-    cout << "Pass2 .dw size: " << dw_size << endl;
-  if (dw_size > 0) {
-    optional<uint16_t> addr = GetFirstEmptyWindowWithSize(dw_size);
-    if (!addr) {
-      ErrorCollector::GetInstance().err(
-        "Can't find " + to_string(dw_size) + " word of free space in ROM",
-        max_line);
-      return;
-    }
-
-    for (auto& dw : dw_consts_) {
-      uint16_t dummy {0};
-      if (dw.second.Address(dummy)) {
-        cout << "Error. You can't set address of DWConsts cause it's already set." << endl;
-        break;
-      }
-
-      dw.second.SetAddress(*addr);
-      uint16_t sz = dw.second.GetSize();
-      OccupyIt(*addr, sz);  // occupy ROM addresses
-      name_to_address_[dw.first] = *addr;
-      *addr += sz;
-    }
-  }
+  SetAddressesOf(string_consts_, ".str", max_line);
+  SetAddressesOf(db_consts_, ".db", max_line);
+  SetAddressesOf(dw_consts_, ".dw", max_line);
 
   if (verbose_)
     cout << "Pass2 out" << endl;
