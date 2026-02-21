@@ -241,6 +241,10 @@ class Assembler {
   void PrintDBs();
   void PrintDWs();
 
+  template<typename T>
+  void SetAddressesOf(std::map<std::string, T>& cont,
+                      std::string cont_name, int max_line);
+
   bool IsOccupied(uint16_t addr) {
     return slot_allocator_.IsOccupied(addr);
   }

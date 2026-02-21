@@ -962,6 +962,44 @@ uint16_t Assembler::GetTotalSizeOfDWConsts() const {
   return GetTotalSizeOf(dw_consts_);
 }
 
+template<typename T>
+void Assembler::SetAddressesOf(map<string, T>& cont, string cont_name,
+                               int max_line) {
+  uint16_t cont_size = GetTotalSizeOf(cont);
+  if (verbose_)
+    cout << "Pass2 " << cont_name <<  "size: " << cont_size << endl;
+
+  if (cont_size == 0) {
+    cout << "Container " << cont_name <<  "is empty." << endl;
+    return;
+  }
+
+  optional<uint16_t> addr = GetFirstEmptyWindowWithSize(cont_size);
+  if (!addr.has_value()) {
+    ErrorCollector::GetInstance().err(
+      "Can't find " + to_string(cont_size) +
+      " word of free space in ROM for " + cont_name,
+      max_line);
+    return;
+  }
+
+  for (auto& c : cont) {
+    uint16_t dummy {0};
+    if (c.second.Address(dummy)) {
+      cout << "Error. You can't set address of " << cont_name
+           << " cause address is already set." << endl;
+      break;
+    }
+
+    c.second.SetAddress(*addr);
+    uint16_t sz = c.second.GetSize();
+    for (uint16_t i = 0; i < sz; i++)
+      OccupyIt(*addr + i);    // occupy ROM address
+    name_to_address[c.first] = *addr;
+    *addr += sz;
+  }
+}
+
 // generate machine code
 void Assembler::Pass1() {
   map<int, string>::iterator it;
