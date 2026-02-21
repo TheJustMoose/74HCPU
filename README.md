@@ -70,8 +70,7 @@ Not a very scary instruction set discrete logic processor.
 | BRNCH |NOP/STOP|   1111 111x   | FF 1111 1111| |
 |----------------------------------------------|-|
 ```
-\* - means ZF, CF, HCF flags
-\+ - means GF, EQ, LF flags
+\* - means ZF, CF, HCF flags, \+ - means GF, EQ, LF flags
 
 ### Registers
 74HCPU has two register banks.
