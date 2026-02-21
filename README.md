@@ -203,7 +203,7 @@ Also you can use LPMW to read the whole 16 bit word from ROM and store data to [
 
 ### LD, ST - Memory commands  
 LD - LoaD data from memory  
-ST - STore date to memory  
+ST - STore data to memory  
 V - 0 for RAM and 1 for Video RAM  
 SRC - register to read  
 DST - register to write  
@@ -211,7 +211,7 @@ EXT - register pair which store pointer to memory
 D - Decrement pointer after use  
 U - Increment pointer after use  
 OFFSET4 - 4 bit integer offset (-8...+7)  
-(CPU whill read/write memory with address ptr(EXT) + OFFSET4)  
+(CPU will read/write memory with address ptr(EXT) + OFFSET4)  
 Examples:
 ```
 LD R0, X    ; read memory data from X pointer into the R0 register
