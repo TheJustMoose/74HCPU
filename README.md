@@ -8,6 +8,7 @@ Not a very scary instruction set discrete logic processor.
 * 16 instructions
 * 8 data registers and 4 pointer registers in 2 banks
 * 1 [flags register](#flags-register) in IO port
+* Assembled from 74HCxx series ICs!
 
 ## Soft!
 [ASM](./ASM.md)
@@ -23,7 +24,7 @@ Not a very scary instruction set discrete logic processor.
 [Layers of PCBs](layers/README.md)
 
 ## Instruction list
-
+*The words 'instruction' and 'command' mean the same thing.*
 ```
 |----------------------------------------------|f|
 |   HIGH BYTE    |    LOW BYTE   |  HIGH BYTE  |l|
@@ -161,18 +162,18 @@ R7:R6
 Rd is used to select output register pair.
 ```
 
-### Flags
+### Command options
 ```
-C - Low byte contains constant value (1) or flags (0).
-Z - Will reset high nibble of SRC before use.
-z - Will reset low nibble of SRC before use.
-I - Will invert high nibble of SRC before use.
-i - Will invert low nibble of SRC before use.
+C - Low byte [of command] contains constant value (1) or options (0).
+Z - Will reset high nibble of SRC register before use.
+z - Will reset low nibble of SRC register before use.
+I - Will invert high nibble of SRC register before use.
+i - Will invert low nibble of SRC register before use.
 F - Set CF flag to TRUE while executing command.
-W - Operation will work with word, not byte
-V - Operation will work with Video RAM
-D - Down, decrease pointer after operation
-U - Up, increase pointer after operation
+W - Command will work with word, not byte
+V - Command will work with Video RAM
+D - Down, decrease pointer after command
+U - Up, increase pointer after command
 OFFSET4 - 4 bit size int offset to current pointer
 O - Out will write to high nibble of port
 o - Out will write to low nibble of port
