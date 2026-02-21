@@ -160,12 +160,12 @@ MUL R2, R7 -> R3:R2  := R2 * R7
 ....
 ```
 
-#### Register pairs
-The MUL command uses the following register pairs to store result:
-R1:R0 (when Rd is R0 or R1)
-R3:R2 (when Rd is R2 or R3)
-R5:R4 (when Rd is R4 or R5)
-R7:R6 (when Rd is R6 or R7)
+#### Register pairs  
+The MUL command uses the following register pairs to store result:  
+R1:R0 (when Rd is R0 or R1)  
+R3:R2 (when Rd is R2 or R3)  
+R5:R4 (when Rd is R4 or R5)  
+R7:R6 (when Rd is R6 or R7)  
 Rd is used to select output register pair.
 
 ### Instruction options  
