@@ -158,14 +158,15 @@ MUL R1, R7 -> R1:R0  := R1 * R7
 MUL R2, R3 -> R3:R2  := R2 * R3
 MUL R2, R7 -> R3:R2  := R2 * R7
 ....
+```
 
+#### Register pairs
 The MUL command uses the following register pairs to store result:
 R1:R0 (when Rd is R0 or R1)
 R3:R2 (when Rd is R2 or R3)
 R5:R4 (when Rd is R4 or R5)
 R7:R6 (when Rd is R6 or R7)
 Rd is used to select output register pair.
-```
 
 ### Instruction options  
 C - Low byte [of command] contains constant value (1) or options (0).  
@@ -196,8 +197,9 @@ SWAP simply swap the nibbles.
 INV simply invert all the bits.
 
 ### LPM - Load Program Memory  
-This command read data from ROM, not RAM.  
-This command stores data in the same ROM that stores the commands themselves.
+This command read (1 byte of) data from ROM, not RAM. And this command write data to register.  
+The data stores in the same ROM that stores the commands themselves.
+Also you can use LPMW to read the whole 16 bit word from ROM and store data to [register pair](#register-pairs).
 
 ### LD, ST - Memory commands  
 LD - LoaD data from memory  
