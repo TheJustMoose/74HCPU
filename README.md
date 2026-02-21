@@ -162,7 +162,7 @@ R7:R6
 Rd is used to select output register pair.
 ```
 
-### Command options
+### Instruction options
 ```
 C - Low byte [of command] contains constant value (1) or options (0).
 Z - Will reset high nibble of SRC register before use.
