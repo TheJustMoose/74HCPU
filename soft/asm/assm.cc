@@ -1070,12 +1070,12 @@ void Assembler::Pass2() {
 
       s.second.SetAddress(*addr);
       uint16_t sz = s.second.GetSize();
-      for (uint16_t i = 0; i < sz; i++)
-        OccupyIt(*addr + i);  // occupy ROM address
+      OccupyIt(*addr, sz);  // occupy ROM addresses
       name_to_address_[s.first] = *addr;
       *addr += sz;
     }
   }
+
 
 
 
@@ -1112,12 +1112,12 @@ void Assembler::Pass2() {
 
       db.second.SetAddress(*addr);
       uint16_t sz = db.second.GetSize();
-      for (uint16_t i = 0; i < sz; i++)
-        OccupyIt(*addr + i);  // occupy ROM address
+      OccupyIt(*addr, sz);  // occupy ROM addresses
       name_to_address_[db.first] = *addr;
       *addr += sz;
     }
   }
+
 
 
 
@@ -1154,8 +1154,7 @@ void Assembler::Pass2() {
 
       dw.second.SetAddress(*addr);
       uint16_t sz = dw.second.GetSize();
-      for (uint16_t i = 0; i < sz; i++)
-        OccupyIt(*addr + i);  // occupy ROM address
+      OccupyIt(*addr, sz);  // occupy ROM addresses
       name_to_address_[dw.first] = *addr;
       *addr += sz;
     }
