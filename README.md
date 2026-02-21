@@ -3,17 +3,18 @@
 Not a very scary instruction set discrete logic processor.
 
 * 8 bit data
-* 16 bit address / 64KB RAM / 128KW Dual Bank Video RAM
+* 16 bit address / 64KB RAM
+* 17 bit address (in V register) / 128KW Dual Bank Video RAM
 * 16 instructions
 * 8 data registers and 4 pointer registers in 2 banks
-* 1 flag register in IO port
+* 1 [flags register](#flags-register) in IO port
 
 ## Soft!
 [ASM](./ASM.md)
 [UEMUL]()
 
 ## CPU structure
-![CPU structure](./CPU2.2.png)
+![CPU structure](./CPU2.3.png)
 
 ## How this CPU works?
 
@@ -42,7 +43,7 @@ Not a very scary instruction set discrete logic processor.
 |   LPM |  DST |0|EXT|D|U|-|-|-|W| 80 1000 0000| |
 |    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| |
 |    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| |
-|--------------|8-7-6-5-4|-------|-------------|-|
+|--------------|8-7-6-5-4|-------|-------------| |
 |   OUT | PORT |1|    CONST or   | B1 1011 0001| |
 |   OUT | PORT |0| SRC |PRT|X|O|o| B0 1011 0000| |
 |----------------------------------------------| |
@@ -72,7 +73,7 @@ Not a very scary instruction set discrete logic processor.
 74HCPU has two register banks.
 First bank has 8 arithmetic registers.
 Second bank has 4 pointers (which can be used as 8 arithmetic registers).
-You can change the active bank by writing BF bit of the flags register.
+You can change the active bank by writing BF bit of the [flags register](#flags-register).
 
 #### Bank0 (8 pcs 8 bits registers):
 |Name|Name|
