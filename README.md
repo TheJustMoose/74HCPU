@@ -126,25 +126,23 @@ Also, you can use the registers of bank 1 in the same way as bank 0: R0, R1, ...
 |1|CF|Carry|Arithmetic|
 |0|HCF|Half Carry|Arithmetic|
 
-### ADD, ADDC, AND, OR, XOR, MUL are binary commands
-```
-You can use it:
-CMD Rd, Rs
-Where Rd - is destination register.
-And Rs - is source register.
-These commands work like this:
-Rd := Rd CMD Rs
-For example, ADD command does this:
-ADD R0, R1 -> R0 := R0 + R1
-Also you can use immediate value:
-CMD Rd, CONST
-(You can use CONST with any command: ADD, ADDC, AND, OR, XOR, MUL)
-There is only one exception, the MUL command.
-A pair of registers is needed to store the multiplication results.
-For example:
-MUL R1, R2 will store result into R1:R0 pair.
+### ADD, ADDC, AND, OR, XOR, MUL are binary commands  
+You can use it:  
+CMD Rd, Rs  
+Where Rd - is destination register.  
+And Rs - is source register.  
+These commands work like this:  
+Rd := Rd CMD Rs  
+For example, ADD command does this:  
+ADD R0, R1 -> R0 := R0 + R1  
+Also you can use immediate value:  
+CMD Rd, CONST  
+(You can use CONST with any command: ADD, ADDC, AND, OR, XOR, MUL)  
+There is only one exception, the MUL command.  
+A pair of registers is needed to store the multiplication results.  
+For example:  
+MUL R1, R2 will store result into R1:R0 pair.  
 That is, R1:R0 := R1 * R2.
-```
 
 ### MUL Examples
 ```
@@ -168,37 +166,33 @@ R7:R6 (when Rd is R6 or R7)
 Rd is used to select output register pair.
 ```
 
-### Instruction options
-```
-C - Low byte [of command] contains constant value (1) or options (0).
-Z - Will reset high nibble of SRC register before use.
-z - Will reset low nibble of SRC register before use.
-I - Will invert high nibble of SRC register before use.
-i - Will invert low nibble of SRC register before use.
-F - Set CF flag to TRUE while executing command.
-W - Command will work with word, not byte
-V - Command will work with Video RAM
-D - Down, decrease pointer after command
-U - Up, increase pointer after command
-OFFSET4 - 4 bit size int offset to current pointer
-O - Out will write to high nibble of port
-o - Out will write to low nibble of port
-X - Out will toggle bits of port by mask in register
-SRC - Index of source register (0-7)
-DST - Index of destination register (0-7)
-TYP - Kind of unary operation (0-3)
-EXT - Index of pointer register (0-3)
-PORT + PRT - 5 bit of port index
-```
+### Instruction options  
+C - Low byte [of command] contains constant value (1) or options (0).  
+Z - Will reset high nibble of SRC register before use.  
+z - Will reset low nibble of SRC register before use.  
+I - Will invert high nibble of SRC register before use.  
+i - Will invert low nibble of SRC register before use.  
+F - Set CF flag to TRUE while executing command.  
+W - Command will work with word, not byte.  
+V - Command will work with Video RAM.  
+D - Down, decrease pointer after command.  
+U - Up, increase pointer after command.  
+OFFSET4 - 4 bit size int offset to current pointer.  
+O - Out will write to high nibble of port.  
+o - Out will write to low nibble of port.  
+X - Out will toggle bits of port by mask in register.  
+SRC - Index of source register (0-7).  
+DST - Index of destination register (0-7).  
+TYP - Kind of unary operation (0-3).  
+EXT - Index of pointer register (0-3).  
+PORT + PRT - 5 bit of port index.
 
-### UNO - unary commands
-```
-There are four unary commands: LSR, LSRC, INV, SWAP.
-LSR shift register bits to the right. CF flag get value of right (low) bit.
-LSRC do same, but left (high) bit get value of CF.
-SWAP simply swap the nibbles.
+### UNO - unary commands  
+There are four unary commands: LSR, LSRC, INV, SWAP.  
+LSR shift register bits to the right. CF flag get value of right (low) bit.  
+LSRC do same, but left (high) bit get value of CF.  
+SWAP simply swap the nibbles.  
 INV simply invert all the bits.
-```
 
 ### LPM - Load Program Memory  
 This command read data from ROM, not RAM.  
@@ -226,24 +220,22 @@ LDV R7, V   ; read data from Video RAM with address V and store it into R7 (R7:R
 LDV R7, V+1 ; **disabled** command, you can use displacement only with X, Y and SP pointers
 ```
 
-### BRNCH - Branch commands
-```
-CALL - call a function by offset
-AFCALL - call a function to an absolute address
-RET - return to the address stored on the stack
-RETI - return from interrupt to the address stored on the stack
-JMP - go by offset
-NOP - no operation (do nothing)
-STOP - the processor will stop executing the program
-JL, JE, JNE, JG, JZ, JNZ, JC, JNC, JHC, JNHC - conditional jump instructions
-JL - jump if less
-JE - jump if equal
-JNE - jump if not equal
-JG - jump if greater
-JZ - jump if zero
-JNZ - jump if not zero
-JC - jump if carry
-JNC - jump if not carry
-JHC - jump if half carry
+### BRNCH - Branch commands  
+CALL - call a function by offset  
+AFCALL - call a function to an absolute address  
+RET - return to the address stored on the stack  
+RETI - return from interrupt to the address stored on the stack  
+JMP - go by offset  
+NOP - no operation (do nothing)  
+STOP - the processor will stop executing the program  
+JL, JE, JNE, JG, JZ, JNZ, JC, JNC, JHC, JNHC - conditional jump instructions  
+JL - jump if less  
+JE - jump if equal  
+JNE - jump if not equal  
+JG - jump if greater  
+JZ - jump if zero  
+JNZ - jump if not zero  
+JC - jump if carry  
+JNC - jump if not carry  
+JHC - jump if half carry  
 JNHC - jump if not half carry
-```
