@@ -11,6 +11,7 @@
 
 #include "ptr.h"
 #include "reg.h"
+#include "slot_allocator.h"
 
 // Code Of Operation
 enum COP {
@@ -240,8 +241,21 @@ class Assembler {
   void PrintDBs();
   void PrintDWs();
 
-  bool IsOccupied(uint16_t addr);
-  std::optional<uint16_t> GetFirstEmptyWindowWithSize(uint16_t size);
+  bool IsOccupied(uint16_t addr) {
+    return slot_allocator_.IsOccupied(addr);
+  }
+
+  void OccupyIt(uint16_t addr) {
+    slot_allocator_.OccupyIt(addr);
+  }
+
+  std::optional<uint16_t> GetFirstEmptyWindowWithSize(uint16_t size) {
+    return slot_allocator_.GetFirstEmptyWindowWithSize(size);
+  }
+
+  std::optional<uint16_t> Allocate(uint16_t size) {
+    return slot_allocator_.Allocate(size);
+  }
 
   uint16_t GetTotalSizeOfStringConsts() const;
   uint16_t GetTotalSizeOfDBConsts() const;
@@ -254,7 +268,7 @@ class Assembler {
   // name_to_address_ contains labels and strings addresses:
   std::map<std::string, uint16_t> name_to_address_ {};
 
-  std::bitset<65536> occupied_addresses_ {};
+  SlotAllocator slot_allocator_;
 
   std::map<std::string, StringConst> string_consts_ {};
   std::map<std::string, DBConsts> db_consts_ {};

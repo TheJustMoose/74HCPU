@@ -129,15 +129,15 @@ Also, you can use the registers of bank 1 in the same way as bank 0: R0, R1, ...
 ### ADD, ADDC, AND, OR, XOR, MUL are binary commands  
 You can use it:  
 CMD Rd, Rs  
-Where Rd - is destination register.  
-And Rs - is source register.  
+Where Rd is destination register.  
+And Rs is source register.  
 These commands work like this:  
 Rd := Rd CMD Rs  
 For example, ADD command does this:  
 ADD R0, R1 -> R0 := R0 + R1  
 Also you can use immediate value:  
 CMD Rd, CONST  
-(You can use CONST with any command: ADD, ADDC, AND, OR, XOR, MUL)
+(You can use CONST with any command: ADD, ADDC, AND, OR, XOR, MUL, MOV...)
 
 The only exception to the use of the Rd register is MUL command.  
 A pair of registers is needed to store the multiplication results.  

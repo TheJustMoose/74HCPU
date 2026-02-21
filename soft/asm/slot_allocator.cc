@@ -4,17 +4,6 @@
 
 using namespace std;
 
-optional<uint16_t> SlotAllocator::Allocate(uint16_t size) {
-  optional<uint16_t> addr = GetFirstEmptyWindowWithSize(size);
-  if (!addr.has_value())
-    return nullopt;
-
-  for (uint16_t i = 0; i < size; i++)
-    occupied_addresses_[addr.value() + i] = true;
-
-  return addr;
-}
-
 optional<uint16_t> SlotAllocator::GetFirstEmptyWindowWithSize(uint16_t size) {
   if (verbose_)
     cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
@@ -47,4 +36,15 @@ optional<uint16_t> SlotAllocator::GetFirstEmptyWindowWithSize(uint16_t size) {
     cout << "Sufficient free space not found." << endl;
 
   return nullopt;
+}
+
+optional<uint16_t> SlotAllocator::Allocate(uint16_t size) {
+  optional<uint16_t> addr = GetFirstEmptyWindowWithSize(size);
+  if (!addr.has_value())
+    return nullopt;
+
+  for (uint16_t i = 0; i < size; i++)
+    occupied_addresses_[addr.value() + i] = true;
+
+  return addr;
 }
