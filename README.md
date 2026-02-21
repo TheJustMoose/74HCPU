@@ -204,18 +204,19 @@ INV simply invert all the bits.
 This command read data from ROM, not RAM.  
 This command stores data in the same ROM that stores the commands themselves.
 
-### LD, ST - Memory commands
-```
-LD - LoaD data from memory
-ST - STore date to memory
-V - 0 for RAM and 1 for Video RAM
-SRC/DST - register to read(SRC)/write(DST)
-EXT - register pair which store pointer to memory
-D - Decrement pointer after use
-U - Increment pointer after use
-OFFSET4 - 4 bit integer offset (-8...+7)
-(CPU whill read/write memory with address ptr(EXT) + OFFSET4)
+### LD, ST - Memory commands  
+LD - LoaD data from memory  
+ST - STore date to memory  
+V - 0 for RAM and 1 for Video RAM  
+SRC - register to read  
+DST - register to write  
+EXT - register pair which store pointer to memory  
+D - Decrement pointer after use  
+U - Increment pointer after use  
+OFFSET4 - 4 bit integer offset (-8...+7)  
+(CPU whill read/write memory with address ptr(EXT) + OFFSET4)  
 Examples:
+```
 LD R0, X    ; read memory data from X pointer into the R0 register
 ST Y, R1    ; write data from R1 into memory with address from Y pointer
 ST YI, R1   ; write data and increment Y pointer
