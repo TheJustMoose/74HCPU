@@ -40,11 +40,14 @@ optional<uint16_t> SlotAllocator::GetFirstEmptyWindowWithSize(uint16_t size) {
 
 bool SlotAllocator::OccupyIt(uint16_t addr, uint16_t size) {
   for (uint16_t i = 0; i < size; i++)
-    if (!occupied_addresses_[addr + i]) {
-      occupied_addresses_[addr + i] = true;
-    } else {
+    if (addr + i >= ROM_SIZE) {
+      cout << "Error. The address " << addr + i << " is outside ROM." << endl;
+      return false;
+    } else if (occupied_addresses_[addr + i]) {
       cout << "Error. The address " << addr + i << " is already occupied." << endl;
       return false;
+    } else {
+      occupied_addresses_[addr + i] = true;
     }
 
   return true;

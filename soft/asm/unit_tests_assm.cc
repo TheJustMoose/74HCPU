@@ -158,6 +158,13 @@ TEST_CASE("check .dw directive") {
   CHECK_EQ(code[2], 3);
   CHECK_EQ(code[3], 4);
   CHECK_EQ(code[4], 0); // .dw == address of .db
+
+  CHECK(asmw.IsOccupiedWrapper(0));
+  CHECK(asmw.IsOccupiedWrapper(1));
+  CHECK(asmw.IsOccupiedWrapper(2));
+  CHECK(asmw.IsOccupiedWrapper(3));
+  CHECK(asmw.IsOccupiedWrapper(4));
+  CHECK(!asmw.IsOccupiedWrapper(5));
 }
 
 TEST_CASE("check all") {
