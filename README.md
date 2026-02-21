@@ -137,8 +137,9 @@ For example, ADD command does this:
 ADD R0, R1 -> R0 := R0 + R1  
 Also you can use immediate value:  
 CMD Rd, CONST  
-(You can use CONST with any command: ADD, ADDC, AND, OR, XOR, MUL)  
-There is only one exception, the MUL command.  
+(You can use CONST with any command: ADD, ADDC, AND, OR, XOR, MUL)
+
+The only exception to the use of the Rd register is MUL command.  
 A pair of registers is needed to store the multiplication results.  
 For example:  
 MUL R1, R2 will store result into R1:R0 pair.  
