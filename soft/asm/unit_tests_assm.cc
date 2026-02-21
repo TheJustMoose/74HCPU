@@ -23,6 +23,10 @@ class AsmWrapper: public Assembler {
     return IsOccupied(addr);
   }
 
+  bool OccupyItWrapper(uint16_t addr, uint16_t size) {
+    return OccupyIt(addr, size);
+  }
+
   optional<uint16_t> GetFirstEmptyWindowWithSizeWrapper(uint16_t size) {
     return GetFirstEmptyWindowWithSize(size);
   }
@@ -294,13 +298,14 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   CHECK(!asmw.IsOccupiedWrapper(6));
   CHECK(!asmw.IsOccupiedWrapper(7));
   CHECK(!asmw.IsOccupiedWrapper(8));
-  CHECK(!asmw.IsOccupiedWrapper(9));
+  CHECK(!asmw.IsOccupiedWrapper(9));  // we have 9 free addresses in a row
   CHECK(asmw.IsOccupiedWrapper(10));  // last STOP command
   CHECK(!asmw.IsOccupiedWrapper(11));
   CHECK(!asmw.IsOccupiedWrapper(12));
 
-  cout << dec;
+  cout << dec;  // doctest does not want to switch the number base formatting to decimal (base 10)
 
+  // Hint: a window means several free addresses in a row.
   optional<uint16_t> first = asmw.GetFirstEmptyWindowWithSizeWrapper(6);
   CHECK(first.has_value());
   CHECK_EQ(first.value(), 1);  // addr 0 and 10 are occupied, add 1, 2, 3, 4, 5, 6, 7, 8, 9 is free
@@ -317,9 +322,9 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
   CHECK(first.has_value());
   CHECK_EQ(first.value(), 1);  // addr 0 and 10 are occupied, add we have 9 free cells between them
 
-  first = asmw.GetFirstEmptyWindowWithSizeWrapper(10);
+  first = asmw.GetFirstEmptyWindowWithSizeWrapper(10);  // Okay, asm, I need free window with size 10
   CHECK(first.has_value());
-  CHECK_EQ(first.value(), 11);  // addr 0 and 10 are occupied, add 1 is free, but window size is too small
+  CHECK_EQ(first.value(), 11);  // addr 0 and 10 are occupied, add 1 is free, but window size (==9) is too small
 
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(17);
   CHECK(first.has_value());
@@ -335,7 +340,13 @@ TEST_CASE("check occupied_addresses_ bitset (two blocks near)") {
 
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(30);
   CHECK(first.has_value());
-  CHECK_EQ(first.value(), 11);  // addr 10 is occupied, but 12 is free
+  CHECK_EQ(first.value(), 11);  // addr 10 is occupied, but 11 is free
+
+  asmw.OccupyItWrapper(11, 3);  // we need 3 memory cells started at address 11
+  CHECK(asmw.IsOccupiedWrapper(11));
+  CHECK(asmw.IsOccupiedWrapper(12));
+  CHECK(asmw.IsOccupiedWrapper(13));
+  CHECK(!asmw.IsOccupiedWrapper(14));  // free address again
 
   first = asmw.GetFirstEmptyWindowWithSizeWrapper(65535);
   CHECK(!first.has_value());  // we should get nullopt == no memory

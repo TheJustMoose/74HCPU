@@ -38,13 +38,14 @@ optional<uint16_t> SlotAllocator::GetFirstEmptyWindowWithSize(uint16_t size) {
   return nullopt;
 }
 
-optional<uint16_t> SlotAllocator::Allocate(uint16_t size) {
-  optional<uint16_t> addr = GetFirstEmptyWindowWithSize(size);
-  if (!addr.has_value())
-    return nullopt;
-
+bool SlotAllocator::OccupyIt(uint16_t addr, uint16_t size) {
   for (uint16_t i = 0; i < size; i++)
-    occupied_addresses_[addr.value() + i] = true;
+    if (!occupied_addresses_[addr + i]) {
+      occupied_addresses_[addr + i] = true;
+    } else {
+      cout << "Error. The address " << addr + i << " is already occupied." << endl;
+      return false;
+    }
 
-  return addr;
+  return true;
 }

@@ -249,12 +249,12 @@ class Assembler {
     slot_allocator_.OccupyIt(addr);
   }
 
-  std::optional<uint16_t> GetFirstEmptyWindowWithSize(uint16_t size) {
-    return slot_allocator_.GetFirstEmptyWindowWithSize(size);
+  bool OccupyIt(uint16_t addr, uint16_t size) {
+    return slot_allocator_.OccupyIt(addr, size);
   }
 
-  std::optional<uint16_t> Allocate(uint16_t size) {
-    return slot_allocator_.Allocate(size);
+  std::optional<uint16_t> GetFirstEmptyWindowWithSize(uint16_t size) {
+    return slot_allocator_.GetFirstEmptyWindowWithSize(size);
   }
 
   uint16_t GetTotalSizeOfStringConsts() const;

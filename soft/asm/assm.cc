@@ -758,6 +758,8 @@ int Assembler::Process(map<int, string> lines, bool show_preprocess_out, bool ve
   verbose_ = verbose;
   if (verbose_)
     cout << "Assembler::Process" << endl;
+  slot_allocator_.SetVerbose(verbose);
+
   lines_ = lines;
 
   Preprocessor pre;
@@ -988,7 +990,7 @@ void Assembler::Pass2() {
     if (org_it != line_to_org_.end() &&
         it->LineNumber() > org_it->first) {  // if line placed after .org
       if (org_it->second > max_addr) {
-        max_addr = org_it->second;               // change line address to .org value
+        max_addr = org_it->second;           // change line address to .org value
         if (verbose_)
           cout << "move address to: " << max_addr << endl;
       }
@@ -996,7 +998,7 @@ void Assembler::Pass2() {
     }
 
     it->SetAddress(max_addr);  // change address of every line
-    occupied_addresses_[max_addr] = true;  // occupy ROM address
+    OccupyIt(max_addr);  // occupy ROM address
 
     // and every label of this line
     vector<string> labels = it->GetLabels();
@@ -1031,11 +1033,25 @@ void Assembler::Pass2() {
       s.second.SetAddress(*addr);
       uint16_t sz = s.second.GetSize();
       for (uint16_t i = 0; i < sz; i++)
-        occupied_addresses_[*addr + i] = true;  // occupy ROM address
+        OccupyIt(*addr + i);  // occupy ROM address
       name_to_address_[s.first] = *addr;
       *addr += sz;
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   uint16_t db_size = GetTotalSizeOfDBConsts();
   if (verbose_)
@@ -1059,16 +1075,30 @@ void Assembler::Pass2() {
       db.second.SetAddress(*addr);
       uint16_t sz = db.second.GetSize();
       for (uint16_t i = 0; i < sz; i++)
-        occupied_addresses_[*addr + i] = true;  // occupy ROM address
+        OccupyIt(*addr + i);  // occupy ROM address
       name_to_address_[db.first] = *addr;
       *addr += sz;
     }
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   uint16_t dw_size = GetTotalSizeOfDWConsts();
   if (verbose_)
     cout << "Pass2 .dw size: " << dw_size << endl;
-  if (dw_size) {
+  if (dw_size > 0) {
     optional<uint16_t> addr = GetFirstEmptyWindowWithSize(dw_size);
     if (!addr) {
       ErrorCollector::GetInstance().err(
@@ -1087,7 +1117,7 @@ void Assembler::Pass2() {
       dw.second.SetAddress(*addr);
       uint16_t sz = dw.second.GetSize();
       for (uint16_t i = 0; i < sz; i++)
-        occupied_addresses_[*addr + i] = true;  // occupy ROM address
+        OccupyIt(*addr + i);  // occupy ROM address
       name_to_address_[dw.first] = *addr;
       *addr += sz;
     }
@@ -1165,7 +1195,7 @@ void Assembler::PrintCode() {
       continue;
     }
 
-    bool occ = occupied_addresses_[cmd_addr.value()];
+    bool occ = IsOccupied(cmd_addr.value());
     if (cmd_addr.has_value() != occ) {
       cout << "Error! cmd_addr.has_value and occupied_addresses_ have different values" << endl;
       cout << dec << "At line : " << it->LineNumber() << endl;
@@ -1322,43 +1352,6 @@ void Assembler::PrintDWs() {
     cout << "     " << (occ ? ToHexString(addr, 4) : "errr")
          << ": " << dw.first << " " << dw.second.Join() << endl;
   }
-}
-
-bool Assembler::IsOccupied(uint16_t addr) {
-  return occupied_addresses_[addr];
-}
-
-optional<uint16_t> Assembler::GetFirstEmptyWindowWithSize(uint16_t size) {
-  if (verbose_)
-    cout << "GetFirstEmptyWindowWithSize for size: " << hex << size << "h" << endl;
-
-  uint16_t cnt {0};
-  optional<uint16_t> beg;
-  uint32_t end {1 << 16};
-  for (uint32_t addr = 0; addr < end; addr++) {
-    if (IsOccupied(addr)) {
-      //cout << hex << setw(2) << addr << "h is occupied" << endl;
-      cnt = 0;
-      beg = nullopt;  // mark addr as empty
-    } else {
-      //cout << hex << setw(2) << addr << "h is free" << endl;
-      cnt++;
-      if (!beg.has_value()) {
-        beg = addr;  // okay, first empty place was found
-        if (verbose_)
-          cout << hex << "now beg == " << addr << "h" << endl;
-      }
-      if (cnt >= size) {
-        if (verbose_)
-          cout << "Okay, will return address == " << hex << beg.value() << "h" << endl;
-        return beg.value();
-      }
-    }
-  }
-
-  if (verbose_)
-    cout << "Sufficient free space not found." << endl;
-  return nullopt;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
