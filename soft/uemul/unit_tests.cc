@@ -34,6 +34,14 @@ TEST_CASE("test names") {
   CHECK(std::size(PtrNames) == 4);  // 4 pointers
   CHECK(std::size(RegNames) == 8);  // 8 registers
   CHECK(std::size(OpNames) == 16);  // and 16 commands
+
+  CHECK_EQ(string(PtrNames[2]), string("SP"));
+  CHECK_EQ(string(PtrNames[3]), string("V"));
+
+  CHECK_EQ(string(PtrRegNames[4]), string("SPL"));
+  CHECK_EQ(string(PtrRegNames[5]), string("SPH"));
+  CHECK_EQ(string(PtrRegNames[6]), string("VL"));
+  CHECK_EQ(string(PtrRegNames[7]), string("VH"));
 }
 
 TEST_CASE("test Cmds") {
