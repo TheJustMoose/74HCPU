@@ -1,6 +1,6 @@
 #pragma once
 
-#include "flags.h"
+#include "../flags.h"
 
 inline const char* OpNames[] {
   // 0       1      2     3      4      5      6      7

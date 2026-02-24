@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "flags.h"
+#include "../flags.h"
 
 constexpr int _32K = 32768;
 constexpr int _64K = 65536;

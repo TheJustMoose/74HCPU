@@ -8,7 +8,6 @@
 
 #include "commands.h"
 #include "cpu.h"
-#include "flags.h"
 #include "names.h"
 #include "offset2int.h"
 
