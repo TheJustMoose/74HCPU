@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "ptr.h"
-#include "reg.h"
+#include "../reg.h"
 #include "slot_allocator.h"
 
 // Code Of Operation
