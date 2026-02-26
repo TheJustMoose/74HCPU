@@ -1,9 +1,13 @@
-# This code require opencv to work
+# This code require opencv and filelock to work
 # To install type:
 # pip install opencv-python
+# pip install opencv-python
+# But build.bat or build.sh will do it for you!
 
 import cv2
 import numpy as np
+
+from filelock import FileLock
 
 width = 480
 height = 272
@@ -40,8 +44,11 @@ def read_image():
 def update_img():
   global image
 
-  image_data = read_image()
-  image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width, 3))
+  lock = FileLock("dump.lock")
+
+  with lock:
+    image_data = read_image()
+    image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width, 3))
 
 def main():
   window_name = 'TFT LCD (press any key to stop!)'
@@ -52,7 +59,7 @@ def main():
   cv2.imshow(window_name, image)
   res = -1
   while (res == -1):
-    res = cv2.waitKey(100)
+    res = cv2.waitKey(200)
     update_img()
 
   cv2.destroyAllWindows()
