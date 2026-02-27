@@ -101,7 +101,13 @@ Token GetToken() {
 
   char c = input_string[idx++];
   if (isdigit(c)) {
-    value = c - '0';
+    value = 0;
+    while (isdigit(c)) {
+      int dig = c - '0';
+      value = value*10 + dig;
+      c = input_string[idx++];
+    }
+    idx--;
     cout << "tNum" << endl;
     return tNum;
   }
@@ -121,7 +127,7 @@ Token GetToken() {
     return tMinus;
   }
 
-  cout << "tEnd" << endl;
+  cout << "tEnd(2)" << endl;
   return tEnd;
 }
 
