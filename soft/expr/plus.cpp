@@ -12,19 +12,33 @@ enum Token {
   tPlus, tNum, tName, tEnd
 };
 
+// это прототип, чтобы поиграть в деревья
+// поэтому пока считаем, что числа и цифры - это одно и то же,
+// из операций есть только плюс, и в строке нет пробелов,
+// только цифры и плюсы!
 Token GetToken() {
-  char c = input_string[idx];
-  if (isdigit(c))
+  if (idx >= input_string.size())
+    return tEnd;
+
+  char c = input_string[idx++];
+  if (isdigit(c)) {
+    value = c - '0';
     return tNum;
+  }
+
   if (isalpha(c))
     return tName;
+
   if (c == '+')
     return tPlus;
+
   return tEnd;
 }
 
 int expr() {
   Token t = GetToken();
+  if (t == tNum)
+    return value;
   return 0;
 }
 
@@ -43,7 +57,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  expr();
+  cout << "res: " << expr() << endl;
 
   return 0;
 }
