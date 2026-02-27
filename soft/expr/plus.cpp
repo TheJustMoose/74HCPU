@@ -8,6 +8,11 @@ string input_string;
 size_t idx {0};
 int value {0};
 
+int tmp_var_counter {0};
+string new_tmp() {
+  return string("t") + to_string(tmp_var_counter++);
+}
+
 enum Token {
   tPlus, tMinus, tNum, tName, tEnd
 };
@@ -24,6 +29,11 @@ class Node {
   Node(NodeType nt): type_(nt) {}
 
   virtual int res() { return 0; }
+
+  virtual void gen() {}
+
+  virtual string op() { return ""; }
+  virtual string tmp_name() { return ""; }
 
   NodeType type() {
     return type_;
@@ -52,8 +62,18 @@ class Num: public Node {
     return value_;
   }
 
+  void gen() override {
+    tmp_name_ = new_tmp();
+    cout << tmp_name_ << " = " << value_ << endl;
+  }
+
+  string tmp_name() override {
+    return tmp_name_;
+  }
+
  private:
   int value_ {0};
+  string tmp_name_ {};
 };
 
 class BinOp: public Node {
@@ -76,13 +96,46 @@ class BinOp: public Node {
     return 0;
   }
 
+  void gen() override {
+    if (!left)
+      cout << "left node is nullptr" << endl;
+    else if (!right)
+      cout << "right node is nullptr" << endl;
+    else {
+      left->gen();
+      right->gen();
+      tmp_name_ = new_tmp();
+      cout << tmp_name_ << " = "
+           << left->tmp_name() << " " << op() << " "
+           << right->tmp_name() << endl;
+    }
+  }
+
+  string op() override {
+    if (type() == ntSum)
+      return "+";
+    else if (type() == ntSub)
+      return "-";
+    else
+      return "";
+  }
+
+  string tmp_name() override {
+    return tmp_name_;
+  }
+
   Node* left {nullptr};
   Node* right {nullptr};
+
+ private:
+  string tmp_name_ {};
 };
 
 class UnOp: public Node {
  public:
   UnOp(): Node(ntUMinus) {}
+
+  void gen() override {}
 
   Node* child {nullptr};
 };
@@ -181,6 +234,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  cout << "expr res: " << n->res() << endl;
+  //cout << "expr res: " << n->res() << endl;
+  n->gen();  // проходим по дереву, генерируем трёхадресный (?) код!
+
   return 0;
 }
