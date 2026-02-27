@@ -9,12 +9,12 @@ size_t idx {0};
 int value {0};
 
 enum Token {
-  tPlus, tNum, tName, tEnd
+  tPlus, tMinus, tNum, tName, tEnd
 };
 
 enum NodeType {
   // var   num    binary operations
-  ntName, ntNum, ntSum, //ntSub, ntMul, ntDiv,
+  ntName, ntNum, ntSum, ntSub, //ntMul, ntDiv,
   ntUMinus,  // unary minus
   ntUnknown  // we do not know now what is it
 };
@@ -28,6 +28,15 @@ class Node {
   NodeType type() {
     return type_;
   };
+
+  static NodeType Token2NodeType(Token t) {
+    if (t == tPlus)
+      return ntSum;
+    else if (t == tMinus)
+      return ntSub;
+    else
+      return ntUnknown;
+  }
 
  private:
   NodeType type_ {ntUnknown};
@@ -49,15 +58,21 @@ class Num: public Node {
 
 class BinOp: public Node {
  public:
-  BinOp(): Node(ntSum) {}
+  BinOp(Token t): Node(Token2NodeType(t)) {}
 
   int res() override {
     if (!left)
       cout << "left node is nullptr" << endl;
     else if (!right)
       cout << "right node is nullptr" << endl;
-    else
-      return left->res() + right->res();
+    else {
+      if (type() == ntSum)
+        return left->res() + right->res();
+      else if (type() == ntSub)
+        return left->res() - right->res();
+      else
+        cout << "Only add and sub operations supported right now" << endl;
+    }
     return 0;
   }
 
@@ -78,22 +93,35 @@ class UnOp: public Node {
 // только цифры и плюсы!
 //
 Token GetToken() {
-  cout << "GetToken()" << endl;
-  if (idx >= input_string.size())
+  cout << "GetToken(): ";
+  if (idx >= input_string.size()) {
+    cout << "tEnd" << endl;
     return tEnd;
+  }
 
   char c = input_string[idx++];
   if (isdigit(c)) {
     value = c - '0';
+    cout << "tNum" << endl;
     return tNum;
   }
 
-  if (isalpha(c))
+  if (isalpha(c)) {
+    cout << "tName" << endl;
     return tName;
+  }
 
-  if (c == '+')
+  if (c == '+') {
+    cout << "tPlus" << endl;
     return tPlus;
+  }
 
+  if (c == '-') {
+    cout << "tMinus" << endl;
+    return tMinus;
+  }
+
+  cout << "tEnd" << endl;
   return tEnd;
 }
 
@@ -109,18 +137,20 @@ Node* prim() {
 Node* expr() {
   Node* left = prim();
   Token t = GetToken();
-  if (t == tPlus) {
+  while (t == tPlus || t == tMinus) {
     Node* right = prim();
-    BinOp* op = new BinOp();
+    BinOp* op = new BinOp(t);
     op->left = left;
     op->right = right;
-    return op;
-  } else if (left) {
-    return left;
-  } else {
-    cout << "Got Token == " << static_cast<int>(t) << endl;
-    return nullptr;
+    left = op;
+    t = GetToken();
   }
+
+  if (left)
+    return left;
+
+  cout << "Got Token == " << static_cast<int>(t) << endl;
+  return nullptr;
 }
 
 int main(int argc, char* argv[]) {
@@ -145,6 +175,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  cout << "res: " << n->res() << endl;
+  cout << "expr res: " << n->res() << endl;
   return 0;
 }
