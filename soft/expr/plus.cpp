@@ -51,6 +51,16 @@ class BinOp: public Node {
  public:
   BinOp(): Node(ntSum) {}
 
+  int res() override {
+    if (!left)
+      cout << "left node is nullptr" << endl;
+    else if (!right)
+      cout << "right node is nullptr" << endl;
+    else
+      return left->res() + right->res();
+    return 0;
+  }
+
   Node* left {nullptr};
   Node* right {nullptr};
 };
@@ -87,14 +97,30 @@ Token GetToken() {
   return tEnd;
 }
 
-Node* expr() {
+Node* prim() {
   Token t = GetToken();
   if (t == tNum) {
     cout << "Find num: " << value << endl;
     return new Num(value);
   } else
+    return nullptr;
+}
+
+Node* expr() {
+  Node* left = prim();
+  Token t = GetToken();
+  if (t == tPlus) {
+    Node* right = prim();
+    BinOp* op = new BinOp();
+    op->left = left;
+    op->right = right;
+    return op;
+  } else if (left) {
+    return left;
+  } else {
     cout << "Got Token == " << static_cast<int>(t) << endl;
-  return 0;
+    return nullptr;
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -119,10 +145,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  if (n->type() == ntNum)
-    cout << "res: " << n->res() << endl;
-  else
-    cout << "type: " << n->type() << endl;
-
+  cout << "res: " << n->res() << endl;
   return 0;
 }
