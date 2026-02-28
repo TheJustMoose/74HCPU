@@ -135,9 +135,31 @@ class UnOp: public Node {
  public:
   UnOp(): Node(ntUMinus) {}
 
-  void gen() override {}
+  int res() override {
+    if (!child)
+      cout << "child node is nullptr" << endl;
+    return - child->res();
+  }
+
+  void gen() override {
+    child->gen();
+    tmp_name_ = new_tmp();
+    cout << tmp_name_ << " = " << op()
+         << child->tmp_name() << " " << endl;
+  }
+
+  string op() override {
+    return "-";
+  }
+
+  string tmp_name() override {
+    return tmp_name_;
+  }
 
   Node* child {nullptr};
+
+ private:
+  string tmp_name_ {};
 };
 
 // это прототип, чтобы поиграть в деревья
@@ -189,6 +211,10 @@ Node* prim() {
   if (t == tNum) {
     cout << "Find num: " << value << endl;
     return new Num(value);
+  } else if (t == tMinus) {
+    UnOp* n = new UnOp();
+    n->child = prim();
+    return n;
   } else
     return nullptr;
 }
