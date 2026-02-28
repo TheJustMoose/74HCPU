@@ -1,8 +1,36 @@
 #include <cctype>
 #include <iostream>
+#include <stack>
 #include <string>
 
+// это прототип, чтобы поиграть в деревья
+//
+
 using namespace std;
+
+stack<string> call_stack {};
+
+string stack_str() {
+  stack<string> s = call_stack;
+  string res;
+  while (!s.empty()) {
+    res = s.top() + string(">") + res;
+    s.pop();
+  }
+  res += " ";
+  return res;
+}
+
+class FuncGuard {
+ public:
+  FuncGuard(string n) {
+    call_stack.push(n);
+  }
+
+  ~FuncGuard() {
+    call_stack.pop();
+  }
+};
 
 string input_string;
 size_t idx {0};
@@ -14,12 +42,12 @@ string new_tmp() {
 }
 
 enum Token {
-  tPlus, tMinus, tNum, tName, tEnd
+  tPlus, tMinus, tMul, tDiv, tNum, tName, tEnd
 };
 
 enum NodeType {
   // var   num    binary operations
-  ntName, ntNum, ntSum, ntSub, //ntMul, ntDiv,
+  ntName, ntNum, ntSum, ntSub, ntMul, ntDiv,
   ntUMinus,  // unary minus
   ntUnknown  // we do not know now what is it
 };
@@ -44,6 +72,10 @@ class Node {
       return ntSum;
     else if (t == tMinus)
       return ntSub;
+    else if (t == tMul)
+      return ntMul;
+    else if (t == tDiv)
+      return ntDiv;
     else
       return ntUnknown;
   }
@@ -64,7 +96,7 @@ class Num: public Node {
 
   void gen() override {
     tmp_name_ = new_tmp();
-    cout << tmp_name_ << " = " << value_ << endl;
+    cout << stack_str() << tmp_name_ << " = " << value_ << endl;
   }
 
   string tmp_name() override {
@@ -90,8 +122,12 @@ class BinOp: public Node {
         return left->res() + right->res();
       else if (type() == ntSub)
         return left->res() - right->res();
+      else if (type() == ntMul)
+        return left->res() * right->res();
+      else if (type() == ntDiv)
+        return left->res() / right->res();
       else
-        cout << "Only add and sub operations supported right now" << endl;
+        cout << "Only add, sub, mul, div operations supported right now" << endl;
     }
     return 0;
   }
@@ -105,7 +141,7 @@ class BinOp: public Node {
       left->gen();
       right->gen();
       tmp_name_ = new_tmp();
-      cout << tmp_name_ << " = "
+      cout << stack_str() << tmp_name_ << " = "
            << left->tmp_name() << " " << op() << " "
            << right->tmp_name() << endl;
     }
@@ -116,6 +152,10 @@ class BinOp: public Node {
       return "+";
     else if (type() == ntSub)
       return "-";
+    else if (type() == ntMul)
+      return "*";
+    else if (type() == ntDiv)
+      return "/";
     else
       return "";
   }
@@ -144,7 +184,7 @@ class UnOp: public Node {
   void gen() override {
     child->gen();
     tmp_name_ = new_tmp();
-    cout << tmp_name_ << " = " << op()
+    cout << stack_str() << tmp_name_ << " = " << op()
          << child->tmp_name() << " " << endl;
   }
 
@@ -162,13 +202,9 @@ class UnOp: public Node {
   string tmp_name_ {};
 };
 
-// это прототип, чтобы поиграть в деревья
-// поэтому пока считаем, что числа и цифры - это одно и то же,
-// из операций есть только плюс, и в строке нет пробелов,
-// только цифры и плюсы!
-//
 Token GetToken() {
-  cout << "GetToken(): ";
+  FuncGuard fg("getT");
+  cout << stack_str() << "GetToken(): ";
   if (idx >= input_string.size()) {
     cout << "tEnd" << endl;
     return tEnd;
@@ -202,27 +238,51 @@ Token GetToken() {
     return tMinus;
   }
 
+  if (c == '*') {
+    cout << "tMul" << endl;
+    return tMul;
+  }
+
+  if (c == '/') {
+    cout << "tDiv" << endl;
+    return tDiv;
+  }
+
+  cout << stack_str() << "Unknown token: " << c << endl;
   cout << "tEnd(2)" << endl;
   return tEnd;
 }
 
+void ReturnToken() {
+  FuncGuard fg("retT");
+  cout << stack_str() << "ReturnToken()" << endl;
+  if (idx > 0 && idx < input_string.size())
+    idx--;
+  else
+    cout << "...Nothing to return. We are at the npos of input string" << endl;
+}
+
 Node* prim() {
+  FuncGuard fg("prim");
   Token t = GetToken();
   if (t == tNum) {
-    cout << "Find num: " << value << endl;
+    cout << stack_str() << "Find num: " << value << endl;
     return new Num(value);
   } else if (t == tMinus) {
     UnOp* n = new UnOp();
     n->child = prim();
     return n;
-  } else
+  } else {
+    ReturnToken();  // check it!
     return nullptr;
+  }
 }
 
-Node* expr() {
+Node* term() {
+  FuncGuard fg("term");
   Node* left = prim();
   Token t = GetToken();
-  while (t == tPlus || t == tMinus) {
+  while (t == tMul || t == tDiv) {
     Node* right = prim();
     BinOp* op = new BinOp(t);
     op->left = left;
@@ -231,14 +291,36 @@ Node* expr() {
     t = GetToken();
   }
 
-  if (left)
-    return left;
+  if (t != tMul && t != tDiv)  // token was not used!
+    ReturnToken();
 
-  cout << "Got Token == " << static_cast<int>(t) << endl;
-  return nullptr;
+  return left;
+}
+
+Node* expr() {
+  FuncGuard fg("expr");
+  Node* left = term();
+  Token t = GetToken();
+  while (t == tPlus || t == tMinus) {
+    Node* right = term();
+    BinOp* op = new BinOp(t);
+    op->left = left;
+    op->right = right;
+    left = op;
+    t = GetToken();
+  }
+
+  if (t != tPlus && t != tMinus)  // token was not used!
+    ReturnToken();  // check it!
+
+  if (!left)
+    cout << "Got Token == " << static_cast<int>(t) << endl;
+  return left;
 }
 
 int main(int argc, char* argv[]) {
+  FuncGuard fg("main");
+  cout << "stack: " << stack_str() << endl;
   cout << "argc: " << argc << endl;
   for (int i = 0; i < argc; i++) {
     cout << "i: " << i << ", arg[i]: " << argv[i] << endl;
@@ -260,8 +342,9 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  //cout << "expr res: " << n->res() << endl;
   n->gen();  // проходим по дереву, генерируем трёхадресный (?) код!
+  cout << "expr res: " << n->res() << endl;
 
+  cout << "main finished" << endl;
   return 0;
 }
