@@ -68,16 +68,13 @@ class Node {
   };
 
   static NodeType Token2NodeType(Token t) {
-    if (t == tPlus)
-      return ntSum;
-    else if (t == tMinus)
-      return ntSub;
-    else if (t == tMul)
-      return ntMul;
-    else if (t == tDiv)
-      return ntDiv;
-    else
-      return ntUnknown;
+    switch (t) {
+      case tPlus: return ntSum;
+      case tMinus: return ntSub;
+      case tMul: return ntMul;
+      case tDiv: return ntDiv;
+      default: return ntUnknown;
+    }
   }
 
  private:
