@@ -42,7 +42,7 @@ string new_tmp() {
 }
 
 enum Token {
-  tPlus, tMinus, tMul, tDiv, tNum, tName, tEnd
+  tPlus, tMinus, tMul, tDiv, tNum, tName, tRBracket, tLBracket, tEnd
 };
 
 enum NodeType {
@@ -80,6 +80,10 @@ class Node {
  private:
   NodeType type_ {ntUnknown};
 };
+
+Node* prim();
+Node* term();
+Node* expr();
 
 class Num: public Node {
  public:
@@ -145,16 +149,13 @@ class BinOp: public Node {
   }
 
   string op() override {
-    if (type() == ntSum)
-      return "+";
-    else if (type() == ntSub)
-      return "-";
-    else if (type() == ntMul)
-      return "*";
-    else if (type() == ntDiv)
-      return "/";
-    else
-      return "";
+    switch (type()) {
+      case ntSum: return "+";
+      case ntSub: return "-";
+      case ntMul: return "*";
+      case ntDiv: return "/";
+      default: return "";
+    }
   }
 
   string tmp_name() override {
@@ -245,6 +246,16 @@ Token GetToken() {
     return tDiv;
   }
 
+  if (c == '(') {
+    cout << "tLBracket" << endl;
+    return tLBracket;
+  }
+
+  if (c == ')') {
+    cout << "tRBracket" << endl;
+    return tRBracket;
+  }
+
   cout << stack_str() << "Unknown token: " << c << endl;
   cout << "tEnd(2)" << endl;
   return tEnd;
@@ -253,10 +264,12 @@ Token GetToken() {
 void ReturnToken() {
   FuncGuard fg("retT");
   cout << stack_str() << "ReturnToken()" << endl;
-  if (idx > 0 && idx < input_string.size())
+  if (idx > 0) {  //  && idx < input_string.size()
     idx--;
-  else
-    cout << "...Nothing to return. We are at the npos of input string" << endl;
+    cout << "idx: " << (idx + 1) << " --> " << idx << endl;
+    cout << "tok: " << input_string[idx + 1] << " --> " << input_string[idx] << endl;
+  } else
+    cout << "...Nothing to return. idx == 0" << endl;
 }
 
 Node* prim() {
@@ -268,6 +281,11 @@ Node* prim() {
   } else if (t == tMinus) {
     UnOp* n = new UnOp();
     n->child = prim();
+    return n;
+  } else if (t == tLBracket) {
+    Node* n = expr();
+    if (t != tRBracket)
+      cout << "Error. Waiting for right bracket" << endl;
     return n;
   } else {
     ReturnToken();  // check it!
@@ -290,6 +308,8 @@ Node* term() {
 
   if (t != tMul && t != tDiv)  // token was not used!
     ReturnToken();
+  else
+    cout << "Term will not return token" << endl;
 
   return left;
 }
@@ -309,6 +329,8 @@ Node* expr() {
 
   if (t != tPlus && t != tMinus)  // token was not used!
     ReturnToken();  // check it!
+  else
+    cout << "Expt will not return token" << endl;
 
   if (!left)
     cout << "Got Token == " << static_cast<int>(t) << endl;
