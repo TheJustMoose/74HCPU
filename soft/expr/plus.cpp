@@ -284,11 +284,14 @@ Node* prim() {
     return n;
   } else if (t == tLBracket) {
     Node* n = expr();
-    if (t != tRBracket)
+    t = GetToken();
+    if (t != tRBracket) {
+      ReturnToken();
       cout << "Error. Waiting for right bracket" << endl;
+    }
     return n;
   } else {
-    ReturnToken();  // check it!
+    ReturnToken();
     return nullptr;
   }
 }
@@ -306,11 +309,7 @@ Node* term() {
     t = GetToken();
   }
 
-  if (t != tMul && t != tDiv)  // token was not used!
-    ReturnToken();
-  else
-    cout << "Term will not return token" << endl;
-
+  ReturnToken();
   return left;
 }
 
@@ -327,11 +326,7 @@ Node* expr() {
     t = GetToken();
   }
 
-  if (t != tPlus && t != tMinus)  // token was not used!
-    ReturnToken();  // check it!
-  else
-    cout << "Expt will not return token" << endl;
-
+  ReturnToken();  // check it!
   if (!left)
     cout << "Got Token == " << static_cast<int>(t) << endl;
   return left;
