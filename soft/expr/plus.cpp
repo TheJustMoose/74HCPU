@@ -44,7 +44,7 @@ string new_tmp() {
 }
 
 enum Token {
-  tPlus, tMinus, tMul, tDiv, tNum, tName, tLBracket, tRBracket, tEqual, tEnd
+  tPlus, tMinus, tMul, tDiv, tNum, tName, tLBracket, tRBracket, tEqual, tSemicolon, tEnd
 };
 
 map<Token, string> TokenName {
@@ -57,6 +57,7 @@ map<Token, string> TokenName {
   {tLBracket, "tLBracket"},
   {tRBracket, "tRBracket"},
   {tEqual, "tEqual"},
+  {tSemicolon, "tSemicolon"},
   {tEnd, "tEnd"},
 };
 
@@ -109,6 +110,7 @@ Node* prim();
 Node* term();
 Node* expr();
 Node* assign();
+Node* stmt();
 
 class Num: public Node {
  public:
@@ -143,7 +145,6 @@ class Name: public Node {
 
   string tmp_name() override {
     return value_;
-    //return value_ + "(" + tmp_name_ + ")";
   }
 
   string name() {
@@ -296,6 +297,7 @@ Token GetToken() {
     case '(': cout << TokenName[tLBracket] << endl; return tLBracket;
     case ')': cout << TokenName[tRBracket] << endl; return tRBracket;
     case '=': cout << TokenName[tEqual] << endl; return tEqual;
+    case ';': cout << TokenName[tSemicolon] << endl; return tSemicolon;
   }
 
   cout << stack_str() << "Unknown token: " << c << endl;
@@ -396,6 +398,14 @@ Node* assign() {
   return left;
 }
 
+Node* stmt() {
+  Node* n = assign();
+  Token t = GetToken();
+  cout << "Token after \"n = assign()\" -> (" << static_cast<int>(t)
+       << ", " << TokenName[t] << ")" << endl;
+  return n;
+}
+
 int main(int argc, char* argv[]) {
   FuncGuard fg("main");
   cout << "stack: " << stack_str() << endl;
@@ -414,7 +424,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  Node* n = assign();
+  Node* n = stmt();
   if (!n) {
     cout << "Node* is nullptr" << endl;
     return 1;
