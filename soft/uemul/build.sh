@@ -1,3 +1,5 @@
+pip install opencv-python
+pip install filelock
 mkdir bin
 cd bin
 cmake ..
