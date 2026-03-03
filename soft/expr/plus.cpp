@@ -1,9 +1,10 @@
 #include <cctype>
 #include <iostream>
+#include <map>
 #include <stack>
 #include <string>
 
-// это прототип, чтобы поиграть в деревья
+// Prototype to play with tree
 //
 
 using namespace std;
@@ -43,6 +44,16 @@ string new_tmp() {
 
 enum Token {
   tPlus, tMinus, tMul, tDiv, tNum, tName, tRBracket, tLBracket, tEqual, tEnd
+};
+
+map<Token, string> TokenName {
+  {tPlus, "tPlus"},
+  {tMinus, "tMinus"},
+  {tMul, "tMul"},
+  {tDiv, "tDiv"},
+  {tEqual, "tEqual"},
+  {tLBracket, "tLBracket"},
+  {tRBracket, "tRBracket"},
 };
 
 enum NodeType {
@@ -118,17 +129,17 @@ class BinOp: public Node {
     else if (!right)
       cout << "right node is nullptr" << endl;
     else {
-      if (type() == ntSum)
-        return left->res() + right->res();
-      else if (type() == ntSub)
-        return left->res() - right->res();
-      else if (type() == ntMul)
-        return left->res() * right->res();
-      else if (type() == ntDiv)
-        return left->res() / right->res();
-      else
-        cout << "Only add, sub, mul, div operations supported right now" << endl;
+      switch (type()) {
+        case ntSum: return left->res() + right->res();
+        case ntSub: return left->res() - right->res();
+        case ntMul: return left->res() * right->res();
+        case ntDiv: return left->res() * right->res();
+        //case ntAssign: return ???;
+        default:
+          cout << "Only add, sub, mul, div operations supported right now" << endl;
+      }
     }
+
     return 0;
   }
 
@@ -211,34 +222,13 @@ Token GetToken() {
     return tName;
   }
 
-  if (c == '+') {
-    cout << "tPlus" << endl;
-    return tPlus;
-  }
-
-  if (c == '-') {
-    cout << "tMinus" << endl;
-    return tMinus;
-  }
-
-  if (c == '*') {
-    cout << "tMul" << endl;
-    return tMul;
-  }
-
-  if (c == '/') {
-    cout << "tDiv" << endl;
-    return tDiv;
-  }
-
-  if (c == '(') {
-    cout << "tLBracket" << endl;
-    return tLBracket;
-  }
-
-  if (c == ')') {
-    cout << "tRBracket" << endl;
-    return tRBracket;
+  switch (c) {
+    case '+': cout << TokenName[tPlus] << endl; return tPlus;
+    case '-': cout << TokenName[tMinus] << endl; return tMinus;
+    case '*': cout << TokenName[tMul] << endl; return tMul;
+    case '/': cout << TokenName[tDiv] << endl; return tDiv;
+    case '(': cout << TokenName[tLBracket] << endl; return tLBracket;
+    case ')': cout << TokenName[tRBracket] << endl; return tRBracket;
   }
 
   cout << stack_str() << "Unknown token: " << c << endl;
