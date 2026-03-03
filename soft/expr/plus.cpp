@@ -57,12 +57,13 @@ class Node {
  public:
   Node(NodeType nt): type_(nt) {}
 
-  virtual int res() { return 0; }
-
-  virtual void gen() {}
+  virtual int res() = 0;
+  virtual void gen() = 0;
 
   virtual string op() { return ""; }
-  virtual string tmp_name() { return ""; }
+  virtual string tmp_name() {
+    return tmp_name_;
+  }
 
   NodeType type() {
     return type_;
@@ -79,8 +80,9 @@ class Node {
     }
   }
 
- private:
+ protected:
   NodeType type_ {ntUnknown};
+  string tmp_name_ {};
 };
 
 Node* prim();
@@ -102,13 +104,8 @@ class Num: public Node {
     cout << stack_str() << tmp_name_ << " = " << value_ << endl;
   }
 
-  string tmp_name() override {
-    return tmp_name_;
-  }
-
  private:
   int value_ {0};
-  string tmp_name_ {};
 };
 
 class BinOp: public Node {
@@ -160,15 +157,8 @@ class BinOp: public Node {
     }
   }
 
-  string tmp_name() override {
-    return tmp_name_;
-  }
-
   Node* left {nullptr};
   Node* right {nullptr};
-
- private:
-  string tmp_name_ {};
 };
 
 class UnOp: public Node {
@@ -192,14 +182,7 @@ class UnOp: public Node {
     return "-";
   }
 
-  string tmp_name() override {
-    return tmp_name_;
-  }
-
   Node* child {nullptr};
-
- private:
-  string tmp_name_ {};
 };
 
 Token GetToken() {
