@@ -68,6 +68,11 @@ enum NodeType {
   ntUnknown  // we do not know now what is it
 };
 
+map<NodeType, string> NodeName {
+  {ntName, "ntName"},
+  {ntNum, "ntNum"},
+};
+
 static NodeType Token2NodeType(Token t) {
   switch (t) {
     case tPlus: return ntSum;
@@ -133,6 +138,16 @@ class Name: public Node {
   }
 
   void gen() override {
+    cout << stack_str() << "Name! Name! Name!" << endl;
+  }
+
+  string tmp_name() override {
+    return value_;
+    //return value_ + "(" + tmp_name_ + ")";
+  }
+
+  string name() {
+    return value_;
   }
 
  private:
@@ -225,7 +240,17 @@ class AssignOp: public Node {
 
   void gen() override {
     right->gen();
-    cout << "some var" << " = " << right->tmp_name() << endl;
+    if (!left) {
+      cout << stack_str() << "left == nullptr" << endl;
+      return;
+    }
+    Name* name_node = dynamic_cast<Name*>(left);
+    if (!name_node) {
+      cout << stack_str() << "Error. left node is not Name class" << endl;
+      return;
+    }
+
+    cout << stack_str() << name_node->name() << " = " << right->tmp_name() << endl;
   }
 
   string op() override {
@@ -356,9 +381,10 @@ Node* assign() {
   FuncGuard fg("assi");
   Node* left = expr();
   Token t = GetToken();
-  cout << "Got Token after left = expr(); == " << static_cast<int>(t) << endl;
+  cout << "Token after \"left = expr()\" -> (" << static_cast<int>(t)
+       << ", " << TokenName[t] << ")" << endl;
   while (t == tEqual) {
-    cout << "Okay, will process left = right" << endl;
+    cout << "Okay, will process \"left = right\"" << endl;
     Node* right = expr();
     AssignOp* op = new AssignOp();
     op->left = left;
