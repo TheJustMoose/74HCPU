@@ -36,6 +36,7 @@ class FuncGuard {
 string input_string;
 size_t idx {0};
 int value {0};
+string name {""};
 
 int tmp_var_counter {0};
 string new_tmp() {
@@ -124,14 +125,18 @@ class Num: public Node {
 
 class Name: public Node {
  public:
-  Name(char letter)
-    : Node(ntName) {}
+  Name(string value)
+    : Node(ntName), value_(value) {}
 
   int res() override {
+    return 0;
   }
 
   void gen() override {
   }
+
+ private:
+  string value_ {0};
 };
 
 class BinOp: public Node {
@@ -215,10 +220,12 @@ class AssignOp: public Node {
   AssignOp(): Node(ntAssign) {}
 
   int res() override {
-    return 0;
+    return right ? right->res() : 0;
   }
 
   void gen() override {
+    right->gen();
+    cout << "some var" << " = " << right->tmp_name() << endl;
   }
 
   string op() override {
@@ -251,7 +258,8 @@ Token GetToken() {
   }
 
   if (isalpha(c)) {
-    cout << "tName" << endl;
+    name = c;
+    cout << "tName: " << name << endl;
     return tName;
   }
 
@@ -288,7 +296,8 @@ Node* prim() {
     cout << stack_str() << "Find num: " << value << endl;
     return new Num(value);
   } else if (t == tName) {
-    return new Var();
+    cout << stack_str() << "Find name: " << name << endl;
+    return new Name(name);
   } else if (t == tMinus) {
     UnOp* n = new UnOp();
     n->child = prim();
