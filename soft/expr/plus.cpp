@@ -42,13 +42,14 @@ string new_tmp() {
 }
 
 enum Token {
-  tPlus, tMinus, tMul, tDiv, tNum, tName, tRBracket, tLBracket, tEnd
+  tPlus, tMinus, tMul, tDiv, tNum, tName, tRBracket, tLBracket, tEqual, tEnd
 };
 
 enum NodeType {
   // var   num    binary operations
   ntName, ntNum, ntSum, ntSub, ntMul, ntDiv,
   ntUMinus,  // unary minus
+  ntAssign,  // a = b;
   ntUnknown  // we do not know now what is it
 };
 
@@ -73,6 +74,7 @@ class Node {
       case tMinus: return ntSub;
       case tMul: return ntMul;
       case tDiv: return ntDiv;
+      case tEqual: return ntAssign;
       default: return ntUnknown;
     }
   }
