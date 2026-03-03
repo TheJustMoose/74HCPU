@@ -43,7 +43,7 @@ string new_tmp() {
 }
 
 enum Token {
-  tPlus, tMinus, tMul, tDiv, tNum, tName, tRBracket, tLBracket, tEqual, tEnd
+  tPlus, tMinus, tMul, tDiv, tNum, tName, tLBracket, tRBracket, tEqual, tEnd
 };
 
 map<Token, string> TokenName {
@@ -51,9 +51,12 @@ map<Token, string> TokenName {
   {tMinus, "tMinus"},
   {tMul, "tMul"},
   {tDiv, "tDiv"},
-  {tEqual, "tEqual"},
+  {tNum, "tNum"},
+  {tName, "tName"},
   {tLBracket, "tLBracket"},
   {tRBracket, "tRBracket"},
+  {tEqual, "tEqual"},
+  {tEnd, "tEnd"},
 };
 
 enum NodeType {
@@ -63,6 +66,17 @@ enum NodeType {
   ntAssign,  // a = b;
   ntUnknown  // we do not know now what is it
 };
+
+static NodeType Token2NodeType(Token t) {
+  switch (t) {
+    case tPlus: return ntSum;
+    case tMinus: return ntSub;
+    case tMul: return ntMul;
+    case tDiv: return ntDiv;
+    case tEqual: return ntAssign;
+    default: return ntUnknown;
+  }
+}
 
 class Node {
  public:
@@ -80,17 +94,6 @@ class Node {
     return type_;
   };
 
-  static NodeType Token2NodeType(Token t) {
-    switch (t) {
-      case tPlus: return ntSum;
-      case tMinus: return ntSub;
-      case tMul: return ntMul;
-      case tDiv: return ntDiv;
-      case tEqual: return ntAssign;
-      default: return ntUnknown;
-    }
-  }
-
  protected:
   NodeType type_ {ntUnknown};
   string tmp_name_ {};
@@ -99,12 +102,12 @@ class Node {
 Node* prim();
 Node* term();
 Node* expr();
+Node* assign();
 
 class Num: public Node {
  public:
   Num(int value)
-    : Node(ntNum), value_(value) {
-  }
+    : Node(ntNum), value_(value) {}
 
   int res() override {
     return value_;
@@ -117,6 +120,18 @@ class Num: public Node {
 
  private:
   int value_ {0};
+};
+
+class Name: public Node {
+ public:
+  Name(char letter)
+    : Node(ntName) {}
+
+  int res() override {
+  }
+
+  void gen() override {
+  }
 };
 
 class BinOp: public Node {
@@ -134,7 +149,6 @@ class BinOp: public Node {
         case ntSub: return left->res() - right->res();
         case ntMul: return left->res() * right->res();
         case ntDiv: return left->res() * right->res();
-        //case ntAssign: return ???;
         default:
           cout << "Only add, sub, mul, div operations supported right now" << endl;
       }
@@ -196,6 +210,25 @@ class UnOp: public Node {
   Node* child {nullptr};
 };
 
+class AssignOp: public Node {
+ public:
+  AssignOp(): Node(ntAssign) {}
+
+  int res() override {
+    return 0;
+  }
+
+  void gen() override {
+  }
+
+  string op() override {
+    return "=";
+  }
+
+  Node* left {nullptr};
+  Node* right {nullptr};
+};
+
 Token GetToken() {
   FuncGuard fg("getT");
   cout << stack_str() << "GetToken(): ";
@@ -229,6 +262,7 @@ Token GetToken() {
     case '/': cout << TokenName[tDiv] << endl; return tDiv;
     case '(': cout << TokenName[tLBracket] << endl; return tLBracket;
     case ')': cout << TokenName[tRBracket] << endl; return tRBracket;
+    case '=': cout << TokenName[tEqual] << endl; return tEqual;
   }
 
   cout << stack_str() << "Unknown token: " << c << endl;
@@ -253,6 +287,8 @@ Node* prim() {
   if (t == tNum) {
     cout << stack_str() << "Find num: " << value << endl;
     return new Num(value);
+  } else if (t == tName) {
+    return new Var();
   } else if (t == tMinus) {
     UnOp* n = new UnOp();
     n->child = prim();
@@ -307,6 +343,24 @@ Node* expr() {
   return left;
 }
 
+Node* assign() {
+  FuncGuard fg("assi");
+  Node* left = expr();
+  Token t = GetToken();
+  cout << "Got Token after left = expr(); == " << static_cast<int>(t) << endl;
+  while (t == tEqual) {
+    cout << "Okay, will process left = right" << endl;
+    Node* right = expr();
+    AssignOp* op = new AssignOp();
+    op->left = left;
+    op->right = right;
+    left = op;
+    t = GetToken();
+  }
+  ReturnToken();
+  return left;
+}
+
 int main(int argc, char* argv[]) {
   FuncGuard fg("main");
   cout << "stack: " << stack_str() << endl;
@@ -325,7 +379,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  Node* n = expr();
+  Node* n = assign();
   if (!n) {
     cout << "Node* is nullptr" << endl;
     return 1;
