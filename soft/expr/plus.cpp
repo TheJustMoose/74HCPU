@@ -429,6 +429,7 @@ Node* assign() {
 }
 
 Node* stmt() {
+  FuncGuard fg("stmt");
   Node* n = assign();
   if (!n) {
     cout << "assign return nullptr, I don't know why" << endl;
@@ -438,6 +439,11 @@ Node* stmt() {
   Token t = GetToken();
   cout << "Token after \"n = assign()\" -> (" << static_cast<int>(t)
        << ", " << TokenName[t] << ")" << endl;
+
+  if (t == tSemicolon)
+    cout << "**** HORAY!! ****" << endl;
+  else
+    cout << "**** Error. Please add ';' to the end of statement ****" << endl;
   return n;
 }
 
