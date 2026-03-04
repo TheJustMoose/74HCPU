@@ -322,8 +322,8 @@ void ReturnToken() {
   cout << stack_str() << "ReturnToken()" << endl;
   if (idx > 0) {  //  && idx < input_string.size()
     idx--;
-    cout << "idx: " << (idx + 1) << " --> " << idx << endl;
-    cout << "tok: " << input_string[idx + 1] << " --> " << input_string[idx] << endl;
+    //cout << "idx: " << (idx + 1) << " --> " << idx << endl;
+    //cout << "tok: " << input_string[idx + 1] << " --> " << input_string[idx] << endl;
   } else
     cout << "...Nothing to return. idx == 0" << endl;
 }
@@ -350,7 +350,8 @@ Node* prim() {
     }
     return n;
   } else {
-    ReturnToken();
+    cout << "Before return " << TokenName[t] << " token" << endl;
+    //ReturnToken();
     return nullptr;
   }
 }
@@ -358,6 +359,9 @@ Node* prim() {
 Node* term() {
   FuncGuard fg("term");
   Node* left = prim();
+  if (!left)
+    return nullptr;
+
   Token t = GetToken();
   while (t == tMul || t == tDiv) {
     Node* right = prim();
@@ -375,6 +379,9 @@ Node* term() {
 Node* expr() {
   FuncGuard fg("expr");
   Node* left = term();
+  if (!left)
+    return nullptr;
+
   Token t = GetToken();
   while (t == tPlus || t == tMinus) {
     Node* right = term();
@@ -393,27 +400,41 @@ Node* expr() {
 
 Node* assign() {
   FuncGuard fg("assi");
-  Node* left = expr();
+  Node* left = expr();  // a
+  if (!left)
+    return nullptr;
+
+  cout << "  left/expr()->type(): " << NodeName[left->type()] << endl;
+
   Token t = GetToken();
-  cout << "Token after \"left = expr()\" -> (" << static_cast<int>(t)
+  if (t == tEnd)
+    return left;
+
+  cout << "  right token -> (" << static_cast<int>(t)
        << ", " << TokenName[t] << ")" << endl;
-  while (t == tEqual) {
-    cout << "Okay, will process \"left = right\"" << endl;
-    Node* right = expr();
-    AssignOp* op = new AssignOp();
-    op->left = left;
-    op->right = right;
-    left = op;
-    t = GetToken();
+
+  Node* res {nullptr};
+  if (t == tEqual) {
+    AssignOp* op = new AssignOp();  // =
+    cout << "  AssignOp was created..." << endl;
+    op->left = left;                // a =
+    op->right = assign();           // a = assign(); // recursion
+    res = op;
+  } else {
+    res = left;
+    ReturnToken();
   }
-  cout << "Token after \"while (t == tEqual)\" -> (" << static_cast<int>(t)
-       << ", " << TokenName[t] << ")" << endl;
-  ReturnToken();
-  return left;
+
+  return res;
 }
 
 Node* stmt() {
   Node* n = assign();
+  if (!n) {
+    cout << "assign return nullptr, I don't know why" << endl;
+    return nullptr;
+  }
+
   Token t = GetToken();
   cout << "Token after \"n = assign()\" -> (" << static_cast<int>(t)
        << ", " << TokenName[t] << ")" << endl;
@@ -448,20 +469,35 @@ int main(int argc, char* argv[]) {
     cout << "Root node is ntAssign" << endl;
     AssignOp* assign = dynamic_cast<AssignOp*>(n);
     if (assign) {
-      NodeType ntLeft = assign->left ? assign->left->type() : ntNull;
-      cout << "  root->left->type(): " << NodeName[ntLeft] << endl;
-      NodeType ntRight = assign->right ? assign->right->type() : ntNull;
-      cout << "  root->right->type(): " << NodeName[ntRight] << endl;
-      if (Name* n = dynamic_cast<Name*>(assign->left))
-        cout << "  left->name(): " << (n ? n->name() : string("left is nullptr")) << endl;
+      if (AssignOp* t1 = assign) {
+        NodeType ntLeft = t1->left ? t1->left->type() : ntNull;
+        cout << "  t1->left->type(): " << NodeName[ntLeft] << endl;
+        NodeType ntRight = t1->right ? t1->right->type() : ntNull;
+        cout << "  t1->right->type(): " << NodeName[ntRight] << endl;
+        Name* n {nullptr};
+        if (t1->left && (n = dynamic_cast<Name*>(t1->left)))
+          cout << "  left->name(): " << (n ? n->name() : string("left is nullptr")) << endl;
+      }
+
+      if (AssignOp* t1 = dynamic_cast<AssignOp*>(assign->right)) {
+        NodeType ntLeft = t1->left ? t1->left->type() : ntNull;
+        cout << "  t1->left->type(): " << NodeName[ntLeft] << endl;
+        NodeType ntRight = t1->right ? t1->right->type() : ntNull;
+        cout << "  t1->right->type(): " << NodeName[ntRight] << endl;
+        Name* n {nullptr};
+        if (t1->left && (n = dynamic_cast<Name*>(t1->left)))
+          cout << "  left->name(): " << (n ? n->name() : string("left is nullptr")) << endl;
+      }
+    } else {
+      cout << "dynamic_cast<AssignOp*>(n); return nullptr Oo" << endl;
     }
+  } else {
+    cout << "Root node is " << NodeName[n->type()] << endl;
   }
 
-  //NodeName
+  //n->gen();  // enum tree items, generate three-address code 
 
-  n->gen();  // проходим по дереву, генерируем трёхадресный (?) код!
   cout << "expr res: " << n->res() << endl;
-
   cout << "main finished" << endl;
   return 0;
 }
