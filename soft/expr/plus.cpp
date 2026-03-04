@@ -44,7 +44,10 @@ string new_tmp() {
 }
 
 enum Token {
-  tPlus, tMinus, tMul, tDiv, tNum, tName, tLBracket, tRBracket, tEqual, tSemicolon, tEnd
+  tPlus, tMinus, tMul, tDiv,
+  tNum, tName,
+  tLBracket, tRBracket, tEqual, tSemicolon,
+  tEnd
 };
 
 map<Token, string> TokenName {
@@ -64,14 +67,23 @@ map<Token, string> TokenName {
 enum NodeType {
   // var   num    binary operations
   ntName, ntNum, ntSum, ntSub, ntMul, ntDiv,
-  ntUMinus,  // unary minus
-  ntAssign,  // a = b;
-  ntUnknown  // we do not know now what is it
+  ntUMinus,   // unary minus
+  ntAssign,   // a = b;
+  ntUnknown,  // we do not know now what is it
+  ntNull
 };
 
 map<NodeType, string> NodeName {
   {ntName, "ntName"},
   {ntNum, "ntNum"},
+  {ntSum, "ntSum"},
+  {ntSub, "ntSub"},
+  {ntMul, "ntMul"},
+  {ntDiv, "ntDiv"},
+  {ntUMinus, "ntUMinus"},
+  {ntAssign, "ntAssign"},
+  {ntUnknown, "ntUnknown"},
+  {ntNull, "ntNull"},
 };
 
 static NodeType Token2NodeType(Token t) {
@@ -394,6 +406,8 @@ Node* assign() {
     left = op;
     t = GetToken();
   }
+  cout << "Token after \"while (t == tEqual)\" -> (" << static_cast<int>(t)
+       << ", " << TokenName[t] << ")" << endl;
   ReturnToken();
   return left;
 }
@@ -429,6 +443,21 @@ int main(int argc, char* argv[]) {
     cout << "Node* is nullptr" << endl;
     return 1;
   }
+
+  if (n->type() == ntAssign) {
+    cout << "Root node is ntAssign" << endl;
+    AssignOp* assign = dynamic_cast<AssignOp*>(n);
+    if (assign) {
+      NodeType ntLeft = assign->left ? assign->left->type() : ntNull;
+      cout << "  root->left->type(): " << NodeName[ntLeft] << endl;
+      NodeType ntRight = assign->right ? assign->right->type() : ntNull;
+      cout << "  root->right->type(): " << NodeName[ntRight] << endl;
+      if (Name* n = dynamic_cast<Name*>(assign->left))
+        cout << "  left->name(): " << (n ? n->name() : string("left is nullptr")) << endl;
+    }
+  }
+
+  //NodeName
 
   n->gen();  // проходим по дереву, генерируем трёхадресный (?) код!
   cout << "expr res: " << n->res() << endl;
