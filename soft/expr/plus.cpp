@@ -3,6 +3,7 @@
 #include <map>
 #include <stack>
 #include <string>
+#include <vector>
 
 // Prototype to play with tree
 //
@@ -122,7 +123,7 @@ Node* prim();
 Node* term();
 Node* expr();
 Node* assign();
-Node* stmt();
+bool stmt();
 
 class Num: public Node {
  public:
@@ -428,23 +429,36 @@ Node* assign() {
   return res;
 }
 
-Node* stmt() {
+vector<Node*> statements;
+
+bool stmt() {
   FuncGuard fg("stmt");
   Node* n = assign();
   if (!n) {
     cout << "assign return nullptr, I don't know why" << endl;
-    return nullptr;
+    return false;
   }
 
   Token t = GetToken();
   cout << "Token after \"n = assign()\" -> (" << static_cast<int>(t)
        << ", " << TokenName[t] << ")" << endl;
 
-  if (t == tSemicolon)
-    cout << "**** HORAY!! ****" << endl;
+  statements.push_back(n);
+
+  while (t == tSemicolon) {
+    n = assign();
+    if (!n)
+      break;
+    statements.push_back(n);
+    t = GetToken();
+  }
+
+/*
+    cout << "**** HORAY! ****" << endl;
   else
     cout << "**** Error. Please add ';' to the end of statement ****" << endl;
-  return n;
+*/
+  return true;
 }
 
 int main(int argc, char* argv[]) {
@@ -465,13 +479,12 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  Node* n = stmt();
-  if (!n) {
-    cout << "Node* is nullptr" << endl;
-    return 1;
+  stmt();  // have to check result
+  for (Node* n : statements) {
+    n->gen();
   }
 
-  if (n->type() == ntAssign) {
+  /*if (n->type() == ntAssign) {
     cout << "Root node is ntAssign" << endl;
     AssignOp* assign = dynamic_cast<AssignOp*>(n);
     if (assign) {
@@ -499,11 +512,11 @@ int main(int argc, char* argv[]) {
     }
   } else {
     cout << "Root node is " << NodeName[n->type()] << endl;
-  }
+  }*/
 
   //n->gen();  // enum tree items, generate three-address code 
 
-  cout << "expr res: " << n->res() << endl;
+  //cout << "expr res: " << n->res() << endl;
   cout << "main finished" << endl;
   return 0;
 }
