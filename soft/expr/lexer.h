@@ -7,11 +7,11 @@
 class Lexer {
  public:
   Lexer() {}
-  Lexer(string s) {
+  Lexer(std::string s) {
     setInputString(s);
   }
 
-  void setInputString(string s) {
+  void setInputString(std::string s) {
     input_string_ = s;
     idx_ = 0;
   }
@@ -26,8 +26,11 @@ class Lexer {
   void findNextToken();
   char readChar();
 
-  string input_string_ {};
+  std::string input_string_ {};
   size_t idx_ {0};
+
+  int int_value_ {0};
+  std::string name_ {};
 
   Token current_token_ {tEnd};
 };

@@ -8,13 +8,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "../../Release")
 project(simple_expr CXX)
 add_executable(simple_expr
 	lexer.h
-	plus.cpp
+	plus.cc
 )
 
-include_directories("../doctest")
+include_directories("../doctest/doctest")
 
 project(unit_tests CXX)
 add_executable(simple_expr_unit_tests
+	lexer.h
 	lexer.cc
-	plus.cpp
+	simple_expr_unit_tests.cc
 )
