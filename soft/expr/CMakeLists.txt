@@ -15,5 +15,6 @@ include_directories("../doctest")
 
 project(unit_tests CXX)
 add_executable(simple_expr_unit_tests
+	lexer.cc
 	plus.cpp
 )
