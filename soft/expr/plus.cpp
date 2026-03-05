@@ -34,8 +34,26 @@ class FuncGuard {
   }
 };
 
-string input_string;
-size_t idx {0};
+
+class Lexer {
+ public:
+  Lexer(string s): input_string_(s) {}
+
+  char currentToken() {
+    return (idx_ < input_string_.size()) ?
+        input_string_[idx_] : 0;
+  }
+
+  void consume() {
+    if (idx_ < input_string_.size())
+      idx_++;
+  }
+
+ private:
+  string input_string_ {};
+  size_t idx_ {0};
+};
+
 int value {0};
 string name {""};
 
@@ -153,7 +171,7 @@ class Name: public Node {
   }
 
   void gen() override {
-    cout << stack_str() << "Name! Name! Name!" << endl;
+    cout << stack_str() << "Okay, this is a Name object: " << value_ << endl;
   }
 
   string tmp_name() override {
