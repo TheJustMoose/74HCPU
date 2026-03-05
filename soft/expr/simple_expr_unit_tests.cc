@@ -2,9 +2,13 @@
 #include <doctest.h>
 
 #include "lexer.h"
+#include "token.h"
+
+#include <string>
 
 using namespace std;
 
 TEST_CASE("check Lexer") {
-  CHECK(false);
+  Lexer l("a");
+  CHECK_EQ(l.currentToken(), tName);
 }
