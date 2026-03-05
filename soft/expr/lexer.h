@@ -9,6 +9,7 @@ class Lexer {
   Lexer() {}
   Lexer(std::string s) {
     setInputString(s);
+    consume();  // have to find first token
   }
 
   void setInputString(std::string s) {
