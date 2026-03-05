@@ -37,14 +37,13 @@ void Lexer::findNextToken() {
 
   if (isalpha(c) || c == '_') {
     string name;
-    name += c;
-    if (isalpha(c) || isdigit(c) || c == '_') {
+    while (isalpha(c) || isdigit(c) || c == '_') {
       name += c;
       c = readChar();
     }
 
     cout << "tName: " << name << endl;
-    name_ = name;
+    var_name_ = name;
     current_token_ = tName;
     return;
   }

@@ -21,6 +21,14 @@ class Lexer {
     return current_token_;
   }
 
+  int getIntValue() {
+    return int_value_;
+  }
+
+  std::string getVarName() {
+    return var_name_;
+  }
+
   void consume();
 
  private:
@@ -31,7 +39,7 @@ class Lexer {
   size_t idx_ {0};
 
   int int_value_ {0};
-  std::string name_ {};
+  std::string var_name_ {};
 
   Token current_token_ {tEnd};
 };
