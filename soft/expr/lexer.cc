@@ -21,6 +21,12 @@ void Lexer::findNextToken() {
   }
 
   char c = readChar();
+  if (isspace(c)) {     // if we have space, we have to skip it
+    while (isspace(c))  // example: a b c
+      c = readChar();
+  }
+
+  // Okay, now c != space
   if (isdigit(c)) {
     int value = 0;
     while (isdigit(c)) {
@@ -28,8 +34,10 @@ void Lexer::findNextToken() {
       value = value*10 + dig;
       c = readChar();
     }
-    idx_--;  // last char was not isdigit so we should step back
-    cout << "tNum" << endl;
+    if (idx_ < input_string_.size())  // if we stopped on '\0' char, we should stay there
+      idx_--;  // last char was not isdigit so we should step back
+
+    cout << "tNum: " << value << endl;
     int_value_ = value;
     current_token_ = tNum;
     return;
@@ -39,8 +47,9 @@ void Lexer::findNextToken() {
     string name;
     while (isalpha(c) || isdigit(c) || c == '_') {
       name += c;
-      c = readChar();
-    }
+      c = readChar();  // readChar will return 0 instead of tEnd
+    }  // However "if (idx_ >= input_string_.size())" is at the beginning of the method,
+       // so no decrement is required here.
 
     cout << "tName: " << name << endl;
     var_name_ = name;
@@ -49,17 +58,14 @@ void Lexer::findNextToken() {
   }
 
   switch (c) {
-    case '+': /*cout << TokenName[tPlus] << endl;*/ current_token_ = tPlus; break;
-    case '-': /*cout << TokenName[tMinus] << endl;*/ current_token_ = tMinus; break;
-    case '*': /*cout << TokenName[tMul] << endl;*/ current_token_ = tMul; break;
-    case '/': /*cout << TokenName[tDiv] << endl;*/ current_token_ = tDiv; break;
-    case '(': /*cout << TokenName[tLBracket] << endl;*/ current_token_ = tLBracket; break;
-    case ')': /*cout << TokenName[tRBracket] << endl;*/ current_token_ = tRBracket; break;
-    case '=': /*cout << TokenName[tEqual] << endl;*/ current_token_ = tEqual; break;
-    case ';': /*cout << TokenName[tSemicolon] << endl;*/ current_token_ = tSemicolon; break;
+    case '+': /*cout << TokenName[tPlus] << endl;*/ current_token_ = tPlus; return;
+    case '-': /*cout << TokenName[tMinus] << endl;*/ current_token_ = tMinus; return;
+    case '*': /*cout << TokenName[tMul] << endl;*/ current_token_ = tMul; return;
+    case '/': /*cout << TokenName[tDiv] << endl;*/ current_token_ = tDiv; return;
+    case '(': /*cout << TokenName[tLBracket] << endl;*/ current_token_ = tLBracket; return;
+    case ')': /*cout << TokenName[tRBracket] << endl;*/ current_token_ = tRBracket; return;
+    case '=': /*cout << TokenName[tEqual] << endl;*/ current_token_ = tEqual; return;
+    case ';': /*cout << TokenName[tSemicolon] << endl;*/ current_token_ = tSemicolon; return;
+    default: cout << "Lexer: Unknown token: " << int(c) << endl; current_token_ = tError; break;
   }
-
-  cout << "Lexer: Unknown token: " << c << endl;
-  current_token_ = tError;
-  return;
 }
