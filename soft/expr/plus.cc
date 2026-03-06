@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "lexer.h"
 #include "node_type.h"
 #include "token.h"
 
@@ -266,7 +267,9 @@ class AssignOp: public Node {
 Token GetToken() {
   FuncGuard fg("getT");
   cout << stack_str() << "GetToken(): ";
-  ///////
+
+  static Lexer l {input_string};
+  return l.currentToken();
 }
 
 void ReturnToken() {
