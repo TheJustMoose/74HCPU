@@ -255,6 +255,8 @@ Node* prim() {
     int val = lex.getIntValue();
     cout << stack_str() << "Find num: " << val << endl;
     lex.consume();
+    cout << stack_str() << "Moved to token: "
+         << GetTokenName(lex.currentToken()) << endl;
     return new Num(val);
   } else if (t == tName) {
     string str = lex.getStrValue();
@@ -292,6 +294,8 @@ Node* term() {
     cout << stack_str() << "Okay. Found * or /" << endl;
     Token t_op = t;
     lex.consume();
+    cout << stack_str() << "Moved to token: "
+         << GetTokenName(lex.currentToken()) << endl;
 
     Node* right = prim();
     // prim have already called lex.consume();
@@ -301,7 +305,11 @@ Node* term() {
     op->right = right;
     left = op;
     t = lex.currentToken();
+    cout << stack_str() << "Moved to token: "
+         << GetTokenName(lex.currentToken()) << endl;
   }
+  cout << stack_str() << "Token on the end of term(): "
+       << GetTokenName(lex.currentToken()) << endl;
 
   return left;
 }
@@ -319,6 +327,8 @@ Node* expr() {
     cout << stack_str() << "Okay. Found + or -" << endl;
     Token t_op = t;
     lex.consume();
+    cout << stack_str() << "Moved to token: "
+         << GetTokenName(lex.currentToken()) << endl;
 
     Node* right = term();
     // term have already called lex.consume(); in prim()
@@ -332,7 +342,11 @@ Node* expr() {
     op->right = right;
     left = op;
     t = lex.currentToken();
+    cout << stack_str() << "Moved to token: "
+         << GetTokenName(lex.currentToken()) << endl;
   }
+  cout << stack_str() << "Token on the end of expr(): "
+       << GetTokenName(lex.currentToken()) << endl;
 
   if (!left)
     cout << stack_str() << "Got Token == " << static_cast<int>(t) << endl;

@@ -161,6 +161,7 @@ TEST_CASE("check Lexer with sum") {
     {tNum, "", 1},
     {tPlus, "", 0},
     {tNum, "", 1},
+    {tSemicolon, "", 0},
     {tEnd, "", 0},
   };
 
