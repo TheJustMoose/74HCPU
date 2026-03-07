@@ -153,3 +153,16 @@ TEST_CASE("check Lexer: Okay, now we can check arithm") {
 
   CheckLexerOutput(l, r);
 }
+
+TEST_CASE("check Lexer with sum") {
+  Lexer l("1+1;");
+
+  vector<TestToken> r {
+    {tNum, "", 1},
+    {tPlus, "", 0},
+    {tNum, "", 1},
+    {tEnd, "", 0},
+  };
+
+  CheckLexerOutput(l, r);
+}
