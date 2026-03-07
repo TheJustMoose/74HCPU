@@ -263,6 +263,7 @@ class AssignOp: public Node {
 Node* prim() {
   FuncGuard fg("prim");
   Token t = lex.currentToken();
+  cout << stack_str() << ", token: " << static_cast<int>(t) << endl;
   if (t == tNum) {
     int val = lex.getIntValue();
     cout << stack_str() << "Find num: " << val << endl;
@@ -283,12 +284,12 @@ Node* prim() {
     Node* n = expr();
     t = lex.currentToken();
     if (t != tRBracket)
-      cout << "Error. Waiting for right bracket" << endl;
+      cout << stack_str() << "Error. Waiting for right bracket" << endl;
     else
       lex.consume();
     return n;
   } else {
-    cout << "Before return " << TokenName[t] << " token" << endl;
+    cout << stack_str() << "Before return " << TokenName[t] << " token" << endl;
     return nullptr;
   }
 }
@@ -331,7 +332,7 @@ Node* expr() {
   }
 
   if (!left)
-    cout << "Got Token == " << static_cast<int>(t) << endl;
+    cout << stack_str() << "Got Token == " << static_cast<int>(t) << endl;
   return left;
 }
 
@@ -341,20 +342,20 @@ Node* assign() {
   if (!left)
     return nullptr;
 
-  cout << "  left/expr()->type(): " << NodeName[left->type()] << endl;
+  cout << stack_str() << "  left/expr()->type(): " << NodeName[left->type()] << endl;
 
   Token t = lex.currentToken();
   if (t == tEnd)
     return left;
 
-  cout << "  right token -> (" << static_cast<int>(t)
-       << ", " << TokenName[t] << ")" << endl;
+  cout << stack_str() << "  right token -> (" << static_cast<int>(t)
+                      << ", " << TokenName[t] << ")" << endl;
 
   Node* res {nullptr};
   if (t == tEqual) {
     lex.consume();
     AssignOp* op = new AssignOp();  // =
-    cout << "  AssignOp was created..." << endl;
+    cout << stack_str() << "  AssignOp was created..." << endl;
     op->left = left;                // a =
     op->right = assign();           // a = assign(); // recursion
     res = op;
@@ -371,16 +372,13 @@ bool stmt() {
   FuncGuard fg("stmt");
   Node* n = assign();
   if (!n) {
-    cout << "assign return nullptr, I don't know why" << endl;
+    cout << stack_str() << "assign() return nullptr, I don't know why" << endl;
     return false;
   }
 
-  Token t = lex.currentToken();
-  cout << "Token after \"n = assign()\" -> (" << static_cast<int>(t)
-       << ", " << TokenName[t] << ")" << endl;
-
   statements.push_back(n);
 
+  Token t = lex.currentToken();
   while (true) {
     if (t == tSemicolon) {
       lex.consume();
@@ -390,7 +388,7 @@ bool stmt() {
       statements.push_back(n);
       t = lex.currentToken();
     } else {
-      cout << "**** Error. Please add ';' to the end of statement ****" << endl;
+      cout << stack_str() << "**** Error. Please add ';' to the end of statement ****" << endl;
       return false;
     }
   }
@@ -408,7 +406,7 @@ int main(int argc, char* argv[]) {
   cout << endl;
 
   if (argc == 2 && argv[1]) {
-    cout << "Try to process: " << argv[1] << "..." << endl;
+    cout << "Try to process: \"" << argv[1] << "\"" << endl;
     string s {argv[1]};
     lex.setInputString(s);
     cout << "input_string.size(): " << s.size() << endl;

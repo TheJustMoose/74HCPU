@@ -9,12 +9,12 @@ class Lexer {
   Lexer() {}
   Lexer(std::string s) {
     setInputString(s);
-    consume();  // have to find first token
   }
 
   void setInputString(std::string s) {
     input_string_ = s;
     idx_ = 0;
+    consume();  // have to find first token
   }
 
   Token currentToken() {
@@ -41,5 +41,5 @@ class Lexer {
   int int_value_ {0};
   std::string var_name_ {};
 
-  Token current_token_ {tEnd};
+  Token current_token_ {tNotInitialized};
 };
