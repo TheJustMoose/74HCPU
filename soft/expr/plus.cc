@@ -38,11 +38,7 @@ class FuncGuard {
   }
 };
 
-string input_string;
-size_t idx {0};
-
-int value {0};
-string name {""};
+Lexer lex;
 
 int tmp_var_counter {0};
 string new_tmp() {
@@ -264,49 +260,35 @@ class AssignOp: public Node {
   Node* right {nullptr};
 };
 
-Token GetToken() {
-  FuncGuard fg("getT");
-  cout << stack_str() << "GetToken(): ";
-
-  static Lexer l {input_string};
-  return l.currentToken();
-}
-
-void ReturnToken() {
-  FuncGuard fg("retT");
-  cout << stack_str() << "ReturnToken()" << endl;
-  if (idx > 0) {  //  && idx < input_string.size()
-    idx--;
-    //cout << "idx: " << (idx + 1) << " --> " << idx << endl;
-    //cout << "tok: " << input_string[idx + 1] << " --> " << input_string[idx] << endl;
-  } else
-    cout << "...Nothing to return. idx == 0" << endl;
-}
-
 Node* prim() {
   FuncGuard fg("prim");
-  Token t = GetToken();
+  Token t = lex.currentToken();
   if (t == tNum) {
-    cout << stack_str() << "Find num: " << value << endl;
-    return new Num(value);
+    int val = lex.getIntValue();
+    cout << stack_str() << "Find num: " << val << endl;
+    lex.consume();
+    return new Num(val);
   } else if (t == tName) {
-    cout << stack_str() << "Find name: " << name << endl;
-    return new Name(name);
+    string str = lex.getStrValue();
+    cout << stack_str() << "Find name: " << str << endl;
+    lex.consume();
+    return new Name(str);
   } else if (t == tMinus) {
+    lex.consume();
     UnOp* n = new UnOp();
     n->child = prim();
     return n;
   } else if (t == tLBracket) {
+    lex.consume();
     Node* n = expr();
-    t = GetToken();
-    if (t != tRBracket) {
-      ReturnToken();
+    t = lex.currentToken();
+    if (t != tRBracket)
       cout << "Error. Waiting for right bracket" << endl;
-    }
+    else
+      lex.consume();
     return n;
   } else {
     cout << "Before return " << TokenName[t] << " token" << endl;
-    //ReturnToken();
     return nullptr;
   }
 }
@@ -317,17 +299,17 @@ Node* term() {
   if (!left)
     return nullptr;
 
-  Token t = GetToken();
+  Token t = lex.currentToken();
   while (t == tMul || t == tDiv) {
+    lex.consume();
     Node* right = prim();
     BinOp* op = new BinOp(t);
     op->left = left;
     op->right = right;
     left = op;
-    t = GetToken();
+    t = lex.currentToken();
   }
 
-  ReturnToken();
   return left;
 }
 
@@ -337,17 +319,17 @@ Node* expr() {
   if (!left)
     return nullptr;
 
-  Token t = GetToken();
+  Token t = lex.currentToken();
   while (t == tPlus || t == tMinus) {
+    lex.consume();
     Node* right = term();
     BinOp* op = new BinOp(t);
     op->left = left;
     op->right = right;
     left = op;
-    t = GetToken();
+    t = lex.currentToken();
   }
 
-  ReturnToken();  // check it!
   if (!left)
     cout << "Got Token == " << static_cast<int>(t) << endl;
   return left;
@@ -361,7 +343,7 @@ Node* assign() {
 
   cout << "  left/expr()->type(): " << NodeName[left->type()] << endl;
 
-  Token t = GetToken();
+  Token t = lex.currentToken();
   if (t == tEnd)
     return left;
 
@@ -370,6 +352,7 @@ Node* assign() {
 
   Node* res {nullptr};
   if (t == tEqual) {
+    lex.consume();
     AssignOp* op = new AssignOp();  // =
     cout << "  AssignOp was created..." << endl;
     op->left = left;                // a =
@@ -377,7 +360,6 @@ Node* assign() {
     res = op;
   } else {
     res = left;
-    ReturnToken();
   }
 
   return res;
@@ -393,7 +375,7 @@ bool stmt() {
     return false;
   }
 
-  Token t = GetToken();
+  Token t = lex.currentToken();
   cout << "Token after \"n = assign()\" -> (" << static_cast<int>(t)
        << ", " << TokenName[t] << ")" << endl;
 
@@ -401,11 +383,12 @@ bool stmt() {
 
   while (true) {
     if (t == tSemicolon) {
+      lex.consume();
       n = assign();
       if (!n)
         break;
       statements.push_back(n);
-      t = GetToken();
+      t = lex.currentToken();
     } else {
       cout << "**** Error. Please add ';' to the end of statement ****" << endl;
       return false;
@@ -426,8 +409,9 @@ int main(int argc, char* argv[]) {
 
   if (argc == 2 && argv[1]) {
     cout << "Try to process: " << argv[1] << "..." << endl;
-    input_string = argv[1];
-    cout << "input_string.size(): " << input_string.size() << endl;
+    string s {argv[1]};
+    lex.setInputString(s);
+    cout << "input_string.size(): " << s.size() << endl;
   } else {
     cout << "Using: plus.exe \"1+2+3\"" << endl;
     return 1;
