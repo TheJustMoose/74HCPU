@@ -25,7 +25,7 @@ class Lexer {
     return int_value_;
   }
 
-  std::string getVarName() {
+  std::string getStrValue() {
     return var_name_;
   }
 

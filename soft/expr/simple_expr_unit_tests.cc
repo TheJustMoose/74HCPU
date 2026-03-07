@@ -23,11 +23,11 @@ TEST_CASE("check C++") {
 TEST_CASE("check Lexer") {
   Lexer l("a");
   CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getVarName(), "a");
+  CHECK_EQ(l.getStrValue(), "a");
 
   Lexer l2("abcd");
   CHECK_EQ(l2.currentToken(), tName);
-  CHECK_EQ(l2.getVarName(), "abcd");
+  CHECK_EQ(l2.getStrValue(), "abcd");
 
   Lexer l3("123");
   CHECK_EQ(l3.currentToken(), tNum);
@@ -74,12 +74,12 @@ TEST_CASE("check Lexer tokens") {
 TEST_CASE("check Lexer and many long strings") {
   Lexer l("abcd efgh");
   CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getVarName(), "abcd");
+  CHECK_EQ(l.getStrValue(), "abcd");
 
   l.consume();
 
   CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getVarName(), "efgh");
+  CHECK_EQ(l.getStrValue(), "efgh");
 
   l.consume();
 
@@ -119,7 +119,7 @@ TEST_CASE("check Lexer and numbers and string") {
   l.consume();
 
   CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getVarName(), "abc");
+  CHECK_EQ(l.getStrValue(), "abc");
 
   l.consume();
 
