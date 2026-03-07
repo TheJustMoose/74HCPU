@@ -9,6 +9,36 @@
 
 using namespace std;
 
+struct TestToken {
+  Token token {tEnd};
+  string text {""};
+  int number {0};
+
+  TestToken(Token t, string s, int i)
+    : token(t), text(s), number(i) {}
+};
+
+void CheckLexerOutput(Lexer& l, const vector<TestToken>& right) {
+  vector<TestToken> left;
+  Token t {tEnd};
+  do {
+    t = l.currentToken();
+    string s = l.getStrValue();
+    int i = l.getIntValue();
+    left.emplace_back(t, s, i);
+    l.consume();
+  } while (t != tEnd && t != tError);
+
+  CHECK_EQ(left.size(), right.size());
+  for (size_t i = 0; i < left.size(); i++) {
+    CHECK_EQ(left[i].token, right[i].token);
+    if (right[i].token == tName)
+      CHECK_EQ(left[i].text, right[i].text);
+    if (right[i].token == tNum)
+      CHECK_EQ(left[i].number, right[i].number);
+  }
+}
+
 TEST_CASE("check C++") {
   CHECK(isalpha('a'));
   CHECK(isalpha('Z'));
@@ -73,37 +103,27 @@ TEST_CASE("check Lexer tokens") {
 
 TEST_CASE("check Lexer and many long strings") {
   Lexer l("abcd efgh");
-  CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getStrValue(), "abcd");
 
-  l.consume();
+  vector<TestToken> r {
+    {tName, "abcd", 0},
+    {tName, "efgh", 0},
+    {tEnd, "", 0},
+  };
 
-  CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getStrValue(), "efgh");
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tEnd);
+  CheckLexerOutput(l, r);
 }
 
 TEST_CASE("check Lexer and many numbers") {
   Lexer l("12 234 56789");
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 12);
 
-  l.consume();
+  vector<TestToken> r {
+    {tNum, "", 12},
+    {tNum, "", 234},
+    {tNum, "", 56789},
+    {tEnd, "", 0},
+  };
 
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 234);
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 56789);
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tEnd);
+  CheckLexerOutput(l, r);
 }
 
 TEST_CASE("check Lexer and numbers and string") {
