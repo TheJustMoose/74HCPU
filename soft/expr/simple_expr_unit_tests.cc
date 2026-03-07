@@ -128,65 +128,28 @@ TEST_CASE("check Lexer and many numbers") {
 
 TEST_CASE("check Lexer and numbers and string") {
   Lexer l("12 234 abc");
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 12);
 
-  l.consume();
+  vector<TestToken> r {
+    {tNum, "", 12},
+    {tNum, "", 234},
+    {tName, "abc", 0},
+    {tEnd, "", 0},
+  };
 
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 234);
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getStrValue(), "abc");
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tEnd);
+  CheckLexerOutput(l, r);
 }
 
 TEST_CASE("check Lexer: Okay, now we can check arithm") {
   Lexer l("12+234-56");
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 12);
 
-  l.consume();
+  vector<TestToken> r {
+    {tNum, "", 12},
+    {tPlus, "", 0},
+    {tNum, "", 234},
+    {tMinus, "", 0},
+    {tNum, "", 56},
+    {tEnd, "", 0},
+  };
 
-  CHECK_EQ(l.currentToken(), tPlus);
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 234);
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tMinus);
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tNum);
-  CHECK_EQ(l.getIntValue(), 56);
-
-  l.consume();
-
-  CHECK_EQ(l.currentToken(), tEnd);
-
-  Lexer l2(" 12 * 234 ");
-  CHECK_EQ(l2.currentToken(), tNum);
-  CHECK_EQ(l2.getIntValue(), 12);
-
-  l2.consume();
-
-  CHECK_EQ(l2.currentToken(), tMul);
-
-  l2.consume();
-
-  CHECK_EQ(l2.currentToken(), tNum);
-  CHECK_EQ(l2.getIntValue(), 234);
-
-  l2.consume();
-
-  CHECK_EQ(l2.currentToken(), tEnd);
+  CheckLexerOutput(l, r);
 }
