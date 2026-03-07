@@ -8,11 +8,25 @@
 #include "lexer.h"
 #include "node_type.h"
 #include "token.h"
+#include "names.h"
 
 using namespace std;
 
 // Prototype to play with tree
 //
+
+/*
+name -> id (a few letters)
+prim -> num | name | (expr)
+term -> term * prim
+expr -> expr + term
+assi -> assi = expr | name
+
+
+term_rest -> * prim | E
+term -> prim | term_rest
+
+*/
 
 stack<string> call_stack {};
 
@@ -44,33 +58,6 @@ int tmp_var_counter {0};
 string new_tmp() {
   return string("t") + to_string(tmp_var_counter++);
 }
-
-map<Token, string> TokenName {
-  {tPlus, "tPlus"},
-  {tMinus, "tMinus"},
-  {tMul, "tMul"},
-  {tDiv, "tDiv"},
-  {tNum, "tNum"},
-  {tName, "tName"},
-  {tLBracket, "tLBracket"},
-  {tRBracket, "tRBracket"},
-  {tEqual, "tEqual"},
-  {tSemicolon, "tSemicolon"},
-  {tEnd, "tEnd"},
-};
-
-map<NodeType, string> NodeName {
-  {ntName, "ntName"},
-  {ntNum, "ntNum"},
-  {ntSum, "ntSum"},
-  {ntSub, "ntSub"},
-  {ntMul, "ntMul"},
-  {ntDiv, "ntDiv"},
-  {ntUMinus, "ntUMinus"},
-  {ntAssign, "ntAssign"},
-  {ntUnknown, "ntUnknown"},
-  {ntNull, "ntNull"},
-};
 
 static NodeType Token2NodeType(Token t) {
   switch (t) {
@@ -263,7 +250,7 @@ class AssignOp: public Node {
 Node* prim() {
   FuncGuard fg("prim");
   Token t = lex.currentToken();
-  cout << stack_str() << ", token: " << static_cast<int>(t) << endl;
+  cout << stack_str() << "token: " << static_cast<int>(t) << endl;
   if (t == tNum) {
     int val = lex.getIntValue();
     cout << stack_str() << "Find num: " << val << endl;
@@ -289,7 +276,7 @@ Node* prim() {
       lex.consume();
     return n;
   } else {
-    cout << stack_str() << "Before return " << TokenName[t] << " token" << endl;
+    cout << stack_str() << "Before return " << GetTokenName(t) << " token" << endl;
     return nullptr;
   }
 }
@@ -302,9 +289,14 @@ Node* term() {
 
   Token t = lex.currentToken();
   while (t == tMul || t == tDiv) {
+    cout << stack_str() << "Okay. Found * or /" << endl;
+    Token t_op = t;
     lex.consume();
+
     Node* right = prim();
-    BinOp* op = new BinOp(t);
+    // prim have already called lex.consume();
+
+    BinOp* op = new BinOp(t_op);
     op->left = left;
     op->right = right;
     left = op;
@@ -317,14 +309,25 @@ Node* term() {
 Node* expr() {
   FuncGuard fg("expr");
   Node* left = term();
-  if (!left)
+  if (!left) {
+    cout << stack_str() << "term() return nullptr" << endl;
     return nullptr;
+  }
 
   Token t = lex.currentToken();
   while (t == tPlus || t == tMinus) {
+    cout << stack_str() << "Okay. Found + or -" << endl;
+    Token t_op = t;
     lex.consume();
+
     Node* right = term();
-    BinOp* op = new BinOp(t);
+    // term have already called lex.consume(); in prim()
+    if (right)
+      cout << stack_str()
+           << "right (part of sum) is not null, right->type() is "
+           << GetNodeTypeName(right->type()) << endl;
+
+    BinOp* op = new BinOp(t_op);
     op->left = left;
     op->right = right;
     left = op;
@@ -342,14 +345,15 @@ Node* assign() {
   if (!left)
     return nullptr;
 
-  cout << stack_str() << "  left/expr()->type(): " << NodeName[left->type()] << endl;
+  cout << stack_str() << "  left/expr()->type(): "
+                      << GetNodeTypeName(left->type()) << endl;
 
   Token t = lex.currentToken();
   if (t == tEnd)
     return left;
 
   cout << stack_str() << "  right token -> (" << static_cast<int>(t)
-                      << ", " << TokenName[t] << ")" << endl;
+                      << ", " << GetTokenName(t) << ")" << endl;
 
   Node* res {nullptr};
   if (t == tEqual) {
@@ -372,7 +376,7 @@ bool stmt() {
   FuncGuard fg("stmt");
   Node* n = assign();
   if (!n) {
-    cout << stack_str() << "assign() return nullptr, I don't know why" << endl;
+    cout << stack_str() << "**** Error. assign() return nullptr ****" << endl;
     return false;
   }
 

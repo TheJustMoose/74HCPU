@@ -10,6 +10,7 @@ add_executable(simple_expr
 	lexer.h
 	lexer.cc
 	plus.cc
+	names.cc
 	node_type.h
 	token.h
 )
@@ -20,6 +21,7 @@ project(unit_tests CXX)
 add_executable(simple_expr_unit_tests
 	lexer.h
 	lexer.cc
+	names.cc
 	node_type.h
 	simple_expr_unit_tests.cc
 	token.h

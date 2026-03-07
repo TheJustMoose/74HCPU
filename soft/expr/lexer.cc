@@ -15,7 +15,7 @@ char Lexer::readChar() {
 
 void Lexer::findNextToken() {
   if (idx_ >= input_string_.size()) {
-    cout << "tEnd" << endl;
+    cout << "Lexer::findNextToken> tEnd cause idx_ > size()" << endl;
     current_token_ = tEnd;
     return;
   }
@@ -37,7 +37,7 @@ void Lexer::findNextToken() {
     if (idx_ < input_string_.size())  // if we stopped on '\0' char, we should stay there
       idx_--;  // last char was not isdigit so we should step back
 
-    cout << "tNum: " << value << endl;
+    cout << "Lexer::findNextToken> tNum: " << value << endl;
     int_value_ = value;
     current_token_ = tNum;
     return;
@@ -51,7 +51,7 @@ void Lexer::findNextToken() {
     }  // However "if (idx_ >= input_string_.size())" is at the beginning of the method,
        // so no decrement is required here.
 
-    cout << "tName: " << name << endl;
+    cout << "Lexer::findNextToken> tName: " << name << endl;
     var_name_ = name;
     current_token_ = tName;
     return;
@@ -66,6 +66,6 @@ void Lexer::findNextToken() {
     case ')': /*cout << TokenName[tRBracket] << endl;*/ current_token_ = tRBracket; return;
     case '=': /*cout << TokenName[tEqual] << endl;*/ current_token_ = tEqual; return;
     case ';': /*cout << TokenName[tSemicolon] << endl;*/ current_token_ = tSemicolon; return;
-    default: cout << "Lexer: Unknown token: " << int(c) << endl; current_token_ = tError; break;
+    default: cout << "Lexer::findNextToken> Unknown token: " << int(c) << endl; current_token_ = tError; break;
   }
 }
