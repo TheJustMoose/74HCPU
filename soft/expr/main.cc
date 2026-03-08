@@ -31,9 +31,18 @@ int main(int argc, char* argv[]) {
   if (!stmt(statements))
     return 1;
 
+  cout << "nodes:" << endl;
+  vector<Operation> res_code;
   for (Node* n : statements) {
-    n->gen();  // enum tree items, generate three-address code 
+    n->gen(res_code);  // enum tree items, generate three-address code
     cout << "expr res: " << n->res() << endl;
+  }
+
+  cout << "res_code.size(): " << res_code.size() << endl;
+
+  cout << "final asm:" << endl;
+  for (Operation& n : res_code) {
+    cout << n.str() << endl;
   }
 
   cout << "main finished" << endl;

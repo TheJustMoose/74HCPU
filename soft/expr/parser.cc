@@ -46,10 +46,11 @@ class Num: public Node {
     return value_;
   }
 
-  Operation gen() override {
+  void gen(vector<Operation>& res_code) override {
+    cout << "gen()" << endl;
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
-    return {"=", tmp_name_, to_string(value_)};
+    res_code.emplace_back("=", tmp_name_, to_string(value_));
   }
 
  private:
@@ -65,9 +66,9 @@ class Name: public Node {
     return 0;
   }
 
-  Operation gen() override {
+  void gen(vector<Operation>& res_code) override {
+    cout << "gen()" << endl;
     cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
-    return {};
   }
 
   string tmp_name() override {
@@ -105,20 +106,21 @@ class BinOp: public Node {
     return 0;
   }
 
-  Operation gen() override {
+  void gen(vector<Operation>& res_code) override {
+    cout << "gen()" << endl;
     if (!left)
       cout << "left node is nullptr" << endl;
     else if (!right)
       cout << "right node is nullptr" << endl;
     else {
-      left->gen();
-      right->gen();
+      left->gen(res_code);
+      right->gen(res_code);
       tmp_name_ = new_tmp();
       cout << FuncGuard::stack_str() << tmp_name_ << " = "
            << left->tmp_name() << " " << op() << " "
            << right->tmp_name() << endl;
     }
-    return {op(), left->tmp_name(), right->tmp_name()};
+    res_code.emplace_back(op(), left->tmp_name(), right->tmp_name());
   }
 
   string op() override {
@@ -145,12 +147,13 @@ class UnOp: public Node {
     return - child->res();
   }
 
-  Operation gen() override {
-    child->gen();
+  void gen(vector<Operation>& res_code) override {
+    cout << "gen()" << endl;
+    child->gen(res_code);
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << op()
          << child->tmp_name() << " " << endl;
-    return {op(), child->tmp_name(), ""};
+    res_code.emplace_back(op(), child->tmp_name(), "");
   }
 
   string op() override {
@@ -168,22 +171,23 @@ class AssignOp: public Node {
     return right ? right->res() : 0;
   }
 
-  Operation gen() override {
-    right->gen();
+  void gen(vector<Operation>& res_code) override {
+    cout << "gen()" << endl;
+    right->gen(res_code);
     if (!left) {
       cout << FuncGuard::stack_str() << "left == nullptr" << endl;
-      return {};
+      return;
     }
     Name* name_node = dynamic_cast<Name*>(left);
     if (!name_node) {
       cout << FuncGuard::stack_str() << "Error. left node is not Name class" << endl;
-      return {};
+      return;
     }
 
     cout << FuncGuard::stack_str()
          << name_node->name() << " = "
          << right->tmp_name() << endl;
-    return {"=", name_node->name(), right->tmp_name()};
+    res_code.emplace_back("=", name_node->name(), right->tmp_name());
   }
 
   string op() override {

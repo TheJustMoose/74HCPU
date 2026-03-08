@@ -10,7 +10,7 @@ class Node {
   Node(NodeType nt): type_(nt) {}
 
   virtual int res() = 0;
-  virtual Operation gen() = 0;
+  virtual void gen(std::vector<Operation>& res_code) = 0;
 
   virtual std::string op() { return ""; }
   virtual std::string tmp_name() {
