@@ -47,7 +47,6 @@ class Num: public Node {
   }
 
   void gen(vector<Operation>& res_code) override {
-    cout << "gen()" << endl;
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
     res_code.emplace_back(tmp_name_, "", to_string(value_), "", true);
@@ -67,7 +66,6 @@ class Name: public Node {
   }
 
   void gen(vector<Operation>& res_code) override {
-    cout << "gen()" << endl;
     cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
   }
 
@@ -107,7 +105,6 @@ class BinOp: public Node {
   }
 
   void gen(vector<Operation>& res_code) override {
-    cout << "gen()" << endl;
     if (!left)
       cout << "left node is nullptr" << endl;
     else if (!right)
@@ -148,7 +145,6 @@ class UnOp: public Node {
   }
 
   void gen(vector<Operation>& res_code) override {
-    cout << "gen()" << endl;
     child->gen(res_code);
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << op()
@@ -172,7 +168,6 @@ class AssignOp: public Node {
   }
 
   void gen(vector<Operation>& res_code) override {
-    cout << "gen()" << endl;
     right->gen(res_code);
     if (!left) {
       cout << FuncGuard::stack_str() << "left == nullptr" << endl;
@@ -187,7 +182,7 @@ class AssignOp: public Node {
     cout << FuncGuard::stack_str()
          << name_node->name() << " = "
          << right->tmp_name() << endl;
-    res_code.emplace_back(name_node->name(), right->tmp_name(), "", "");
+    res_code.emplace_back(name_node->name(), "", right->tmp_name(), "");
   }
 
   string op() override {

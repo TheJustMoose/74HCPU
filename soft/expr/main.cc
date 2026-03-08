@@ -51,20 +51,18 @@ int main(int argc, char* argv[]) {
 
   cout << "nodes:" << endl;
   vector<Operation> res_code;
-  for (Node* n : statements) {
-    n->gen(res_code);  // enum tree items, generate three-address code
-    cout << "expr res: " << n->res() << endl;
-  }
+  for (size_t i = 0; i < statements.size(); i++)
+    statements[i]->gen(res_code);  // enum tree items, generate three-address code
 
   cout << "res_code.size(): " << res_code.size() << endl;
 
+  cout << "try to optimize:" << endl;
   Optimize(res_code);
+  cout << "res_code.size(): " << res_code.size() << endl;
 
-  cout << "final asm:" << endl;
-  for (Operation& n : res_code) {
+  cout << endl << "final asm:" << endl;
+  for (Operation& n : res_code)
     cout << n.str() << endl;
-    //cout << "args: " << n.argNum() << endl;
-  }
 
   cout << "main finished" << endl;
   return 0;
