@@ -5,5 +5,5 @@
 struct Operation {
   std::string name {};
   std::string left_arg {};
-  std::string rught_arg {};
+  std::string right_arg {};
 };
