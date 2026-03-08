@@ -49,7 +49,7 @@ class Num: public Node {
   Operation gen() override {
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
-    return {};
+    return {"=", tmp_name_, to_string(value_)};
   }
 
  private:
@@ -118,7 +118,7 @@ class BinOp: public Node {
            << left->tmp_name() << " " << op() << " "
            << right->tmp_name() << endl;
     }
-    return {};
+    return {op(), left->tmp_name(), right->tmp_name()};
   }
 
   string op() override {
@@ -150,7 +150,7 @@ class UnOp: public Node {
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << op()
          << child->tmp_name() << " " << endl;
-    return {};
+    return {op(), child->tmp_name(), ""};
   }
 
   string op() override {
@@ -183,7 +183,7 @@ class AssignOp: public Node {
     cout << FuncGuard::stack_str()
          << name_node->name() << " = "
          << right->tmp_name() << endl;
-    return {};
+    return {"=", name_node->name(), right->tmp_name()};
   }
 
   string op() override {
