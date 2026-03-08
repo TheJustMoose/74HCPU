@@ -6,6 +6,12 @@
 
 using namespace std;
 
+// static
+Lexer& Lexer::instance() {
+  static Lexer lex;
+  return lex;
+}
+
 void Lexer::consume() {
   findNextToken();
 }

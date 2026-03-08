@@ -31,6 +31,8 @@ class Lexer {
 
   void consume();
 
+  static Lexer& instance();
+
  private:
   void findNextToken();
   char readChar();

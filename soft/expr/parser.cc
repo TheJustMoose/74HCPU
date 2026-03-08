@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "parser.h"
+
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
@@ -29,18 +31,10 @@ term -> prim | term_rest
 
 */
 
-Lexer lex;
-
 int tmp_var_counter {0};
 string new_tmp() {
   return string("t") + to_string(tmp_var_counter++);
 }
-
-Node* prim();
-Node* term();
-Node* expr();
-Node* assign();
-bool stmt();
 
 class Num: public Node {
  public:
@@ -53,7 +47,7 @@ class Num: public Node {
 
   void gen() override {
     tmp_name_ = new_tmp();
-    cout << stack_str() << tmp_name_ << " = " << value_ << endl;
+    cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
   }
 
  private:
@@ -70,7 +64,7 @@ class Name: public Node {
   }
 
   void gen() override {
-    cout << stack_str() << "Name object: " << value_ << endl;
+    cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
   }
 
   string tmp_name() override {
@@ -117,7 +111,7 @@ class BinOp: public Node {
       left->gen();
       right->gen();
       tmp_name_ = new_tmp();
-      cout << stack_str() << tmp_name_ << " = "
+      cout << FuncGuard::stack_str() << tmp_name_ << " = "
            << left->tmp_name() << " " << op() << " "
            << right->tmp_name() << endl;
     }
@@ -150,7 +144,7 @@ class UnOp: public Node {
   void gen() override {
     child->gen();
     tmp_name_ = new_tmp();
-    cout << stack_str() << tmp_name_ << " = " << op()
+    cout << FuncGuard::stack_str() << tmp_name_ << " = " << op()
          << child->tmp_name() << " " << endl;
   }
 
@@ -172,16 +166,18 @@ class AssignOp: public Node {
   void gen() override {
     right->gen();
     if (!left) {
-      cout << stack_str() << "left == nullptr" << endl;
+      cout << FuncGuard::stack_str() << "left == nullptr" << endl;
       return;
     }
     Name* name_node = dynamic_cast<Name*>(left);
     if (!name_node) {
-      cout << stack_str() << "Error. left node is not Name class" << endl;
+      cout << FuncGuard::stack_str() << "Error. left node is not Name class" << endl;
       return;
     }
 
-    cout << stack_str() << name_node->name() << " = " << right->tmp_name() << endl;
+    cout << FuncGuard::stack_str()
+         << name_node->name() << " = "
+         << right->tmp_name() << endl;
   }
 
   string op() override {
@@ -194,30 +190,30 @@ class AssignOp: public Node {
 
 Node* prim() {
   FuncGuard fg("prim");
-  Token t = lex.currentToken();
+  Token t = Lexer::instance().currentToken();
   if (t == tNum) {
-    int val = lex.getIntValue();
-    cout << stack_str() << "Find num: " << val << endl;
-    lex.consume();
+    int val = Lexer::instance().getIntValue();
+    cout << FuncGuard::stack_str() << "Find num: " << val << endl;
+    Lexer::instance().consume();
     return new Num(val);
   } else if (t == tName) {
-    string str = lex.getStrValue();
-    cout << stack_str() << "Find name: " << str << endl;
-    lex.consume();
+    string str = Lexer::instance().getStrValue();
+    cout << FuncGuard::stack_str() << "Find name: " << str << endl;
+    Lexer::instance().consume();
     return new Name(str);
   } else if (t == tMinus) {
-    lex.consume();
+    Lexer::instance().consume();
     UnOp* n = new UnOp();
     n->child = prim();
     return n;
   } else if (t == tLBracket) {
-    lex.consume();
+    Lexer::instance().consume();
     Node* n = expr();
-    t = lex.currentToken();
+    t = Lexer::instance().currentToken();
     if (t != tRBracket)
-      cout << stack_str() << "Error. Waiting for right bracket" << endl;
+      cout << FuncGuard::stack_str() << "Error. Waiting for right bracket" << endl;
     else
-      lex.consume();
+      Lexer::instance().consume();
     return n;
   } else {
     return nullptr;
@@ -230,20 +226,20 @@ Node* term() {
   if (!left)
     return nullptr;
 
-  Token t = lex.currentToken();
+  Token t = Lexer::instance().currentToken();
   while (t == tMul || t == tDiv) {
-    cout << stack_str() << "Okay. Found * or /" << endl;
+    cout << FuncGuard::stack_str() << "Okay. Found * or /" << endl;
     Token t_op = t;
-    lex.consume();
+    Lexer::instance().consume();
 
     Node* right = prim();
-    // prim have already called lex.consume();
+    // prim have already called Lexer::instance().consume();
 
     BinOp* op = new BinOp(t_op);
     op->left = left;
     op->right = right;
     left = op;
-    t = lex.currentToken();
+    t = Lexer::instance().currentToken();
   }
 
   return left;
@@ -256,20 +252,20 @@ Node* expr() {
     return nullptr;
   }
 
-  Token t = lex.currentToken();
+  Token t = Lexer::instance().currentToken();
   while (t == tPlus || t == tMinus) {
-    cout << stack_str() << "Okay. Found + or -" << endl;
+    cout << FuncGuard::stack_str() << "Okay. Found + or -" << endl;
     Token t_op = t;
-    lex.consume();
+    Lexer::instance().consume();
 
     Node* right = term();
-    // term have already called lex.consume(); in prim()
+    // term have already called Lexer::instance().consume(); in prim()
 
     BinOp* op = new BinOp(t_op);
     op->left = left;
     op->right = right;
     left = op;
-    t = lex.currentToken();
+    t = Lexer::instance().currentToken();
   }
 
   return left;
@@ -281,13 +277,13 @@ Node* assign() {
   if (!left)
     return nullptr;
 
-  Token t = lex.currentToken();
+  Token t = Lexer::instance().currentToken();
   if (t == tEnd)
     return left;
 
   Node* res {nullptr};
   if (t == tEqual) {
-    lex.consume();
+    Lexer::instance().consume();
     AssignOp* op = new AssignOp();  // =
     op->left = left;                // a =
     op->right = assign();           // a = assign(); // recursion
@@ -299,29 +295,27 @@ Node* assign() {
   return res;
 }
 
-vector<Node*> statements;
-
-bool stmt() {
+bool stmt(vector<Node*>& statements) {
   FuncGuard fg("stmt");
   Node* n = assign();
   if (!n) {
-    cout << stack_str() << "**** Error. assign() return nullptr ****" << endl;
+    cout << FuncGuard::stack_str() << "**** Error. assign() return nullptr ****" << endl;
     return false;
   }
 
   statements.push_back(n);
 
-  Token t = lex.currentToken();
+  Token t = Lexer::instance().currentToken();
   while (true) {
     if (t == tSemicolon) {
-      lex.consume();
+      Lexer::instance().consume();
       n = assign();
       if (!n)
         break;
       statements.push_back(n);
-      t = lex.currentToken();
+      t = Lexer::instance().currentToken();
     } else {
-      cout << stack_str() << "**** Error. Please add ';' to the end of statement ****" << endl;
+      cout << FuncGuard::stack_str() << "**** Error. Please add ';' to the end of statement ****" << endl;
       return false;
     }
   }
