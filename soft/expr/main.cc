@@ -11,8 +11,6 @@
 
 using namespace std;
 
-vector<Node*> statements;
-
 int main(int argc, char* argv[]) {
   FuncGuard fg("main");
   cout << "stack: " << FuncGuard::stack_str() << endl;
@@ -46,7 +44,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  if (!stmt(statements))
+  vector<Node*> statements;
+  if (!stmts(statements))
     return 1;
 
   cout << "nodes:" << endl;

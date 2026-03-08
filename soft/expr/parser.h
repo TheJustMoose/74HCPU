@@ -8,4 +8,6 @@ Node* prim();
 Node* term();
 Node* expr();
 Node* assign();
-bool stmt(std::vector<Node*>& statements);
+Node* declare();
+Node* stmt();
+bool stmts(std::vector<Node*>& statements);

@@ -301,25 +301,22 @@ Node* assign() {
   return res;
 }
 
-bool stmt(vector<Node*>& statements) {
+Node* stmt() {
+  return assign();
+}
+
+bool stmts(vector<Node*>& statements) {
   FuncGuard fg("stmt");
-  Node* n = assign();
-  if (!n) {
-    cout << FuncGuard::stack_str()
-         << "**** Error. assign() return nullptr ****" << endl;
-    return false;
-  }
 
-  statements.push_back(n);
-
+  Node* n = stmt();
   Token t = Lexer::instance().currentToken();
-  while (true) {
+  while (n) {
     if (t == tSemicolon) {
+      statements.push_back(n);
       Lexer::instance().consume();
-      n = assign();
+      n = stmt();
       if (!n)
         break;
-      statements.push_back(n);
       t = Lexer::instance().currentToken();
     } else {
       cout << FuncGuard::stack_str()
