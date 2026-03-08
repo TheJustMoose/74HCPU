@@ -7,3 +7,4 @@
 
 std::string GetNodeTypeName(NodeType);
 std::string GetTokenName(Token);
+NodeType Token2NodeType(Token t);

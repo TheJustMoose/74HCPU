@@ -46,3 +46,13 @@ string GetTokenName(Token t) {
     return "Unknown Token";
 }
 
+NodeType Token2NodeType(Token t) {
+  switch (t) {
+    case tPlus: return ntSum;
+    case tMinus: return ntSub;
+    case tMul: return ntMul;
+    case tDiv: return ntDiv;
+    case tEqual: return ntAssign;
+    default: return ntUnknown;
+  }
+}

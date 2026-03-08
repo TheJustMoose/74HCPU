@@ -1,11 +1,12 @@
 #include <cctype>
 #include <iostream>
 #include <map>
-#include <stack>
 #include <string>
 #include <vector>
 
+#include "func_guard.h"
 #include "lexer.h"
+#include "node.h"
 #include "node_type.h"
 #include "token.h"
 #include "names.h"
@@ -28,68 +29,12 @@ term -> prim | term_rest
 
 */
 
-stack<string> call_stack {};
-
-string stack_str() {
-  stack<string> s = call_stack;
-  string res;
-  while (!s.empty()) {
-    res = s.top() + string(">") + res;
-    s.pop();
-  }
-  res += " ";
-  return res;
-}
-
-class FuncGuard {
- public:
-  FuncGuard(string n) {
-    call_stack.push(n);
-  }
-
-  ~FuncGuard() {
-    call_stack.pop();
-  }
-};
-
 Lexer lex;
 
 int tmp_var_counter {0};
 string new_tmp() {
   return string("t") + to_string(tmp_var_counter++);
 }
-
-static NodeType Token2NodeType(Token t) {
-  switch (t) {
-    case tPlus: return ntSum;
-    case tMinus: return ntSub;
-    case tMul: return ntMul;
-    case tDiv: return ntDiv;
-    case tEqual: return ntAssign;
-    default: return ntUnknown;
-  }
-}
-
-class Node {
- public:
-  Node(NodeType nt): type_(nt) {}
-
-  virtual int res() = 0;
-  virtual void gen() = 0;
-
-  virtual string op() { return ""; }
-  virtual string tmp_name() {
-    return tmp_name_;
-  }
-
-  NodeType type() {
-    return type_;
-  };
-
- protected:
-  NodeType type_ {ntUnknown};
-  string tmp_name_ {};
-};
 
 Node* prim();
 Node* term();
@@ -125,7 +70,7 @@ class Name: public Node {
   }
 
   void gen() override {
-    cout << stack_str() << "Okay, this is a Name object: " << value_ << endl;
+    cout << stack_str() << "Name object: " << value_ << endl;
   }
 
   string tmp_name() override {
@@ -382,34 +327,4 @@ bool stmt() {
   }
 
   return true;
-}
-
-int main(int argc, char* argv[]) {
-  FuncGuard fg("main");
-  cout << "stack: " << stack_str() << endl;
-  cout << "argc: " << argc << endl;
-  for (int i = 0; i < argc; i++) {
-    cout << "i: " << i << ", arg[i]: " << argv[i] << endl;
-  }
-  cout << endl;
-
-  if (argc == 2 && argv[1]) {
-    cout << "Try to process: \"" << argv[1] << "\"" << endl;
-    string s {argv[1]};
-    lex.setInputString(s);
-  } else {
-    cout << "Using: plus.exe \"1+2+3\"" << endl;
-    return 1;
-  }
-
-  if (!stmt())
-    return 1;
-
-  for (Node* n : statements) {
-    n->gen();  // enum tree items, generate three-address code 
-    cout << "expr res: " << n->res() << endl;
-  }
-
-  cout << "main finished" << endl;
-  return 0;
 }
