@@ -1,4 +1,6 @@
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include "func_guard.h"
@@ -19,7 +21,22 @@ int main(int argc, char* argv[]) {
   }
   cout << endl;
 
-  if (argc == 2 && argv[1]) {
+  if (argc == 3 && argv[1] && argv[2]) {
+    string key(argv[1]);
+    if (key == "-f") {
+      string fname(argv[2]);
+      ifstream f(fname, ios_base::in);
+      if (!f) {
+        cout << "Can't open input file " << fname << endl;
+        return 1;
+      }
+
+      stringstream buf;
+      buf << f.rdbuf();
+      string content = buf.str();
+      Lexer::instance().setInputString(content);
+    }
+  } else if (argc == 2 && argv[1]) {
     cout << "Try to process: \"" << argv[1] << "\"" << endl;
     string s {argv[1]};
     Lexer::instance().setInputString(s);
