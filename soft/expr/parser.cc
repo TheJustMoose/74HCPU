@@ -10,6 +10,7 @@
 #include "lexer.h"
 #include "node.h"
 #include "node_type.h"
+#include "operation.h"
 #include "token.h"
 #include "names.h"
 
@@ -45,9 +46,10 @@ class Num: public Node {
     return value_;
   }
 
-  void gen() override {
+  Operation gen() override {
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
+    return {};
   }
 
  private:
@@ -63,8 +65,9 @@ class Name: public Node {
     return 0;
   }
 
-  void gen() override {
+  Operation gen() override {
     cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
+    return {};
   }
 
   string tmp_name() override {
@@ -102,7 +105,7 @@ class BinOp: public Node {
     return 0;
   }
 
-  void gen() override {
+  Operation gen() override {
     if (!left)
       cout << "left node is nullptr" << endl;
     else if (!right)
@@ -115,6 +118,7 @@ class BinOp: public Node {
            << left->tmp_name() << " " << op() << " "
            << right->tmp_name() << endl;
     }
+    return {};
   }
 
   string op() override {
@@ -141,11 +145,12 @@ class UnOp: public Node {
     return - child->res();
   }
 
-  void gen() override {
+  Operation gen() override {
     child->gen();
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << op()
          << child->tmp_name() << " " << endl;
+    return {};
   }
 
   string op() override {
@@ -163,21 +168,22 @@ class AssignOp: public Node {
     return right ? right->res() : 0;
   }
 
-  void gen() override {
+  Operation gen() override {
     right->gen();
     if (!left) {
       cout << FuncGuard::stack_str() << "left == nullptr" << endl;
-      return;
+      return {};
     }
     Name* name_node = dynamic_cast<Name*>(left);
     if (!name_node) {
       cout << FuncGuard::stack_str() << "Error. left node is not Name class" << endl;
-      return;
+      return {};
     }
 
     cout << FuncGuard::stack_str()
          << name_node->name() << " = "
          << right->tmp_name() << endl;
+    return {};
   }
 
   string op() override {
@@ -211,7 +217,8 @@ Node* prim() {
     Node* n = expr();
     t = Lexer::instance().currentToken();
     if (t != tRBracket)
-      cout << FuncGuard::stack_str() << "Error. Waiting for right bracket" << endl;
+      cout << FuncGuard::stack_str()
+           << "Error. Waiting for right bracket" << endl;
     else
       Lexer::instance().consume();
     return n;
@@ -299,7 +306,8 @@ bool stmt(vector<Node*>& statements) {
   FuncGuard fg("stmt");
   Node* n = assign();
   if (!n) {
-    cout << FuncGuard::stack_str() << "**** Error. assign() return nullptr ****" << endl;
+    cout << FuncGuard::stack_str()
+         << "**** Error. assign() return nullptr ****" << endl;
     return false;
   }
 
@@ -315,7 +323,8 @@ bool stmt(vector<Node*>& statements) {
       statements.push_back(n);
       t = Lexer::instance().currentToken();
     } else {
-      cout << FuncGuard::stack_str() << "**** Error. Please add ';' to the end of statement ****" << endl;
+      cout << FuncGuard::stack_str()
+           << "**** Error. Please add ';' to the end of statement ****" << endl;
       return false;
     }
   }
