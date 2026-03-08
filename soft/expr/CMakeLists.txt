@@ -15,6 +15,7 @@ add_executable(simple_expr
 	names.cc
 	node.h
 	node_type.h
+	optimize.cc
 	parser.cc
 	token.h
 )
@@ -30,6 +31,7 @@ add_executable(simple_expr_unit_tests
 	names.cc
 	node.h
 	node_type.h
+	optimize.cc
 	parser.cc
 	simple_expr_unit_tests.cc
 	token.h

@@ -50,7 +50,7 @@ class Num: public Node {
     cout << "gen()" << endl;
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
-    res_code.emplace_back(tmp_name_, to_string(value_), "", "");
+    res_code.emplace_back(tmp_name_, "", to_string(value_), "");
   }
 
  private:
@@ -153,7 +153,7 @@ class UnOp: public Node {
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << op()
          << child->tmp_name() << " " << endl;
-    res_code.emplace_back(tmp_name_, op(), child->tmp_name(), "");
+    res_code.emplace_back(tmp_name_, op(), "", child->tmp_name());
   }
 
   string op() override {

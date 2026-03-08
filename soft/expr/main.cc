@@ -6,6 +6,7 @@
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
+#include "optimize.h"
 #include "parser.h"
 
 using namespace std;
@@ -57,9 +58,12 @@ int main(int argc, char* argv[]) {
 
   cout << "res_code.size(): " << res_code.size() << endl;
 
+  Optimize(res_code);
+
   cout << "final asm:" << endl;
   for (Operation& n : res_code) {
     cout << n.str() << endl;
+    //cout << "args: " << n.argNum() << endl;
   }
 
   cout << "main finished" << endl;
