@@ -51,7 +51,10 @@ int main(int argc, char* argv[]) {
   cout << "nodes:" << endl;
   vector<Operation> res_code;
   for (size_t i = 0; i < statements.size(); i++)
-    statements[i]->gen(res_code);  // enum tree items, generate three-address code
+    if (statements[i])
+      statements[i]->gen(res_code);  // enum tree items, generate three-address code
+    else
+      cout << "statements[i] is null" << endl;
 
   cout << "res_code.size(): " << res_code.size() << endl;
 

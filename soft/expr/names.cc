@@ -15,6 +15,7 @@ map<NodeType, string> NodeName {
   {ntUMinus, "ntUMinus"},
   {ntAssign, "ntAssign"},
   {ntUnknown, "ntUnknown"},
+  {ntVarDecl, "ntVarDecl"},
   {ntNull, "ntNull"},
 };
 
@@ -30,6 +31,7 @@ map<Token, string> TokenName {
   {tEqual, "tEqual"},
   {tSemicolon, "tSemicolon"},
   {tEnd, "tEnd"},
+  {tInt, "tInt"},
 };
 
 string GetNodeTypeName(NodeType nt) {

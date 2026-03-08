@@ -6,5 +6,6 @@ enum NodeType {
   ntUMinus,   // unary minus
   ntAssign,   // a = b;
   ntUnknown,  // we do not know now what is it
+  ntVarDecl,  // variable declaration node
   ntNull
 };

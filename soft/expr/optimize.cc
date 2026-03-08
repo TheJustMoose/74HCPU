@@ -7,6 +7,9 @@ using namespace std;
 void Optimize(std::vector<Operation>& res_code) {
   vector<size_t> can_be_optimized {};
 
+  if (res_code.size() <= 1)
+    return;
+
   // t0 = 1  (res_in_temp == true)
   // x = t0  (res_in_temp == false)
   // t0 is temporary variable, so we can remove second line of code and patch first line

@@ -78,7 +78,7 @@ class Name: public Node {
   }
 
  private:
-  string value_ {0};
+  string value_ {""};
 };
 
 class BinOp: public Node {
@@ -193,6 +193,18 @@ class AssignOp: public Node {
   Node* right {nullptr};
 };
 
+class VarDecl: public Node {
+ public:
+  VarDecl(): Node(ntVarDecl) {}
+
+  int res() override { return 0; }
+
+  void gen(vector<Operation>& res_code) override {
+  }
+
+  string name {""};
+};
+
 Node* prim() {
   FuncGuard fg("prim");
   Token t = Lexer::instance().currentToken();
@@ -301,8 +313,45 @@ Node* assign() {
   return res;
 }
 
+Node* declare() {
+  FuncGuard fg("decl");
+
+  Token t = Lexer::instance().currentToken();
+  if (t == tEnd)
+    return nullptr;
+
+  if (t != tInt) {
+    cout << "This token is not tInt" << endl;
+    return nullptr;
+  }
+
+  Lexer::instance().consume();  // skip int
+  t = Lexer::instance().currentToken();
+  while (t == tName) {
+    cout << "Hooray! tName was found!" << endl;
+    VarDecl* n = new VarDecl();
+    n->name = Lexer::instance().getStrValue();
+    cout << "Int variable \"" << n->name << "\" was declared" << endl;
+
+    Lexer::instance().consume();  // skip var name
+    t = Lexer::instance().currentToken();
+    if (t != tSemicolon) {  // replace it to comma later
+      cout << "Error. Please add ';' to the end of declaration" << endl;
+      cout << "Got token: " << (int)t << endl;
+      return nullptr;
+    } else {
+      cout << "Semicolon found. Leave it for stmts() func" << endl;
+      return n;
+    }
+  }
+
+  return nullptr;
+}
+
 Node* stmt() {
-  return assign();
+  // stmt -> assigh | declare
+  Node* n = declare();
+  return n ? n : assign();
 }
 
 bool stmts(vector<Node*>& statements) {
@@ -312,11 +361,14 @@ bool stmts(vector<Node*>& statements) {
   Token t = Lexer::instance().currentToken();
   while (n) {
     if (t == tSemicolon) {
+      if (!n) {
+        cout << "Node == null was returned from stmt()" << endl;
+        break;
+      }
       statements.push_back(n);
+
       Lexer::instance().consume();
       n = stmt();
-      if (!n)
-        break;
       t = Lexer::instance().currentToken();
     } else {
       cout << FuncGuard::stack_str()

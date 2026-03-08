@@ -59,7 +59,10 @@ void Lexer::findNextToken() {
       idx_--;
 
     var_name_ = name;
-    current_token_ = tName;
+    if (var_name_ == "int")
+      current_token_ = tInt;
+    else
+      current_token_ = tName;
     return;
   }
 
