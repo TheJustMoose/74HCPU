@@ -9,7 +9,6 @@ class Node {
  public:
   Node(NodeType nt): type_(nt) {}
 
-  virtual int res() = 0;
   virtual void gen(std::vector<Operation>& res_code) = 0;
 
   virtual std::string op() { return ""; }

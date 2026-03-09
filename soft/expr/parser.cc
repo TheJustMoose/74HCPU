@@ -43,10 +43,6 @@ class Num: public Node {
   Num(int value)
     : Node(ntNum), value_(value) {}
 
-  int res() override {
-    return value_;
-  }
-
   void gen(vector<Operation>& res_code) override {
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
@@ -61,10 +57,6 @@ class Name: public Node {
  public:
   Name(string value)
     : Node(ntName), value_(value) {}
-
-  int res() override {
-    return 0;
-  }
 
   void gen(vector<Operation>& res_code) override {
     cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
@@ -85,25 +77,6 @@ class Name: public Node {
 class BinOp: public Node {
  public:
   BinOp(Token t): Node(Token2NodeType(t)) {}
-
-  int res() override {
-    if (!left)
-      cout << "left node is nullptr" << endl;
-    else if (!right)
-      cout << "right node is nullptr" << endl;
-    else {
-      switch (type()) {
-        case ntSum: return left->res() + right->res();
-        case ntSub: return left->res() - right->res();
-        case ntMul: return left->res() * right->res();
-        case ntDiv: return left->res() * right->res();
-        default:
-          cout << "Only add, sub, mul, div operations supported right now" << endl;
-      }
-    }
-
-    return 0;
-  }
 
   void gen(vector<Operation>& res_code) override {
     if (!left)
@@ -139,12 +112,6 @@ class UnOp: public Node {
  public:
   UnOp(): Node(ntUMinus) {}
 
-  int res() override {
-    if (!child)
-      cout << "child node is nullptr" << endl;
-    return - child->res();
-  }
-
   void gen(vector<Operation>& res_code) override {
     child->gen(res_code);
     tmp_name_ = new_tmp();
@@ -163,10 +130,6 @@ class UnOp: public Node {
 class AssignOp: public Node {
  public:
   AssignOp(): Node(ntAssign) {}
-
-  int res() override {
-    return right ? right->res() : 0;
-  }
 
   void gen(vector<Operation>& res_code) override {
     right->gen(res_code);
@@ -198,8 +161,6 @@ class VarDecl: public Node {
  public:
   VarDecl(DataType dt, bool is_ptr)
     : Node(ntVarDecl), data_type(dt), is_pointer(is_ptr) {}
-
-  int res() override { return 0; }
 
   void gen(vector<Operation>& res_code) override {
     // This node is just variable declaration.
