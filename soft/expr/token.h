@@ -5,5 +5,5 @@ enum Token {
   tNum = 4, tName = 5,
   tLBracket = 6, tRBracket = 7, tEqual = 8, tSemicolon = 9,
   tError = 10, tEnd = 11, tNotInitialized = 12,
-  tInt = 13,
+  tComma = 13, tInt = 14, tAtSign = 15,
 };

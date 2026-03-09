@@ -6,6 +6,7 @@
 
 #include "parser.h"
 
+#include "data_type.h"
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
@@ -195,14 +196,27 @@ class AssignOp: public Node {
 
 class VarDecl: public Node {
  public:
-  VarDecl(): Node(ntVarDecl) {}
+  VarDecl(DataType dt, bool is_ptr)
+    : Node(ntVarDecl), data_type(dt), is_pointer(is_ptr) {}
 
   int res() override { return 0; }
 
   void gen(vector<Operation>& res_code) override {
+    // This node is just variable declaration.
+    // No machine code to implement it.
   }
 
-  string name {""};
+  // This is not C++!
+  // "char@ a, b; " means, that we have two pointers.
+  // ***** b has type char@ too. *****
+  // Yes, I use @ instead of *.
+  //
+  // In C++ "char* a, b; means
+  // that you have pointer "a" and char "b".
+
+  DataType data_type {dtNotInitialize};
+  bool is_pointer {false};
+  vector<string> names {};
 };
 
 Node* prim() {
@@ -326,22 +340,37 @@ Node* declare() {
   }
 
   Lexer::instance().consume();  // skip int
+
+  bool is_ptr = false;
+  t = Lexer::instance().currentToken();
+  if (t == tAtSign) {  // pointer sign (not asterisk)
+    is_ptr = true;
+    Lexer::instance().consume();
+  }
+
+  VarDecl* n = new VarDecl(dtInt, is_ptr);  // Okay, try to find variable name[s]
+
   t = Lexer::instance().currentToken();
   while (t == tName) {
-    cout << "Hooray! tName was found!" << endl;
-    VarDecl* n = new VarDecl();
-    n->name = Lexer::instance().getStrValue();
-    cout << "Int variable \"" << n->name << "\" was declared" << endl;
+    cout << "Variable name was found!" << endl;
+    string var_name = Lexer::instance().getStrValue();
+    n->names.push_back(var_name);
+    cout << "Int variable \"" << var_name << "\" was declared" << endl;
+
+    // What about variable initialization?
 
     Lexer::instance().consume();  // skip var name
     t = Lexer::instance().currentToken();
-    if (t != tSemicolon) {  // replace it to comma later
+    if (t == tComma) {
+      Lexer::instance().consume();  // skip comma
+      t = Lexer::instance().currentToken();
+    } else if (t == tSemicolon) {  // replace it to comma later
+      cout << "Semicolon found. Leave it for stmts() func" << endl;
+      return n;
+    } else {
       cout << "Error. Please add ';' to the end of declaration" << endl;
       cout << "Got token: " << (int)t << endl;
       return nullptr;
-    } else {
-      cout << "Semicolon found. Leave it for stmts() func" << endl;
-      return n;
     }
   }
 
