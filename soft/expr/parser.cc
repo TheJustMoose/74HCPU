@@ -206,6 +206,8 @@ class VarDecl: public Node {
     // No machine code to implement it.
   }
 
+  static vector<VarDecl*> variables;
+
   // This is not C++!
   // "char@ a, b; " means, that we have two pointers.
   // ***** b has type char@ too. *****
@@ -218,6 +220,8 @@ class VarDecl: public Node {
   bool is_pointer {false};
   vector<string> names {};
 };
+
+vector<VarDecl*> VarDecl::variables {};
 
 Node* prim() {
   FuncGuard fg("prim");
@@ -348,8 +352,10 @@ Node* declare() {
     Lexer::instance().consume();
   }
 
-  VarDecl* n = new VarDecl(dtInt, is_ptr);  // Okay, try to find variable name[s]
+  VarDecl* n = new VarDecl(dtInt, is_ptr);
+  VarDecl::variables.push_back(n);
 
+  // Okay, now try to find variable name[s]
   t = Lexer::instance().currentToken();
   while (t == tName) {
     cout << "Variable name was found!" << endl;
