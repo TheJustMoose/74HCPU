@@ -63,8 +63,12 @@ int main(int argc, char* argv[]) {
   cout << "res_code.size(): " << res_code.size() << endl;
 
   cout << endl << "final asm:" << endl;
-  for (Operation& n : res_code)
-    cout << n.str() << endl;
+  for (Operation& n : res_code) {
+    if (isDeclared(n.res_arg))
+      cout << n.str() << endl;
+    else
+      cout << n.str() << "  // was not declared" << endl;
+  }
 
   cout << "main finished" << endl;
   return 0;
