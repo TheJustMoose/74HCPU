@@ -5803,12 +5803,6 @@
 		(uuid "ec06a320-2f69-4315-87eb-d35c66fbeffe")
 	)
 	(junction
-		(at 52.07 278.13)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "4385c397-fd13-437c-8c7a-75fd1fae760e")
-	)
-	(junction
 		(at 153.67 259.08)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7351,16 +7345,6 @@
 			(type default)
 		)
 		(uuid "5f519839-c76f-40a6-b886-31c36350b277")
-	)
-	(wire
-		(pts
-			(xy 52.07 275.59) (xy 52.07 278.13)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5f7e2177-c0db-42fb-8741-81a9f034091a")
 	)
 	(wire
 		(pts
@@ -22076,136 +22060,6 @@
 			(project ""
 				(path "/8209534a-5d70-4acf-9a72-9345b085efc5"
 					(reference "J24")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 52.07 271.78 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "00000000-0000-0000-0000-00006866dbb7")
-		(property "Reference" "R2"
-			(at 50.165 271.78 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 52.07 271.78 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 50.292 271.78 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 52.07 271.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 52.07 271.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "bcfc923f-aac3-4524-a7db-dddf4d086b18")
-		)
-		(pin "2"
-			(uuid "14b65eaa-be45-423c-917b-14299861e6ec")
-		)
-		(instances
-			(project ""
-				(path "/8209534a-5d70-4acf-9a72-9345b085efc5"
-					(reference "R2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:VCC")
-		(at 52.07 267.97 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "00000000-0000-0000-0000-0000686894f5")
-		(property "Reference" "#PWR05"
-			(at 52.07 271.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "VCC"
-			(at 52.451 263.5758 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 52.07 267.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 52.07 267.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 52.07 267.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "eb359975-607d-453a-bdc1-3e86c7b60256")
-		)
-		(instances
-			(project ""
-				(path "/8209534a-5d70-4acf-9a72-9345b085efc5"
-					(reference "#PWR05")
 					(unit 1)
 				)
 			)
