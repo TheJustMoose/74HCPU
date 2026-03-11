@@ -115,8 +115,8 @@ class UnOp: public Node {
   void gen(vector<Operation>& res_code) override {
     child->gen(res_code);
     tmp_name_ = new_tmp();
-    cout << FuncGuard::stack_str() << tmp_name_ << " = " << op()
-         << child->tmp_name() << " " << endl;
+    cout << FuncGuard::stack_str() << tmp_name_ << " = "
+         << op() << child->tmp_name() << " " << endl;
     res_code.emplace_back(tmp_name_, op(), "", child->tmp_name(), true);
   }
 
@@ -176,6 +176,9 @@ class VarDecl: public Node {
   //
   // In C++ "char* a, b; means
   // that you have pointer "a" and char "b".
+  uint8_t var_size() {
+    return 2;  // 2 byte for variable value == sizeof(int) ;)
+  }
 
   DataType data_type {dtNotInitialize};
   bool is_pointer {false};
@@ -183,6 +186,23 @@ class VarDecl: public Node {
 };
 
 vector<VarDecl*> VarDecl::variables {};
+
+bool isDeclared(string var_name, int* var_size) {
+  cout << "searching: \'" << var_name << "\'" << endl;
+
+  for (VarDecl* vd : VarDecl::variables)
+    if (vd && vd->names.size())
+      for (const string& n : vd->names) {
+        cout << "var: \'" << n << "\'" << endl;
+        if (n == var_name) {
+          if (var_size)
+            *var_size = vd->var_size();
+          return true;
+        }
+      }
+
+  return false;
+}
 
 Node* prim() {
   FuncGuard fg("prim");
@@ -273,6 +293,19 @@ Node* assign() {
   Node* left = expr();  // a
   if (!left)
     return nullptr;
+
+  if (left->type() == ntName) {
+    Name* n = dynamic_cast<Name*>(left);
+    // вообще, где-то здесь не хватает проверки res_in_temp
+    // но этот флажок лежит совсем в другом месте :(
+    if (!isDeclared(n->name()))
+      cout << "You try to assign to variable \"" << n->name()
+           << "\" which was not beed declared" << endl;
+  }
+
+  // TODO: теперь хорошо бы добавить инициализацию объявляемых переменных
+  // и сделать оператор взятия адреса - &
+
 
   Token t = Lexer::instance().currentToken();
   if (t == tEnd)
@@ -375,3 +408,13 @@ bool stmts(vector<Node*>& statements) {
 
   return true;
 }
+
+
+/*
+
+ Теперь, когда есть таблица переменных, хорошо бы проверить,
+ объявлены ли они на момент использования.
+
+ А что делать с временными переменными? Их то в таблице нет :(
+
+*/
