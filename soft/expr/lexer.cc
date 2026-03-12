@@ -61,6 +61,8 @@ void Lexer::findNextToken() {
     var_name_ = name;
     if (var_name_ == "int")
       current_token_ = tInt;
+    else if (var_name_ == "byte")
+      current_token_ = tByte;
     else
       current_token_ = tName;
     return;

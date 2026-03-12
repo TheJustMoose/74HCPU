@@ -9,11 +9,11 @@
 #include "data_type.h"
 #include "func_guard.h"
 #include "lexer.h"
+#include "names.h"
 #include "node.h"
 #include "node_type.h"
 #include "operation.h"
 #include "token.h"
-#include "names.h"
 
 using namespace std;
 
@@ -174,10 +174,16 @@ class VarDecl: public Node {
   // ***** b has type char@ too. *****
   // Yes, I use @ instead of *.
   //
-  // In C++ "char* a, b; means
+  // In C++ "char* a, b;" means
   // that you have pointer "a" and char "b".
   uint8_t var_size() {
-    return 2;  // 2 byte for variable value == sizeof(int) ;)
+    if (is_pointer)
+      return 2;
+    if (data_type == dtInt)
+      return 2;
+    if (data_type == dtByte)
+      return 1;
+    return 0;
   }
 
   DataType data_type {dtNotInitialize};
@@ -195,8 +201,11 @@ bool isDeclared(string var_name, int* var_size) {
       for (const string& n : vd->names) {
         cout << "var: \'" << n << "\'" << endl;
         if (n == var_name) {
-          if (var_size)
+          if (var_size) {
             *var_size = vd->var_size();
+            if (*var_size == 0)
+              cout << "Error! var_size return 0!" << endl;
+          }
           return true;
         }
       }
@@ -304,8 +313,7 @@ Node* assign() {
   }
 
   // TODO: теперь хорошо бы добавить инициализацию объявляемых переменных
-  // и сделать оператор взятия адреса - &
-
+  // и сделать оператор взятия адреса - & (или @ ?)
 
   Token t = Lexer::instance().currentToken();
   if (t == tEnd)
@@ -332,8 +340,13 @@ Node* declare() {
   if (t == tEnd)
     return nullptr;
 
-  if (t != tInt) {
-    cout << "This token is not tInt" << endl;
+  DataType dt {dtNotInitialize};
+  if (t == tInt) {
+    dt = dtInt;
+  } else if (t == tByte) {
+    dt = dtByte;
+  } else {
+    cout << "This token is not tInt, but " << GetTokenName(t) << endl;
     return nullptr;
   }
 
@@ -346,7 +359,7 @@ Node* declare() {
     Lexer::instance().consume();
   }
 
-  VarDecl* n = new VarDecl(dtInt, is_ptr);
+  VarDecl* n = new VarDecl(dt, is_ptr);
   VarDecl::variables.push_back(n);
 
   // Okay, now try to find variable name[s]
