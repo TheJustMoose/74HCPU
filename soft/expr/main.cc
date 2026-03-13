@@ -1,3 +1,4 @@
+#include "assemble.h"
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
@@ -63,7 +64,7 @@ int main(int argc, char* argv[]) {
   Optimize(res_code);
   cout << "res_code.size(): " << res_code.size() << endl;
 
-  cout << endl << "final asm:" << endl;
+  cout << endl << "final IR:" << endl;
   for (Operation& n : res_code) {
     uint8_t sz {0};
     if (isDeclared(n.res_arg, &sz))
@@ -73,6 +74,11 @@ int main(int argc, char* argv[]) {
     else
       cout << n.str() << "  // was not declared" << endl;
   }
+
+  cout << endl << "final asm:" << endl;
+  vector<string> res_asm = Assemble(res_code);
+  for (string& s : res_asm)
+    cout << s << endl;
 
   cout << "main finished" << endl;
   return 0;

@@ -7,6 +7,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "../../Release")
 
 project(simple_expr CXX)
 add_executable(simple_expr
+	assemble.h
+	assemble.cc
 	func_guard.h
 	func_guard.cc
 	lexer.h
@@ -28,6 +30,8 @@ include_directories("../doctest/doctest")
 
 project(unit_tests CXX)
 add_executable(simple_expr_unit_tests
+	assemble.h
+	assemble.cc
 	func_guard.h
 	func_guard.cc
 	lexer.h
