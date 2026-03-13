@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void Optimize(std::vector<Operation>& res_code) {
+void Optimize(vector<Operation>& res_code) {
   vector<size_t> can_be_optimized {};
 
   if (res_code.size() <= 1)
@@ -19,11 +19,16 @@ void Optimize(std::vector<Operation>& res_code) {
     if (res_code[i].res_in_temp && ! res_code[i + 1].res_in_temp &&
         res_code[i].res_arg == res_code[i + 1].left_arg) {
 
+      cout << "Will merge " << i << " with " << i + 1 << " operations" << endl;
+      cout << "i " << res_code[i].str() << endl;
+      cout << "i+1 " << res_code[i + 1].str() << endl;
+
       can_be_optimized.push_back(i + 1);
       //cout << res_code[i].str() << " - can be optimized! i: " << i << endl;
       res_code[i].res_arg = res_code[i + 1].res_arg;
       res_code[i].res_in_temp = false;  // see first condition in if
       res_code[i + 1].clear();
+      i++;  // have to skip just cleared instruction
     }
   }
 
@@ -32,11 +37,15 @@ void Optimize(std::vector<Operation>& res_code) {
     return;
   }
 
-  //cout << "can_be_optimized.size(): " << can_be_optimized.size() << endl;
+  cout << "can_be_optimized.size(): " << can_be_optimized.size() << endl;
 
   // now we can remove all empty ( .clear() ) strings
-  for (auto it = can_be_optimized.rbegin(); it != can_be_optimized.rend(); ++it) {
-    //cout << "Line with idx == " << *it << " will be removed" << endl;
+  for (auto it = can_be_optimized.rbegin(); it != can_be_optimized.rend(); it++) {
+    //cout << "Line with idx == " << *it << " will be removed"
+    //     << "  " << res_code[*it].str() << endl;
     res_code.erase(res_code.begin() + *it);
   }
+
+  for (size_t i = 0; i < res_code.size() - 1; i++)
+    cout << res_code[i].str() << endl;
 }

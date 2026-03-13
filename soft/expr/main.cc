@@ -68,7 +68,9 @@ int main(int argc, char* argv[]) {
     uint8_t sz {0};
     if (isDeclared(n.res_arg, &sz))
       cout << n.str() << "(" << static_cast<int>(sz) << ")" << endl;
-    else if (!n.res_in_temp)
+    else if (n.res_in_temp)
+      cout << n.str() << endl;
+    else
       cout << n.str() << "  // was not declared" << endl;
   }
 
