@@ -4,6 +4,7 @@
 #include "operation.h"
 
 #include <string>
+#include <vector>
 
 class Node {
  public:

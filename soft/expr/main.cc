@@ -1,13 +1,14 @@
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <vector>
-
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
 #include "optimize.h"
 #include "parser.h"
+
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -64,8 +65,9 @@ int main(int argc, char* argv[]) {
 
   cout << endl << "final asm:" << endl;
   for (Operation& n : res_code) {
-    if (isDeclared(n.res_arg))
-      cout << n.str() << endl;
+    uint8_t sz {0};
+    if (isDeclared(n.res_arg, &sz))
+      cout << n.str() << "(" << static_cast<int>(sz) << ")" << endl;
     else if (!n.res_in_temp)
       cout << n.str() << "  // was not declared" << endl;
   }

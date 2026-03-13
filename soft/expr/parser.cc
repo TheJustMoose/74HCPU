@@ -62,6 +62,10 @@ class Name: public Node {
   Name(string value)
     : Node(ntName), value_(value) {}
 
+  void init_size(uint8_t size) {
+    cached_size_ = size;
+  }
+
   void gen(vector<Operation>& res_code) override {
     cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
   }
@@ -74,8 +78,13 @@ class Name: public Node {
     return value_;
   }
 
+  uint8_t cached_size() {
+    return cached_size_;
+  }
+
  private:
   string value_ {""};
+  uint8_t cached_size_ {0};
 };
 
 class BinOp: public Node {
@@ -172,8 +181,6 @@ class VarDecl: public Node {
     // No machine code to implement it.
   }
 
-  static vector<VarDecl*> variables;
-
   // This is not the C++!
   // "char@ a, b; " means, that we have two pointers.
   // ***** b has type char@ too. *****
@@ -190,8 +197,7 @@ class VarDecl: public Node {
   vector<string> names {};
 };
 
-bool isDeclared(string var_name, int* var_size) {
-  //cout << "searching: \'" << var_name << "\'" << endl;
+bool isDeclared(string var_name, uint8_t* var_size) {
   for (const Var& v : vars)
     if (v.name == var_name) {
       if (var_size) {
@@ -296,11 +302,11 @@ Node* assign() {
   if (!left)
     return nullptr;
 
-  int var_size {0};
+  uint8_t var_size {0};
   if (left->type() == ntName) {
     Name* n = dynamic_cast<Name*>(left);
     // вообще, где-то здесь не хватает проверки res_in_temp
-    // но этот флажок лежит в таблице со список операций :(
+    // но этот флажок лежит в таблице со списком операций :(
     if (!isDeclared(n->name(), &var_size))
       cout << "You try to assign to variable \"" << n->name()
            << "\" which was not beed declared" << endl;

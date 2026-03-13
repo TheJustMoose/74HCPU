@@ -11,5 +11,5 @@ struct Var {
   Var(std::string n, DataType dt)
     : name(n), data_type(dt) {}
 
-  int size() const;
+  uint8_t size() const;
 };
