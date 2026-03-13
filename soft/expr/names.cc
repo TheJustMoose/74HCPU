@@ -1,7 +1,7 @@
+#include "names.h"
+
 #include <map>
 #include <string>
-
-#include "names.h"
 
 using namespace std;
 
@@ -30,7 +30,12 @@ map<Token, string> TokenName {
   {tRBracket, "tRBracket"},
   {tEqual, "tEqual"},
   {tSemicolon, "tSemicolon"},
+  {tError, "tError"},
   {tEnd, "tEnd"},
+  {tNotInitialized, "tNotInitialized"},
+  {tComma, "tComma"},
+  {tAtSign, "tAtSign"},
+  {tByte, "tByte"},
   {tInt, "tInt"},
 };
 

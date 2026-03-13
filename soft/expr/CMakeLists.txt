@@ -18,6 +18,10 @@ add_executable(simple_expr
 	optimize.cc
 	parser.cc
 	token.h
+	var.cc
+	var.h
+	var_size.cc
+	var_size.h
 )
 
 include_directories("../doctest/doctest")
@@ -35,4 +39,8 @@ add_executable(simple_expr_unit_tests
 	parser.cc
 	simple_expr_unit_tests.cc
 	token.h
+	var.cc
+	var.h
+	var_size.cc
+	var_size.h
 )

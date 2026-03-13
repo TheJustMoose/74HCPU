@@ -1,9 +1,3 @@
-#include <cctype>
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
 #include "parser.h"
 
 #include "data_type.h"
@@ -14,6 +8,14 @@
 #include "node_type.h"
 #include "operation.h"
 #include "token.h"
+#include "var.h"
+#include "var_size.h"
+
+#include <cstdint>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -32,6 +34,8 @@ term_rest -> * prim | E
 term -> prim | term_rest
 
 */
+
+vector<Var> vars {};
 
 int tmp_var_counter {0};
 string new_tmp() {
@@ -86,6 +90,7 @@ class BinOp: public Node {
     else {
       left->gen(res_code);
       right->gen(res_code);
+      // Okay, let's put operation result into temp variable
       tmp_name_ = new_tmp();
       cout << FuncGuard::stack_str() << tmp_name_ << " = "
            << left->tmp_name() << " " << op() << " "
@@ -169,7 +174,7 @@ class VarDecl: public Node {
 
   static vector<VarDecl*> variables;
 
-  // This is not C++!
+  // This is not the C++!
   // "char@ a, b; " means, that we have two pointers.
   // ***** b has type char@ too. *****
   // Yes, I use @ instead of *.
@@ -177,13 +182,7 @@ class VarDecl: public Node {
   // In C++ "char* a, b;" means
   // that you have pointer "a" and char "b".
   uint8_t var_size() {
-    if (is_pointer)
-      return 2;
-    if (data_type == dtInt)
-      return 2;
-    if (data_type == dtByte)
-      return 1;
-    return 0;
+    return ::var_size(data_type, is_pointer);
   }
 
   DataType data_type {dtNotInitialize};
@@ -191,24 +190,18 @@ class VarDecl: public Node {
   vector<string> names {};
 };
 
-vector<VarDecl*> VarDecl::variables {};
-
 bool isDeclared(string var_name, int* var_size) {
-  cout << "searching: \'" << var_name << "\'" << endl;
-
-  for (VarDecl* vd : VarDecl::variables)
-    if (vd && vd->names.size())
-      for (const string& n : vd->names) {
-        cout << "var: \'" << n << "\'" << endl;
-        if (n == var_name) {
-          if (var_size) {
-            *var_size = vd->var_size();
-            if (*var_size == 0)
-              cout << "Error! var_size return 0!" << endl;
-          }
-          return true;
-        }
+  //cout << "searching: \'" << var_name << "\'" << endl;
+  for (const Var& v : vars)
+    if (v.name == var_name) {
+      if (var_size) {
+        if (v.size() == 0)
+          cout << "Error! var_size return 0!" << endl;
+        else
+          *var_size = v.size();
       }
+      return true;
+    }
 
   return false;
 }
@@ -303,11 +296,12 @@ Node* assign() {
   if (!left)
     return nullptr;
 
+  int var_size {0};
   if (left->type() == ntName) {
     Name* n = dynamic_cast<Name*>(left);
     // вообще, где-то здесь не хватает проверки res_in_temp
-    // но этот флажок лежит совсем в другом месте :(
-    if (!isDeclared(n->name()))
+    // но этот флажок лежит в таблице со список операций :(
+    if (!isDeclared(n->name(), &var_size))
       cout << "You try to assign to variable \"" << n->name()
            << "\" which was not beed declared" << endl;
   }
@@ -360,7 +354,6 @@ Node* declare() {
   }
 
   VarDecl* n = new VarDecl(dt, is_ptr);
-  VarDecl::variables.push_back(n);
 
   // Okay, now try to find variable name[s]
   t = Lexer::instance().currentToken();
@@ -369,6 +362,8 @@ Node* declare() {
     string var_name = Lexer::instance().getStrValue();
     n->names.push_back(var_name);
     cout << "Int variable \"" << var_name << "\" was declared" << endl;
+
+    vars.emplace_back(var_name, dt);  // duplicate variable name array
 
     // What about variable initialization?
 
@@ -391,7 +386,7 @@ Node* declare() {
 }
 
 Node* stmt() {
-  // stmt -> assigh | declare
+  // stmt -> assign | declare
   Node* n = declare();
   return n ? n : assign();
 }

@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
   for (Operation& n : res_code) {
     if (isDeclared(n.res_arg))
       cout << n.str() << endl;
-    else
+    else if (!n.res_in_temp)
       cout << n.str() << "  // was not declared" << endl;
   }
 
