@@ -354,7 +354,7 @@ Node* declare() {
 
   bool is_ptr = false;
   t = Lexer::instance().currentToken();
-  if (t == tAtSign) {  // pointer sign (not asterisk)
+  if (t == tAtSign) {  // pointer sign - @ (not asterisk)
     is_ptr = true;
     Lexer::instance().consume();
   }
@@ -370,10 +370,19 @@ Node* declare() {
     cout << "Int variable \"" << var_name << "\" was declared" << endl;
 
     vars.emplace_back(var_name, dt);  // duplicate variable name array
-
-    // What about variable initialization?
-
     Lexer::instance().consume();  // skip var name
+
+    t = Lexer::instance().currentToken();
+    if (t == tEqual) {
+      Lexer::instance().consume();
+      t = Lexer::instance().currentToken();
+      if (t == tNum) {
+        Lexer::instance().consume();
+        int val = Lexer::instance().getIntValue();
+        cout << var_name << " := " << val << "  // initialization" << endl;
+      }
+    }
+
     t = Lexer::instance().currentToken();
     if (t == tComma) {
       Lexer::instance().consume();  // skip comma
