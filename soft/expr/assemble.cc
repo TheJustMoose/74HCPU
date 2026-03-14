@@ -1,10 +1,82 @@
 #include "assemble.h"
 
+#include <iostream>
+
 using namespace std;
 
-vector<string> bank0(8);
-vector<string> bank1(8);
+/*
+  std::string res_arg {};
+  std::string op_name {};
+  std::string left_arg {};
+  std::string right_arg {};
+  bool res_in_temp {false};
+  bool removed {false};
+*/
 
-vector<string> Assemble(vector<Operation> res_code) {
-  return {};
+/*
+  b = -t1
+    ?
+  b = 0
+  b -= t1
+    vs
+  b = t1
+  b = -b
+    vs
+  t1 = -t1
+  b = t1
+*/
+
+size_t reg_cnt = 8;
+vector<string> bank0(reg_cnt);
+vector<string> bank1(reg_cnt);
+
+string FindFreeRegFor(string var_name) {
+  for (size_t i = 0; i < 8; i++)
+    if (!bank0[i].size()) {
+      bank0[i] = var_name;
+      return "R" + to_string(i);
+    }
+
+  return "";
+}
+
+string DumpRegs() {
+  string res {"  // "};
+  for (size_t i = 0; i < 8; i++) {
+    res += "R" + to_string(i);
+    res += ": ";
+    res += bank0[i].size() ? bank0[i] : "-";
+    if (i != 7)
+      res += ", ";
+  }
+
+  return res;
+}
+
+vector<string> Assemble(vector<Operation> code) {
+  vector<string> res;
+
+  for (Operation op : code) {
+    if (!op.op_name.size()) {
+      string line1 = op.res_arg + " = " + op.left_arg;
+      res.push_back(line1);
+
+      string left_reg = FindFreeRegFor(op.left_arg);  // this is immediate value :(((
+      string res_reg = FindFreeRegFor(op.res_arg);
+      string line11 = "mov " + res_reg + ", " + left_reg + "   " + DumpRegs();
+      res.push_back(line11);
+    } else if (!op.left_arg.size()) {  // t1 = -t1
+      string line1 = op.right_arg + " = " + op.op_name + op.right_arg;
+      res.push_back(line1);            // b = t1
+      string line2 = op.res_arg + " = " + op.right_arg;
+      res.push_back(line2);
+    } else {
+      string line1 = op.res_arg + " = " + op.left_arg;
+      res.push_back(line1);
+      string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;
+      res.push_back(line2);
+    }
+  }
+
+  return res;
 }
