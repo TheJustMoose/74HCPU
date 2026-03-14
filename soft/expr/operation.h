@@ -25,6 +25,19 @@ struct Operation {
              + op_name + " " + right_arg + suffix;
   }
 
+  std::string align(std::string s) {
+    std::string res{s};
+    while (res.size() < 4)
+      res = " " + res;
+    return res;
+  }
+
+  std::string raw() {
+    return "|" + align(res_arg) + " |" + align(op_name) + " |" +
+           align(left_arg) + " |" + align(right_arg) + " | " +
+           (res_in_temp ? "tmp" : "var") + " |";
+  }
+
   int argNum() {
     return !left_arg.empty() + !right_arg.empty();
   }

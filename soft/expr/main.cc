@@ -58,7 +58,21 @@ int main(int argc, char* argv[]) {
     else
       cout << "statements[i] is null" << endl;
 
-  cout << "res_code.size(): " << res_code.size() << endl;
+  cout << "res_code.size(): " << res_code.size() << endl << endl;
+
+/*
+  std::string res_arg {};
+  std::string op_name {};
+  std::string left_arg {};
+  std::string right_arg {};
+  bool res_in_temp {false};
+*/
+
+  cout << "| res |  op | left|right| tmp |" << endl;
+  for (auto& r : res_code)
+    cout << r.raw() << endl;
+
+  cout << endl;
 
   cout << "try to optimize:" << endl;
   Optimize(res_code);
