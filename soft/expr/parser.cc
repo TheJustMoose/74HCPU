@@ -380,6 +380,8 @@ Node* declare() {
         Lexer::instance().consume();
         int val = Lexer::instance().getIntValue();
         cout << var_name << " := " << val << "  // initialization" << endl;
+      } else {
+        cout << "Error. Only initialization by numbers is supported now." << endl;
       }
     }
 
