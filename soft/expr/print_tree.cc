@@ -11,7 +11,7 @@
 
 using namespace std;
 
-const int kWidth = 80;
+const int kWidth = 100;
 
 string dup(char c, int w) {
   string res(w, c);
@@ -26,19 +26,26 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
   gLinearTree.push_back(n);
   gNodeLevel[n] = lvl;
   gNodeOffset[n] = mid;
+  cout << "mid: " << mid << ", lvl: " << lvl << endl;
 
   if (BinOp* bop = dynamic_cast<BinOp*>(n)) {
-    Tree2List(bop->left, mid - (lvl + 1)*5, lvl + 1);
-    Tree2List(bop->right, mid + (lvl + 1)*5, lvl + 1);
+    cout << "binop..." << endl;
+    lvl++;
+    int offset = kWidth / (lvl*2 + 5);
+    Tree2List(bop->left, mid - offset, lvl);
+    Tree2List(bop->right, mid + offset, lvl);
   } else if (AssignOp* aop = dynamic_cast<AssignOp*>(n)) {
-    Tree2List(aop->left, mid - (lvl + 1)*5, lvl + 1);
-    Tree2List(aop->right, mid + (lvl + 1)*5, lvl + 1);
+    cout << "assign..." << endl;
+    lvl++;
+    int offset = kWidth / (lvl*2 + 5);
+    Tree2List(aop->left, mid - offset, lvl);
+    Tree2List(aop->right, mid + offset, lvl);
   } else {
     //cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }
 }
 
-void TypeInTheStringIntoBuffer(string& line, string word, int pos) {
+void TypeStringIntoTheBuffer(string& line, string word, int pos) {
   int left = pos - word.size() / 2;
   if (left < 0 || left >= line.size()) {
     cout << "Error! Word position is ouf of bounds!!" << endl;
@@ -55,14 +62,6 @@ void TypeInTheStringIntoBuffer(string& line, string word, int pos) {
 void PrintTree(Node* n) {
   if (!n)
     return;
-/*
-  string line(80, ' ');
-  TypeInTheStringIntoBuffer(line, "Hello", 20);
-  TypeInTheStringIntoBuffer(line, "World", 25);
-  cout << line << endl << endl;
-*/
-  //cout << "n on lvl: " << nodes_on_lvl << endl;
-  //cout << dup(' ', width / 2) << n->op() << endl;
 
   gLinearTree.clear();
   gNodeLevel.clear();
@@ -70,28 +69,30 @@ void PrintTree(Node* n) {
   Tree2List(n, kWidth / 2);  // root node should be in a center of screen
   cout << gLinearTree.size() << " items was stored" << endl;
 
-  string line(80, ' ');
+  string line(kWidth, ' ');
   int last_lvl {0};
   int nodes_on_lvl {0};
-  //int w = kWidth / 2;
   int cnt = 0;
-  for (const Node* n: gLinearTree) {
-    cout << "cnt: " << cnt++ << endl;
+  for (size_t i = 0; i < gLinearTree.size(); i++) {
+    const Node* n = gLinearTree[i];
     int lvl = gNodeLevel[n];
     if (last_lvl != lvl) {
       cout << line << endl;
-      line = string(80, ' ');
+      cout << "The next level..." << endl;
+      line = string(kWidth, ' ');
       last_lvl = lvl;
       nodes_on_lvl = 0;
-      //w /= 2;
     } else {
       nodes_on_lvl++;
     }
 
-    TypeInTheStringIntoBuffer(
+    TypeStringIntoTheBuffer(
         line,
         GetNodeTypeName(n->type()) + " (" + to_string(gNodeOffset[n]) + ")",
         gNodeOffset[n]);
+
+    cout << "cnt: " << cnt << ", " << GetNodeTypeName(n->type()) << endl;
+    cnt++;
   }
 
   // Do not lose last iteration of loop!
