@@ -11,7 +11,7 @@
 
 using namespace std;
 
-const int width = 80;
+const int kWidth = 80;
 
 string dup(char c, int w) {
   string res(w, c);
@@ -20,7 +20,6 @@ string dup(char c, int w) {
 
 vector<Node*> gLinearTree;
 map<const Node*, int> gNodeLevel;
-//map<int, int> gNodesOnLevel;
 
 void Tree2List(Node* n, int lvl = 0) {
   gLinearTree.push_back(n);
@@ -29,11 +28,11 @@ void Tree2List(Node* n, int lvl = 0) {
   if (BinOp* bop = dynamic_cast<BinOp*>(n)) {
     Tree2List(bop->left, lvl + 1);
     Tree2List(bop->right, lvl + 1);
-  }
-
-  if (AssignOp* aop = dynamic_cast<AssignOp*>(n)) {
+  } else if (AssignOp* aop = dynamic_cast<AssignOp*>(n)) {
     Tree2List(aop->left, lvl + 1);
     Tree2List(aop->right, lvl + 1);
+  } else {
+    cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }
 }
 
@@ -50,20 +49,21 @@ void PrintTree(Node* n) {
 
   int last_lvl {0};
   int nodes_on_lvl {0};
+  int w = kWidth / 2;
   for (const Node* n: gLinearTree) {
     int lvl = gNodeLevel[n];
     if (last_lvl != lvl) {
-      cout << nodes_on_lvl << endl;
+      cout << "n on lvl: " << nodes_on_lvl << endl;
       last_lvl = lvl;
       nodes_on_lvl = 0;
+      w /= 2;
     } else {
       nodes_on_lvl++;
     }
 
-    //cout << GetNodeTypeName(n->type()) << " (" << lvl << ")" << endl;
-
-    cout << GetNodeTypeName(n->type()) << " (" << lvl << ")" << dup(' ', 10);
+    cout << dup(' ', w) << GetNodeTypeName(n->type()) << " (" << lvl << ")" << dup(' ', 10);
   }
 
   cout << endl;
+  cout << dup('-', kWidth) << endl;
 }

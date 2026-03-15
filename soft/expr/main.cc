@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     string s {argv[1]};
     Lexer::instance().setInputString(s);
   } else {
-    cout << "Using: plus.exe \"1+2+3\"" << endl;
+    cout << "Using: simple_expr.exe \"1+2+3\"" << endl;
     return 1;
   }
 
