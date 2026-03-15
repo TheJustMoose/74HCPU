@@ -40,8 +40,12 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
     int offset = kWidth / (lvl*2 + 5);
     Tree2List(aop->left, mid - offset, lvl);
     Tree2List(aop->right, mid + offset, lvl);
+  } else if (UnOp* uop = dynamic_cast<UnOp*>(n)) {
+    cout << "unary minus..." << endl;
+    lvl++;
+    Tree2List(uop->child, mid, lvl);
   } else {
-    //cout << "Node: " << GetNodeTypeName(n->type()) << endl;
+    cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }
 }
 
@@ -81,7 +85,7 @@ void PrintTree(Node* n) {
       cout << "The next level..." << endl;
       line = string(kWidth, ' ');
       last_lvl = lvl;
-      nodes_on_lvl = 0;
+      nodes_on_lvl = 1;  // we just found node on next level and node exist, so 'cnt' = 1
     } else {
       nodes_on_lvl++;
     }
