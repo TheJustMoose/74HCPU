@@ -34,7 +34,7 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
     Tree2List(aop->left, mid - (lvl + 1)*5, lvl + 1);
     Tree2List(aop->right, mid + (lvl + 1)*5, lvl + 1);
   } else {
-    cout << "Node: " << GetNodeTypeName(n->type()) << endl;
+    //cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }
 }
 
@@ -55,8 +55,15 @@ void TypeInTheStringIntoBuffer(string& line, string word, int pos) {
 void PrintTree(Node* n) {
   if (!n)
     return;
-
+/*
+  string line(80, ' ');
+  TypeInTheStringIntoBuffer(line, "Hello", 20);
+  TypeInTheStringIntoBuffer(line, "World", 25);
+  cout << line << endl << endl;
+*/
+  //cout << "n on lvl: " << nodes_on_lvl << endl;
   //cout << dup(' ', width / 2) << n->op() << endl;
+
   gLinearTree.clear();
   gNodeLevel.clear();
 
@@ -64,30 +71,32 @@ void PrintTree(Node* n) {
   cout << gLinearTree.size() << " items was stored" << endl;
 
   string line(80, ' ');
-  if (line.size() != 80)
-    cout << "Error!!! line.size() != 80. It's " << line.size() << endl;
-
   int last_lvl {0};
   int nodes_on_lvl {0};
-  int w = kWidth / 2;
+  //int w = kWidth / 2;
   int cnt = 0;
   for (const Node* n: gLinearTree) {
     cout << "cnt: " << cnt++ << endl;
     int lvl = gNodeLevel[n];
     if (last_lvl != lvl) {
-      //cout << "n on lvl: " << nodes_on_lvl << endl;
       cout << line << endl;
       line = string(80, ' ');
       last_lvl = lvl;
       nodes_on_lvl = 0;
-      w /= 2;
+      //w /= 2;
     } else {
       nodes_on_lvl++;
     }
 
-    TypeInTheStringIntoBuffer(line, GetNodeTypeName(n->type()) + to_string(gNodeOffset[n]), gNodeOffset[n]);
+    TypeInTheStringIntoBuffer(
+        line,
+        GetNodeTypeName(n->type()) + " (" + to_string(gNodeOffset[n]) + ")",
+        gNodeOffset[n]);
   }
 
-  cout << endl;
-  cout << dup('-', kWidth) << endl;
+  // Do not lose last iteration of loop!
+  if (nodes_on_lvl > 0)
+    cout << line << endl;
+
+  cout << endl << dup('-', kWidth) << endl;
 }
