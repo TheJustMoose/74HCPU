@@ -13,9 +13,6 @@ class Node {
   virtual void gen(std::vector<Operation>& res_code) = 0;
 
   virtual std::string op() { return ""; }
-  virtual std::string tmp_name() {
-    return tmp_name_;
-  }
 
   NodeType type() {
     return type_;
@@ -23,5 +20,4 @@ class Node {
 
  protected:
   NodeType type_ {ntUnknown};
-  std::string tmp_name_ {};
 };

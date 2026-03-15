@@ -14,9 +14,12 @@ add_executable(simple_expr
 	lexer.h
 	lexer.cc
 	main.cc
+	names.h
 	names.cc
 	node.h
 	node_type.h
+	nodes.h
+	nodes.cc
 	optimize.h
 	optimize.cc
 	parser.h
@@ -24,10 +27,12 @@ add_executable(simple_expr
 	print_tree.h
 	print_tree.cc
 	token.h
-	var.cc
+	token2node_type.h
+	token2node_type.cc
 	var.h
-	var_size.cc
+	var.cc
 	var_size.h
+	var_size.cc
 )
 
 include_directories("../doctest/doctest")
@@ -40,9 +45,12 @@ add_executable(simple_expr_unit_tests
 	func_guard.cc
 	lexer.h
 	lexer.cc
+	names.h
 	names.cc
 	node.h
 	node_type.h
+	nodes.h
+	nodes.cc
 	optimize.h
 	optimize.cc
 	parser.h
@@ -51,8 +59,10 @@ add_executable(simple_expr_unit_tests
 	print_tree.cc
 	simple_expr_unit_tests.cc
 	token.h
-	var.cc
+	token2node_type.h
+	token2node_type.cc
 	var.h
-	var_size.cc
+	var.cc
 	var_size.h
+	var_size.cc
 )

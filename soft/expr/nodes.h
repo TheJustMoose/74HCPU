@@ -26,7 +26,6 @@ class Name: public Node {
 
   void init_size(uint8_t size);
   void gen(std::vector<Operation>& res_code) override;
-  std::string tmp_name() override;
   std::string name();
   uint8_t cached_size();
 
