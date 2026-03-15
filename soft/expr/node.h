@@ -14,7 +14,7 @@ class Node {
 
   virtual std::string op() { return ""; }
 
-  NodeType type() {
+  NodeType type() const {
     return type_;
   };
 
