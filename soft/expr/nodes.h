@@ -47,7 +47,7 @@ class BinOp: public Node {
 
 class UnOp: public Node {
  public:
-  UnOp();
+  UnOp();  // TODO: add type of unary operation here
 
   void gen(std::vector<Operation>& res_code) override;
   std::string op() override;

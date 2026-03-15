@@ -46,7 +46,7 @@ vector<Var> vars {};
 bool isDeclared(string var_name, uint8_t* var_size) {
   for (const Var& v : vars)
     if (v.name == var_name) {
-      if (var_size) {
+      if (var_size != nullptr) {
         if (v.size() == 0)
           cout << "Error! var_size return 0!" << endl;
         else
