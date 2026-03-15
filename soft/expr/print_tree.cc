@@ -42,6 +42,9 @@ void PrintTree(Node* n) {
     return;
 
   //cout << dup(' ', width / 2) << n->op() << endl;
+  gLinearTree.clear();
+  gNodeLevel.clear();
+
   Tree2List(n);
   cout << endl;
 
@@ -56,6 +59,8 @@ void PrintTree(Node* n) {
     } else {
       nodes_on_lvl++;
     }
+
+    //cout << GetNodeTypeName(n->type()) << " (" << lvl << ")" << endl;
 
     cout << GetNodeTypeName(n->type()) << " (" << lvl << ")" << dup(' ', 10);
   }
