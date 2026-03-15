@@ -5,6 +5,7 @@
 #include "lexer.h"
 #include "names.h"
 #include "node.h"
+#include "nodes.h"
 #include "node_type.h"
 #include "operation.h"
 #include "token.h"
@@ -42,160 +43,131 @@ string new_tmp() {
   return string("t") + to_string(tmp_var_counter++);
 }
 
-class Num: public Node {
- public:
-  Num(int value)
-    : Node(ntNum), value_(value) {}
+Num::Num(int value)
+ : Node(ntNum), value_(value) {
+}
 
-  void gen(vector<Operation>& res_code) override {
-    tmp_name_ = new_tmp();
-    cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
-    res_code.emplace_back(tmp_name_, "", to_string(value_), "", true);
-  }
+void Num::gen(vector<Operation>& res_code) {
+  tmp_name_ = new_tmp();
+  cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
+  res_code.emplace_back(tmp_name_, "", to_string(value_), "", true);
+}
 
- private:
-  int value_ {0};
-};
+Name::Name(string value)
+  : Node(ntName), value_(value) {
+}
 
-class Name: public Node {
- public:
-  Name(string value)
-    : Node(ntName), value_(value) {}
+void Name::init_size(uint8_t size) {
+  cached_size_ = size;
+}
 
-  void init_size(uint8_t size) {
-    cached_size_ = size;
-  }
+void Name::gen(vector<Operation>& res_code) {
+  cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
+}
 
-  void gen(vector<Operation>& res_code) override {
-    cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
-  }
+string Name::tmp_name() {
+  return value_;
+}
 
-  string tmp_name() override {
-    return value_;
-  }
+string Name::name() {
+  return value_;
+}
 
-  string name() {
-    return value_;
-  }
+uint8_t Name::cached_size() {
+  return cached_size_;
+}
 
-  uint8_t cached_size() {
-    return cached_size_;
-  }
+BinOp::BinOp(Token t)
+  : Node(Token2NodeType(t)) {
+}
 
- private:
-  string value_ {""};
-  uint8_t cached_size_ {0};
-};
-
-class BinOp: public Node {
- public:
-  BinOp(Token t): Node(Token2NodeType(t)) {}
-
-  void gen(vector<Operation>& res_code) override {
-    if (!left)
-      cout << "left node is nullptr" << endl;
-    else if (!right)
-      cout << "right node is nullptr" << endl;
-    else {
-      left->gen(res_code);
-      right->gen(res_code);
-      // Okay, let's put operation result into temp variable
-      tmp_name_ = new_tmp();
-      cout << FuncGuard::stack_str() << tmp_name_ << " = "
-           << left->tmp_name() << " " << op() << " "
-           << right->tmp_name() << endl;
-    }
-    res_code.emplace_back(tmp_name_, op(), left->tmp_name(), right->tmp_name(), true);
-  }
-
-  string op() override {
-    switch (type()) {
-      case ntSum: return "+";
-      case ntSub: return "-";
-      case ntMul: return "*";
-      case ntDiv: return "/";
-      default: return "";
-    }
-  }
-
-  Node* left {nullptr};
-  Node* right {nullptr};
-};
-
-class UnOp: public Node {
- public:
-  UnOp(): Node(ntUMinus) {}
-
-  void gen(vector<Operation>& res_code) override {
-    child->gen(res_code);
+void BinOp::gen(vector<Operation>& res_code) {
+  if (!left)
+    cout << "left node is nullptr" << endl;
+  else if (!right)
+    cout << "right node is nullptr" << endl;
+  else {
+    left->gen(res_code);
+    right->gen(res_code);
+    // Okay, let's put operation result into temp variable
     tmp_name_ = new_tmp();
     cout << FuncGuard::stack_str() << tmp_name_ << " = "
-         << op() << child->tmp_name() << " " << endl;
-    res_code.emplace_back(tmp_name_, op(), "", child->tmp_name(), true);
-  }
-
-  string op() override {
-    return "-";
-  }
-
-  Node* child {nullptr};
-};
-
-class AssignOp: public Node {
- public:
-  AssignOp(): Node(ntAssign) {}
-
-  void gen(vector<Operation>& res_code) override {
-    right->gen(res_code);
-    if (!left) {
-      cout << FuncGuard::stack_str() << "left == nullptr" << endl;
-      return;
-    }
-    Name* name_node = dynamic_cast<Name*>(left);
-    if (!name_node) {
-      cout << FuncGuard::stack_str() << "Error. left node is not Name class" << endl;
-      return;
-    }
-
-    cout << FuncGuard::stack_str()
-         << name_node->name() << " = "
+         << left->tmp_name() << " " << op() << " "
          << right->tmp_name() << endl;
-    res_code.emplace_back(name_node->name(), "", right->tmp_name(), "");
+  }
+  res_code.emplace_back(tmp_name_, op(), left->tmp_name(), right->tmp_name(), true);
+}
+
+string BinOp::op() {
+  switch (type()) {
+    case ntSum: return "+";
+    case ntSub: return "-";
+    case ntMul: return "*";
+    case ntDiv: return "/";
+    default: return "";
+  }
+}
+
+UnOp::UnOp()
+  : Node(ntUMinus) {
+}
+
+void UnOp::gen(vector<Operation>& res_code) {
+  child->gen(res_code);
+  tmp_name_ = new_tmp();
+  cout << FuncGuard::stack_str() << tmp_name_ << " = "
+       << op() << child->tmp_name() << " " << endl;
+  res_code.emplace_back(tmp_name_, op(), "", child->tmp_name(), true);
+}
+
+string UnOp::op() {
+  return "-";
+}
+
+AssignOp::AssignOp()
+  : Node(ntAssign) {
+}
+
+void AssignOp::gen(vector<Operation>& res_code) {
+  right->gen(res_code);
+  if (!left) {
+    cout << FuncGuard::stack_str() << "left == nullptr" << endl;
+    return;
+  }
+  Name* name_node = dynamic_cast<Name*>(left);
+  if (!name_node) {
+    cout << FuncGuard::stack_str() << "Error. left node is not Name class" << endl;
+    return;
   }
 
-  string op() override {
-    return "=";
-  }
+  cout << FuncGuard::stack_str()
+       << name_node->name() << " = "
+       << right->tmp_name() << endl;
+  res_code.emplace_back(name_node->name(), "", right->tmp_name(), "");
+}
 
-  Node* left {nullptr};
-  Node* right {nullptr};
-};
+string AssignOp::op() {
+  return "=";
+}
 
-class VarDecl: public Node {
- public:
-  VarDecl(DataType dt, bool is_ptr)
-    : Node(ntVarDecl), data_type(dt), is_pointer(is_ptr) {}
+VarDecl::VarDecl(DataType dt, bool is_ptr)
+  : Node(ntVarDecl), data_type(dt), is_pointer(is_ptr) {}
 
-  void gen(vector<Operation>& res_code) override {
-    // This node is just variable declaration.
-    // No machine code to implement it.
-  }
+void VarDecl::gen(vector<Operation>& res_code) {
+  // This node is just variable declaration.
+  // No machine code to implement it.
+}
 
-  // This is not the C++!
-  // "char@ a, b; " means, that we have two pointers.
-  // ***** b has type char@ too. *****
-  // Yes, I use @ instead of *.
-  //
-  // In C++ "char* a, b;" means
-  // that you have pointer "a" and char "b".
-  uint8_t var_size() {
-    return ::var_size(data_type, is_pointer);
-  }
-
-  DataType data_type {dtNotInitialize};
-  bool is_pointer {false};
-  vector<string> names {};
-};
+// This is not the C++!
+// "char@ a, b; " means, that we have two pointers.
+// ***** b has type char@ too. *****
+// Yes, I use @ instead of *.
+//
+// In C++ "char* a, b;" means
+// that you have pointer "a" and char "b".
+uint8_t VarDecl::var_size() {
+  return ::var_size(data_type, is_pointer);
+}
 
 bool isDeclared(string var_name, uint8_t* var_size) {
   for (const Var& v : vars)

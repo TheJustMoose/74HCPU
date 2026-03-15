@@ -17,8 +17,12 @@ add_executable(simple_expr
 	names.cc
 	node.h
 	node_type.h
+	optimize.h
 	optimize.cc
+	parser.h
 	parser.cc
+	print_tree.h
+	print_tree.cc
 	token.h
 	var.cc
 	var.h
@@ -39,8 +43,12 @@ add_executable(simple_expr_unit_tests
 	names.cc
 	node.h
 	node_type.h
+	optimize.h
 	optimize.cc
+	parser.h
 	parser.cc
+	print_tree.h
+	print_tree.cc
 	simple_expr_unit_tests.cc
 	token.h
 	var.cc

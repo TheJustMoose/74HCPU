@@ -4,6 +4,7 @@
 #include "node.h"
 #include "optimize.h"
 #include "parser.h"
+#include "print_tree.h"
 
 #include <cstdint>
 #include <fstream>
@@ -60,13 +61,9 @@ int main(int argc, char* argv[]) {
 
   cout << "res_code.size(): " << res_code.size() << endl << endl;
 
-/*
-  std::string res_arg {};
-  std::string op_name {};
-  std::string left_arg {};
-  std::string right_arg {};
-  bool res_in_temp {false};
-*/
+  for (size_t i = 0; i < statements.size(); i++)
+    if (statements[i])
+      PrintTree(statements[i]);
 
   cout << "| res |  op | left|right| tmp |" << endl;
   for (auto& r : res_code)
