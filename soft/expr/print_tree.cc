@@ -20,17 +20,20 @@ string dup(char c, int w) {
 
 vector<Node*> gLinearTree;
 map<const Node*, int> gNodeLevel;
+map<const Node*, int> gNodeOffset;
 
-void Tree2List(Node* n, int lvl = 0) {
+void Tree2List(Node* n, int mid, int lvl = 0) {
   gLinearTree.push_back(n);
   gNodeLevel[n] = lvl;
+  gNodeOffset[n] = mid;
 
+  int offset = mid/4;
   if (BinOp* bop = dynamic_cast<BinOp*>(n)) {
-    Tree2List(bop->left, lvl + 1);
-    Tree2List(bop->right, lvl + 1);
+    Tree2List(bop->left, mid - mid/2 - offset, lvl + 1);
+    Tree2List(bop->right, mid - mid/2 + offset, lvl + 1);
   } else if (AssignOp* aop = dynamic_cast<AssignOp*>(n)) {
-    Tree2List(aop->left, lvl + 1);
-    Tree2List(aop->right, lvl + 1);
+    Tree2List(aop->left, mid + mid/2 - offset, lvl + 1);
+    Tree2List(aop->right, mid + mid/2 - offset, lvl + 1);
   } else {
     cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }
@@ -44,8 +47,10 @@ void PrintTree(Node* n) {
   gLinearTree.clear();
   gNodeLevel.clear();
 
-  Tree2List(n);
+  Tree2List(n, kWidth / 2);  // root node should be in a center of screen
   cout << endl;
+
+  char line[kWidth + 1];
 
   int last_lvl {0};
   int nodes_on_lvl {0};
@@ -61,7 +66,7 @@ void PrintTree(Node* n) {
       nodes_on_lvl++;
     }
 
-    cout << dup(' ', w) << GetNodeTypeName(n->type()) << " (" << lvl << ")" << dup(' ', 10);
+    cout << dup(' ', w) << GetNodeTypeName(n->type()) << " (" << gNodeOffset[n] << ")" << dup(' ', 10);
   }
 
   cout << endl;
