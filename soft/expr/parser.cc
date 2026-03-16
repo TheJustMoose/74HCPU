@@ -106,7 +106,7 @@ Node* term() {
     Node* right = prim();
     // prim have already called Lexer::instance().consume();
 
-    BinOp* op = new BinOp(t_op);
+    BinOp* op = new BinOp(t_op, new_tmp());
     op->left = left;
     op->right = right;
     left = op;
@@ -132,7 +132,7 @@ Node* expr() {
     Node* right = term();
     // term have already called Lexer::instance().consume(); in prim()
 
-    BinOp* op = new BinOp(t_op);
+    BinOp* op = new BinOp(t_op, new_tmp());
     op->left = left;
     op->right = right;
     left = op;
@@ -192,7 +192,7 @@ Node* declare() {
   } else if (t == tByte) {
     dt = dtByte;
   } else {
-    cout << "This token is not tInt, but " << GetTokenName(t) << endl;
+    //cout << "This token is not tInt, but " << GetTokenName(t) << endl;
     return nullptr;
   }
 
@@ -237,7 +237,7 @@ Node* declare() {
       Lexer::instance().consume();  // skip comma
       t = Lexer::instance().currentToken();
     } else if (t == tSemicolon) {  // replace it to comma later
-      cout << "Semicolon found. Leave it for stmts() func" << endl;
+      //cout << "Semicolon found. Leave it for stmts() func" << endl;
       return n;
     } else {
       cout << "Error. Please add ';' to the end of declaration" << endl;

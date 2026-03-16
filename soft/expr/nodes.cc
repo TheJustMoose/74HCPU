@@ -32,10 +32,10 @@ void Name::init_size(uint8_t size) {
 }
 
 void Name::gen(vector<Operation>& res_code) {
-  cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
+  //cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
 }
 
-string Name::name() {
+string Name::name() const {
   return value_;
 }
 
@@ -43,8 +43,8 @@ uint8_t Name::cached_size() {
   return cached_size_;
 }
 
-BinOp::BinOp(Token t)
-  : Node(Token2NodeType(t)) {
+BinOp::BinOp(Token t, string n)
+  : Node(Token2NodeType(t)), name(n) {
 }
 
 void BinOp::gen(vector<Operation>& res_code) {

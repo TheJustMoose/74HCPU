@@ -15,6 +15,7 @@ class Num: public Node {
   Num(int value);
 
   void gen(std::vector<Operation>& res_code) override;
+  int value() const { return value_; }
 
  private:
   int value_ {0};
@@ -26,7 +27,7 @@ class Name: public Node {
 
   void init_size(uint8_t size);
   void gen(std::vector<Operation>& res_code) override;
-  std::string name();
+  std::string name() const;
   uint8_t cached_size();
 
  private:
@@ -36,13 +37,14 @@ class Name: public Node {
 
 class BinOp: public Node {
  public:
-  BinOp(Token t);
+  BinOp(Token t, std::string n);
 
   void gen(std::vector<Operation>& res_code) override;
   std::string op() override;
 
   Node* left {nullptr};
   Node* right {nullptr};
+  std::string name;
 };
 
 class UnOp: public Node {

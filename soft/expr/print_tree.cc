@@ -90,9 +90,19 @@ void PrintTree(Node* n) {
       nodes_on_lvl++;
     }
 
+    string name {""};
+    if (const Name* name_node = dynamic_cast<const Name*>(n))
+      name = name_node->name();
+
+    if (const Num* num_node = dynamic_cast<const Num*>(n))
+      name = to_string(num_node->value());
+
+    if (const BinOp* binop_node = dynamic_cast<const BinOp*>(n))
+      name = binop_node->name;
+
     TypeStringIntoTheBuffer(
         line,
-        GetNodeTypeName(n->type()) + " (" + to_string(gNodeOffset[n]) + ")",
+        GetNodeTypeName(n->type()) + " (" + name + ")",  // to_string(gNodeOffset[n])
         gNodeOffset[n]);
 
     //cout << "cnt: " << cnt << ", " << GetNodeTypeName(n->type()) << endl;

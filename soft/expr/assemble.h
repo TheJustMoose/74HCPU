@@ -2,7 +2,6 @@
 
 #include "operation.h"
 
-#include <cstdint>
 #include <string>
 #include <vector>
 
