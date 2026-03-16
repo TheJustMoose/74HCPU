@@ -2,6 +2,7 @@
 
 #include "data_type.h"
 
+#include <cstdint>
 #include <string>
 
 struct Var {

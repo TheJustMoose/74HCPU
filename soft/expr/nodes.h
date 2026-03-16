@@ -6,7 +6,7 @@
 #include "node.h"
 #include "node_type.h"
 
-#include <cctype>
+#include <cstdint>
 #include <string>
 #include <vector>
 
