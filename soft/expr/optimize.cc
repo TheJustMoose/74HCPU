@@ -20,7 +20,7 @@ void Optimize(vector<Operation>& res_code) {
         res_code[i].res_arg == res_code[i + 1].left_arg) {
 
       cout << "Will merge " << i << " with " << i + 1 << " operations" << endl;
-      cout << "i " << res_code[i].str() << endl;
+      cout << "i   " << res_code[i].str() << endl;
       cout << "i+1 " << res_code[i + 1].str() << endl;
 
       can_be_optimized.push_back(i + 1);

@@ -73,7 +73,7 @@ Node* prim() {
     return new Name(str);
   } else if (t == tMinus) {
     Lexer::instance().consume();
-    UnOp* n = new UnOp();
+    UnOp* n = new UnOp(new_tmp());
     n->child = prim();
     return n;
   } else if (t == tLBracket) {

@@ -98,7 +98,7 @@ void PrintTree(Node* n) {
       name = to_string(num_node->value());
 
     if (const BinOp* binop_node = dynamic_cast<const BinOp*>(n))
-      name = binop_node->name;
+      name = binop_node->name();
 
     if (const AssignOp* assop_node = dynamic_cast<const AssignOp*>(n))
       name = assop_node->op();

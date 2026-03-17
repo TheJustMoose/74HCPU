@@ -16,11 +16,7 @@ Num::Num(int value)
 }
 
 void Num::gen(vector<Operation>& res_code) {
-/*
-  tmp_name_ = new_tmp();
-  cout << FuncGuard::stack_str() << tmp_name_ << " = " << value_ << endl;
-  res_code.emplace_back(tmp_name_, "", to_string(value_), "", true);
-*/
+  // number value will be used by other nodes
 }
 
 Name::Name(string value)
@@ -32,7 +28,7 @@ void Name::init_size(uint8_t size) {
 }
 
 void Name::gen(vector<Operation>& res_code) {
-  //cout << FuncGuard::stack_str() << "Name object: " << value_ << endl;
+  // name value will be used by other nodes
 }
 
 string Name::name() const {
@@ -44,7 +40,7 @@ uint8_t Name::cached_size() {
 }
 
 BinOp::BinOp(Token t, string n)
-  : Node(Token2NodeType(t)), name(n) {
+  : Node(Token2NodeType(t)), name_(n) {
 }
 
 void BinOp::gen(vector<Operation>& res_code) {
@@ -56,11 +52,11 @@ void BinOp::gen(vector<Operation>& res_code) {
     left->gen(res_code);
     right->gen(res_code);
     // Okay, let's put operation result into temp variable
-    cout << FuncGuard::stack_str() << name << " = "
+    cout << FuncGuard::stack_str() << name() << " = "
          << left->name() << " " << op() << " "
          << right->name() << endl;
   }
-  //res_code.emplace_back(tmp_name_, op(), left->name(), right->name(), true);
+  res_code.emplace_back(name(), op(), left->name(), right->name(), true);
 }
 
 string BinOp::op() const {
@@ -73,17 +69,16 @@ string BinOp::op() const {
   }
 }
 
-UnOp::UnOp()
-  : Node(ntUMinus) {
+UnOp::UnOp(string n)
+  : Node(ntUMinus), name_(n) {
 }
 
 void UnOp::gen(vector<Operation>& res_code) {
   child->gen(res_code);
-/*
-  cout << FuncGuard::stack_str() << tmp_name_ << " = "
+
+  cout << FuncGuard::stack_str() << name_ << " = "
        << op() << child->name() << " " << endl;
-  res_code.emplace_back(tmp_name_, op(), "", child->name(), true);
-*/
+  res_code.emplace_back(name_, op(), "", child->name(), true);
 }
 
 AssignOp::AssignOp()
@@ -98,15 +93,14 @@ void AssignOp::gen(vector<Operation>& res_code) {
   }
   Name* name_node = dynamic_cast<Name*>(left);
   if (!name_node) {
-    cout << FuncGuard::stack_str() << "Error. left node is not Name class" << endl;
+    cout << FuncGuard::stack_str() << "Error. left node is not variable (Name class)" << endl;
     return;
   }
-/*
+
   cout << FuncGuard::stack_str()
        << name_node->name() << " = "
        << right->name() << endl;
   res_code.emplace_back(name_node->name(), "", right->name(), "");
-*/
 }
 
 VarDecl::VarDecl(DataType dt, bool is_ptr)
