@@ -12,11 +12,11 @@ class Node {
 
   virtual void gen(std::vector<Operation>& res_code) = 0;
 
-  virtual std::string op() { return ""; }
+  virtual std::string op() const { return ""; }
 
-  NodeType type() const {
-    return type_;
-  };
+  virtual std::string name() const { return "??"; }
+
+  NodeType type() const { return type_; }
 
  protected:
   NodeType type_ {ntUnknown};

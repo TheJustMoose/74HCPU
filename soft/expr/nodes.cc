@@ -56,17 +56,14 @@ void BinOp::gen(vector<Operation>& res_code) {
     left->gen(res_code);
     right->gen(res_code);
     // Okay, let's put operation result into temp variable
-/*
-    tmp_name_ = new_tmp();
-    cout << FuncGuard::stack_str() << tmp_name_ << " = "
+    cout << FuncGuard::stack_str() << name << " = "
          << left->name() << " " << op() << " "
          << right->name() << endl;
-*/
   }
   //res_code.emplace_back(tmp_name_, op(), left->name(), right->name(), true);
 }
 
-string BinOp::op() {
+string BinOp::op() const {
   switch (type()) {
     case ntSum: return "+";
     case ntSub: return "-";
@@ -83,14 +80,13 @@ UnOp::UnOp()
 void UnOp::gen(vector<Operation>& res_code) {
   child->gen(res_code);
 /*
-  tmp_name_ = new_tmp();
   cout << FuncGuard::stack_str() << tmp_name_ << " = "
        << op() << child->name() << " " << endl;
   res_code.emplace_back(tmp_name_, op(), "", child->name(), true);
 */
 }
 
-string UnOp::op() {
+string UnOp::op() const {
   return "-";
 }
 
@@ -117,7 +113,7 @@ void AssignOp::gen(vector<Operation>& res_code) {
 */
 }
 
-string AssignOp::op() {
+string AssignOp::op() const {
   return "=";
 }
 
