@@ -52,7 +52,7 @@ class UnOp: public Node {
   UnOp();  // TODO: add type of unary operation here
 
   void gen(std::vector<Operation>& res_code) override;
-  std::string op() const override;
+  std::string op() const override { return "-"; }
 
   Node* child {nullptr};
 };
@@ -62,7 +62,7 @@ class AssignOp: public Node {
   AssignOp();
 
   void gen(std::vector<Operation>& res_code) override;
-  std::string op() const override;
+  std::string op() const override { return "="; }
 
   Node* left {nullptr};
   Node* right {nullptr};

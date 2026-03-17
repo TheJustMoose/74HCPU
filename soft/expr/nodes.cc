@@ -86,10 +86,6 @@ void UnOp::gen(vector<Operation>& res_code) {
 */
 }
 
-string UnOp::op() const {
-  return "-";
-}
-
 AssignOp::AssignOp()
   : Node(ntAssign) {
 }
@@ -111,10 +107,6 @@ void AssignOp::gen(vector<Operation>& res_code) {
        << right->name() << endl;
   res_code.emplace_back(name_node->name(), "", right->name(), "");
 */
-}
-
-string AssignOp::op() const {
-  return "=";
 }
 
 VarDecl::VarDecl(DataType dt, bool is_ptr)
