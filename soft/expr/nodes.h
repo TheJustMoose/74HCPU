@@ -30,7 +30,7 @@ class Name: public Node {
 
   void init_size(uint8_t size);
   void gen(std::vector<Operation>& res_code) override;
-  std::string name() const override;
+  std::string name() const override { return value_; }
   uint8_t cached_size();
 
  private:
@@ -43,16 +43,14 @@ class BinOp: public Node {
   BinOp(Token t, std::string n);
 
   void gen(std::vector<Operation>& res_code) override;
-  std::string name() const override {
-    return name_;
-  }
+  std::string name() const override { return name_; }
   std::string op() const override;
 
   Node* left {nullptr};
   Node* right {nullptr};
 
  private:
-  std::string name_;
+  std::string name_ {"bo"};
 };
 
 class UnOp: public Node {
@@ -60,15 +58,13 @@ class UnOp: public Node {
   UnOp(std::string n);  // TODO: add type of unary operation here
 
   void gen(std::vector<Operation>& res_code) override;
-  std::string name() const override {
-    return name_;
-  }
+  std::string name() const override { return name_; }
   std::string op() const override { return "-"; }
 
   Node* child {nullptr};
 
  private:
-  std::string name_;
+  std::string name_{"um"};
 };
 
 class AssignOp: public Node {
@@ -77,6 +73,7 @@ class AssignOp: public Node {
 
   void gen(std::vector<Operation>& res_code) override;
   std::string op() const override { return "="; }
+  std::string name() const override { return left ? left->name() : "eq"; }
 
   Node* left {nullptr};
   Node* right {nullptr};
@@ -88,6 +85,7 @@ class VarDecl: public Node {
 
   void gen(std::vector<Operation>& res_code) override;
   uint8_t var_size();
+  std::string name() const override { return "de"; }
 
   DataType data_type {dtNotInitialize};
   bool is_pointer {false};

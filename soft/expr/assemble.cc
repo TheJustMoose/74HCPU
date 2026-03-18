@@ -58,8 +58,8 @@ vector<string> Assemble(vector<Operation> code) {
   vector<string> res;
 
   for (Operation op : code) {
+    cout << op.raw() << " " << op.str() << endl;
     if (!op.op_name.size()) {
-      cout << "Hooray!!!" << endl;
       string res_reg = FindFreeRegFor(op.res_arg);
       string line1 = op.res_arg + " = " + op.left_arg;
       res.push_back(line1);
@@ -73,11 +73,15 @@ vector<string> Assemble(vector<Operation> code) {
       res.push_back(line1);            // b = t1
       string line2 = op.res_arg + " = " + op.right_arg;
       res.push_back(line2);
+
+      res.push_back("asm will be here soon (op.left_arg is empty)");
     } else {
       string line1 = op.res_arg + " = " + op.left_arg;
       res.push_back(line1);
       string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;
       res.push_back(line2);
+
+      res.push_back("asm will be here soon (else)");
     }
   }
 

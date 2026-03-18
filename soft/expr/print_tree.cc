@@ -69,6 +69,7 @@ void PrintTree(Node* n) {
 
   gLinearTree.clear();
   gNodeLevel.clear();
+  gNodeOffset.clear();
 
   Tree2List(n, kWidth / 2);  // root node should be in a center of screen
   //cout << gLinearTree.size() << " items was stored" << endl;
@@ -82,7 +83,7 @@ void PrintTree(Node* n) {
     int lvl = gNodeLevel[n];
     if (last_lvl != lvl) {
       cout << line << endl;
-      //cout << "The next level..." << endl;
+
       line = string(kWidth, ' ');
       last_lvl = lvl;
       nodes_on_lvl = 1;  // we just found node on next level and node exist, so 'cnt' = 1
@@ -90,7 +91,7 @@ void PrintTree(Node* n) {
       nodes_on_lvl++;
     }
 
-    string name {""};
+    string name {"Oo"};
     if (const Name* name_node = dynamic_cast<const Name*>(n))
       name = name_node->name();
 
@@ -108,7 +109,6 @@ void PrintTree(Node* n) {
         GetNodeTypeName(n->type()) + " (" + name + ")",  // to_string(gNodeOffset[n])
         gNodeOffset[n]);
 
-    //cout << "cnt: " << cnt << ", " << GetNodeTypeName(n->type()) << endl;
     cnt++;
   }
 

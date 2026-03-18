@@ -31,10 +31,6 @@ void Name::gen(vector<Operation>& res_code) {
   // name value will be used by other nodes
 }
 
-string Name::name() const {
-  return value_;
-}
-
 uint8_t Name::cached_size() {
   return cached_size_;
 }
@@ -87,16 +83,22 @@ AssignOp::AssignOp()
 }
 
 void AssignOp::gen(vector<Operation>& res_code) {
+  cout << "AssignOp::gen..." << endl;
+
   right->gen(res_code);
   if (!left) {
     cout << FuncGuard::stack_str() << "left == nullptr" << endl;
     return;
   }
+
   Name* name_node = dynamic_cast<Name*>(left);
   if (!name_node) {
     cout << FuncGuard::stack_str() << "Error. left node is not variable (Name class)" << endl;
     return;
   }
+
+  //left->gen(res_code);
+  //right->gen(res_code);
 
   cout << FuncGuard::stack_str()
        << name_node->name() << " = "
