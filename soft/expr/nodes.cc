@@ -56,7 +56,8 @@ void BinOp::gen(vector<Operation>& res_code) {
          << left->name() << " " << op() << " "
          << right->name() << endl;
   }
-  res_code.emplace_back(name(), op(), left->name(), right->name(), true);
+  bool r_is_n = right && (right->type() == ntNum);
+  res_code.emplace_back(name(), op(), left->name(), r_is_n, right->name(), true);
 }
 
 string BinOp::op() const {
@@ -78,7 +79,7 @@ void UnOp::gen(vector<Operation>& res_code) {
 
   cout << FuncGuard::stack_str() << name_ << " = "
        << op() << child->name() << " " << endl;
-  res_code.emplace_back(name_, op(), "", child->name(), true);
+  res_code.emplace_back(name_, op(), "", false, child->name(), true);
 }
 
 AssignOp::AssignOp()
@@ -100,7 +101,9 @@ void AssignOp::gen(vector<Operation>& res_code) {
   cout << FuncGuard::stack_str()
        << name_node->name() << " = "
        << right->name() << endl;
-  res_code.emplace_back(name_node->name(), "", right->name(), "");
+
+  bool r_is_n = right && (right->type() == ntNum);
+  res_code.emplace_back(name_node->name(), "", right->name(), r_is_n, "");
 }
 
 VarDecl::VarDecl(DataType dt, bool is_ptr)
