@@ -58,11 +58,12 @@ vector<string> Assemble(vector<Operation> code) {
 
   for (Operation op : code) {
     if (!op.op_name.size()) {
+      string left_reg = FindFreeRegFor(op.left_arg);  // this is immediate value :(((
+      string res_reg = FindFreeRegFor(op.res_arg);
+
       string line1 = op.res_arg + " = " + op.left_arg;
       res.push_back(line1);
 
-      string left_reg = FindFreeRegFor(op.left_arg);  // this is immediate value :(((
-      string res_reg = FindFreeRegFor(op.res_arg);
       string line11 = "mov " + res_reg + ", " + left_reg + "   " + DumpRegs();
       res.push_back(line11);
     } else if (!op.left_arg.size()) {  // t1 = -t1

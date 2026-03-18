@@ -33,8 +33,8 @@ struct Operation {
   }
 
   std::string raw() {
-    return "|" + align(res_arg) + " |" + align(op_name) + " |" +
-           align(left_arg) + " |" + align(right_arg) + " | " +
+    return "|" + align(res_arg) + " |" + align(left_arg) + " |" +
+           align(op_name) + " |" + align(right_arg) + " | " +
            (res_in_temp ? "tmp" : "var") + " |";
   }
 
