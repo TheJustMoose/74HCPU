@@ -83,14 +83,13 @@ vector<string> Assemble(vector<Operation> code) {
 
       res.push_back("asm will be here soon (op.left_arg is empty)");
     } else {
-      string res_reg = FindRegFor(op.res_arg);
-
-      string line1 = res_reg + " = " + op.left_arg;
+      string line1 = op.res_arg + " = " + op.left_arg;
       res.push_back(line1);
-      string line2 = res_reg + " " + op.op_name + "= " + op.right_arg;
+      string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;
       res.push_back(line2);
 
-      string line11 = "mov " + res_reg + ", " + op.left_arg;
+      string res_reg = FindRegFor(op.res_arg);
+      string line11 = "mov " + res_reg + ", " + FindRegFor(op.left_arg) + "   " + DumpRegs();
       res.push_back(line11);
 
       string cmd {"unk"};
@@ -103,7 +102,7 @@ vector<string> Assemble(vector<Operation> code) {
       else if (op.op_name == "/")
         cmd = "/ - not implemented!";
 
-      string line21 = cmd + " " + res_reg + ", " + op.right_arg;
+      string line21 = cmd + " " + res_reg + ", " + FindRegFor(op.right_arg) + "   " + DumpRegs();
       res.push_back(line21);
     }
   }
