@@ -58,6 +58,12 @@ bool isDeclared(string var_name, uint8_t* var_size) {
   return false;
 }
 
+void printVars() {
+  for (const Var& v : vars)
+    cout << v.name << ": " << GetDataTypeName(v.data_type)
+         << (v.is_ptr ? "@" : "") << endl;
+}
+
 Node* prim() {
   FuncGuard fg("prim");
   Token t = Lexer::instance().currentToken();
@@ -215,7 +221,7 @@ Node* declare() {
     n->names.push_back(var_name);
     cout << "Int variable \"" << var_name << "\" was declared" << endl;
 
-    vars.emplace_back(var_name, dt);  // duplicate variable name array
+    vars.emplace_back(var_name, dt, is_ptr);  // duplicate variable name array
     Lexer::instance().consume();  // skip var name
 
     t = Lexer::instance().currentToken();

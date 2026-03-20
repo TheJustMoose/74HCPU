@@ -5,12 +5,14 @@
 #include <cstdint>
 #include <string>
 
-struct Var {
-  std::string name {};
-  DataType data_type {dtNotInitialize};
-
-  Var(std::string n, DataType dt)
-    : name(n), data_type(dt) {}
+class Var {
+ public:
+  Var(std::string n, DataType dt, bool is_p)
+    : name(n), data_type(dt), is_ptr(is_p) {}
 
   uint8_t size() const;
+
+  std::string name {};
+  DataType data_type {dtNotInitialize};
+  bool is_ptr {false};
 };

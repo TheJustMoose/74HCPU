@@ -86,6 +86,9 @@ int main(int argc, char* argv[]) {
       cout << n.str() << "  // was not declared" << endl;
   }
 
+  cout << endl << "vars:" << endl;
+  printVars();
+
   cout << endl << "final asm:" << endl;
   vector<string> res_asm = Assemble(res_code);
   for (string& s : res_asm)

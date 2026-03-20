@@ -9,6 +9,8 @@ project(simple_expr CXX)
 add_executable(simple_expr
 	assemble.h
 	assemble.cc
+	data_type.h
+	data_type.cc
 	func_guard.h
 	func_guard.cc
 	lexer.h
@@ -41,6 +43,8 @@ project(unit_tests CXX)
 add_executable(simple_expr_unit_tests
 	assemble.h
 	assemble.cc
+	data_type.h
+	data_type.cc
 	func_guard.h
 	func_guard.cc
 	lexer.h
