@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
   for (Operation& n : res_code) {
     uint8_t sz {0};
     if (isDeclared(n.res_arg, &sz))
-      cout << n.str() << "(" << static_cast<int>(sz) << ")" << endl;
+      cout << n.str() << "(size: " << static_cast<int>(sz) << ")" << endl;
     else if (n.res_in_temp)
       cout << n.str() << endl;
     else

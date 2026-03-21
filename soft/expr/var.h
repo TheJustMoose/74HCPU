@@ -7,6 +7,8 @@
 
 class Var {
  public:
+  Var() {}
+
   Var(std::string n, DataType dt, bool is_p)
     : name(n), data_type(dt), is_ptr(is_p) {}
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "var.h"
+
 class Node;
 
 Node* prim();
@@ -16,3 +18,4 @@ bool stmts(std::vector<Node*>& statements);
 
 bool isDeclared(std::string var_name, uint8_t* var_size = 0);
 void printVars();
+bool getVar(std::string var_name, Var& var);

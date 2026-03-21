@@ -61,7 +61,18 @@ bool isDeclared(string var_name, uint8_t* var_size) {
 void printVars() {
   for (const Var& v : vars)
     cout << v.name << ": " << GetDataTypeName(v.data_type)
-         << (v.is_ptr ? "@" : "") << endl;
+         << (v.is_ptr ? "@" : "")
+         << ", size: " << (int)v.size() << endl;
+}
+
+bool getVar(string var_name, Var& var) {
+  for (const Var& v : vars)
+    if (v.name == var_name) {
+      var = v;
+      return true;
+    }
+
+  return false;
 }
 
 Node* prim() {

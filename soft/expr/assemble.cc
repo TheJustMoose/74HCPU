@@ -1,6 +1,10 @@
 #include "assemble.h"
+#include "parser.h"
 
+#include <algorithm>
 #include <iostream>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -32,7 +36,7 @@ vector<string> bank0(reg_cnt);
 vector<string> bank1(reg_cnt);
 
 string FindRegFor(string var_name) {
-  // check existent pair var:reg
+  // check existing pair var:reg
   for (size_t i = 0; i < 8; i++)
     if (bank0[i] == var_name)
       return "R" + to_string(i);
@@ -43,6 +47,27 @@ string FindRegFor(string var_name) {
       bank0[i] = var_name;
       return "R" + to_string(i);
     }
+
+  // oops
+  return "";
+}
+
+string FindPtrFor(string var_name) {
+  // check existing pair ptr:reg
+  if (bank1[0] == var_name)
+    return "X";
+  if (bank1[2] == var_name)
+    return "Y";
+
+  // try to insert new pair ptr:reg
+  if (!bank1[0].size()) {
+    bank1[0] = var_name;
+    return "X";
+  }
+  if (!bank1[2].size()) {
+    bank1[2] = var_name;
+    return "Y";
+  }
 
   // oops
   return "";
@@ -61,20 +86,64 @@ string DumpRegs() {
   return res;
 }
 
+string ToUpper(string s) {
+  transform(s.begin(), s.end(), s.begin(), ::toupper);
+  return s;
+}
+
+string ToHexString(int value, int width) {
+  stringstream ss;
+  ss << hex << value;
+  string res = ToUpper(ss.str());
+  while (res.size() < width)
+    res = "0" + res;
+  return res;
+}
+
 vector<string> Assemble(vector<Operation> code) {
   vector<string> res;
 
   for (Operation op : code) {
     cout << op.raw() << " " << op.str() << endl;
     if (!op.op_name.size()) {
-      string res_reg = FindRegFor(op.res_arg);
-      string line1 = op.res_arg + " = " + op.left_arg;
-      res.push_back(line1);
+      // bool getVar(std::string var_name, Var& var);
+      Var v;
+      if (!getVar(op.res_arg, v)) {
+        cout << "Variable " << op.res_arg << " was not declared" << endl;
+        continue;
+      }
 
-      string line11 = "mov " + res_reg + ", " +
-                      (op.left_arg_is_num ? op.left_arg : FindRegFor(op.left_arg)) +
-                      "   " + DumpRegs();
-      res.push_back(line11);
+      if (v.is_ptr) {
+        string res_reg = FindPtrFor(op.res_arg);
+        string line1 = op.res_arg + " = " + op.left_arg;
+        res.push_back(line1);
+
+        string lval;
+        string hval;
+        if (op.left_arg_is_num) {
+          int val = std::stoi(op.left_arg);
+          lval = ToHexString(val & 0xFF, 3) + "h";
+          hval = ToHexString((val >> 8) & 0xFF, 3) + "h";
+        } else {
+          string left = FindPtrFor(op.left_arg);
+          lval = left + "L";
+          hval = left + "H";
+        }
+
+        string line11 = "mov " + res_reg + "L, " + lval;
+        res.push_back(line11);
+        string line12 = "mov " + res_reg + "H, " + hval;
+        res.push_back(line12);
+      } else {
+        string res_reg = FindRegFor(op.res_arg);
+        string line1 = op.res_arg + " = " + op.left_arg;
+        res.push_back(line1);
+  
+        string line11 = "mov " + res_reg + ", " +
+                        (op.left_arg_is_num ? op.left_arg : FindRegFor(op.left_arg)) +
+                        "   " + DumpRegs();
+        res.push_back(line11);
+      }
     } else if (!op.left_arg.size()) {  // t1 = -t1
       string line1 = op.right_arg + " = " + op.op_name + op.right_arg;
       res.push_back(line1);            // b = t1
