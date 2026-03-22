@@ -83,8 +83,6 @@ AssignOp::AssignOp()
 }
 
 void AssignOp::gen(vector<Operation>& res_code) {
-  cout << "AssignOp::gen..." << endl;
-
   right->gen(res_code);
   if (!left) {
     cout << FuncGuard::stack_str() << "left == nullptr" << endl;

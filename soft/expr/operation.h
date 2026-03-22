@@ -34,7 +34,7 @@ struct Operation {
   }
 
   std::string raw() {
-    return "|" + align(res_arg) + " |" + align(left_arg) + " |" +
+    return "|" + align(res_arg) + " | = |" + align(left_arg) + " |" +
            (left_arg_is_num ? " num" : "    ") + " |" +
            align(op_name) + " |" + align(right_arg) + " | " +
            (res_in_temp ? "tmp" : "var") + " |";

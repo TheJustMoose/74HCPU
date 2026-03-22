@@ -100,6 +100,23 @@ string ToHexString(int value, int width) {
   return res;
 }
 
+/*
+out  CPU_FLAGS, 0x40  ; BF = 1
+mov  SPL, 0xFF    ; init stack
+mov  SPH, 0xFF
+mov  VL, 0        ; init Video RAM ptr
+mov  VH, 0
+out  CPU_FLAGS, 0 ; BF = 0
+*/
+
+void SwitchToBank0(vector<string> &res) {
+  res.push_back("out  CPU_FLAGS, 0x40");
+}
+
+void SwitchToBank1(vector<string> &res) {
+  res.push_back("out  CPU_FLAGS, 0");
+}
+
 vector<string> Assemble(vector<Operation> code) {
   vector<string> res;
 
@@ -129,10 +146,12 @@ vector<string> Assemble(vector<Operation> code) {
         }
 
         string res_reg = FindPtrFor(op.res_arg);
+        SwitchToBank1(res);
         string line11 = "mov " + res_reg + "L, " + lval;
         res.push_back(line11);
         string line12 = "mov " + res_reg + "H, " + hval;
         res.push_back(line12);
+        SwitchToBank0(res);
       } else {
         string line1 = op.res_arg + " = " + op.left_arg;
         res.push_back(line1);
@@ -151,11 +170,13 @@ vector<string> Assemble(vector<Operation> code) {
 
       res.push_back("asm will be here soon (op.left_arg is empty)");
     } else {  // arithm ops
-      string line1 = op.res_arg + " = " + op.left_arg;
+      // c = a + b   -->   c = a, c += b
+      string line1 = op.res_arg + " = " + op.left_arg;  // c = a
       res.push_back(line1);
-      string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;
+      string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
       res.push_back(line2);
 
+      // what about var_size ?
       string res_reg = FindRegFor(op.res_arg);
       string line11 = "mov " + res_reg + ", " + FindRegFor(op.left_arg) + "   " + DumpRegs();
       res.push_back(line11);

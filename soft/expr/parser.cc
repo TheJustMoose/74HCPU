@@ -80,12 +80,10 @@ Node* prim() {
   Token t = Lexer::instance().currentToken();
   if (t == tNum) {
     int val = Lexer::instance().getIntValue();
-    //cout << FuncGuard::stack_str() << "Find num: " << val << endl;
     Lexer::instance().consume();
     return new Num(val);
   } else if (t == tName) {
     string str = Lexer::instance().getStrValue();
-    //cout << FuncGuard::stack_str() << "Find name: " << str << endl;
     Lexer::instance().consume();
     return new Name(str);
   } else if (t == tMinus) {
@@ -116,7 +114,6 @@ Node* term() {
 
   Token t = Lexer::instance().currentToken();
   while (t == tMul || t == tDiv) {
-    //cout << FuncGuard::stack_str() << "Okay. Found * or /" << endl;
     Token t_op = t;
     Lexer::instance().consume();
 
@@ -142,7 +139,6 @@ Node* expr() {
 
   Token t = Lexer::instance().currentToken();
   while (t == tPlus || t == tMinus) {
-    //cout << FuncGuard::stack_str() << "Okay. Found + or -" << endl;
     Token t_op = t;
     Lexer::instance().consume();
 
@@ -172,7 +168,7 @@ Node* assign() {
     // но этот флажок лежит в таблице со списком операций :(
     if (!isDeclared(n->name(), &var_size))
       cout << "You try to assign to variable \"" << n->name()
-           << "\" which was not beed declared" << endl;
+           << "\" which has not been declared" << endl;
   }
 
   // TODO: теперь хорошо бы добавить инициализацию объявляемых переменных
@@ -209,7 +205,6 @@ Node* declare() {
   } else if (t == tByte) {
     dt = dtByte;
   } else {
-    //cout << "This token is not tInt, but " << GetTokenName(t) << endl;
     return nullptr;
   }
 
@@ -227,10 +222,9 @@ Node* declare() {
   // Okay, now try to find variable name[s]
   t = Lexer::instance().currentToken();
   while (t == tName) {
-    cout << "Variable name was found!" << endl;
     string var_name = Lexer::instance().getStrValue();
     n->names.push_back(var_name);
-    cout << "Int variable \"" << var_name << "\" was declared" << endl;
+    cout << "Int variable \"" << var_name << "\" has been declared" << endl;
 
     vars.emplace_back(var_name, dt, is_ptr);  // duplicate variable name array
     Lexer::instance().consume();  // skip var name
@@ -254,7 +248,6 @@ Node* declare() {
       Lexer::instance().consume();  // skip comma
       t = Lexer::instance().currentToken();
     } else if (t == tSemicolon) {  // replace it to comma later
-      //cout << "Semicolon found. Leave it for stmts() func" << endl;
       return n;
     } else {
       cout << "Error. Please add ';' to the end of declaration" << endl;
