@@ -105,53 +105,52 @@ vector<string> Assemble(vector<Operation> code) {
 
   for (Operation op : code) {
     cout << op.raw() << " " << op.str() << endl;
-    if (!op.op_name.size()) {
-      // bool getVar(std::string var_name, Var& var);
+    if (!op.op_name.size()) {  // empty op_name means assignment
       Var v;
       if (!getVar(op.res_arg, v)) {
         cout << "Variable " << op.res_arg << " was not declared" << endl;
         continue;
       }
 
-      if (v.is_ptr) {
-        string res_reg = FindPtrFor(op.res_arg);
+      if (v.is_ptr) {  // pointer ops
         string line1 = op.res_arg + " = " + op.left_arg;
         res.push_back(line1);
 
         string lval;
         string hval;
-        if (op.left_arg_is_num) {
+        if (op.left_arg_is_num) {  // pointer1 = 0x1000
           int val = std::stoi(op.left_arg);
           lval = ToHexString(val & 0xFF, 3) + "h";
           hval = ToHexString((val >> 8) & 0xFF, 3) + "h";
-        } else {
+        } else {  // pointer1 = pointer2
           string left = FindPtrFor(op.left_arg);
           lval = left + "L";
           hval = left + "H";
         }
 
+        string res_reg = FindPtrFor(op.res_arg);
         string line11 = "mov " + res_reg + "L, " + lval;
         res.push_back(line11);
         string line12 = "mov " + res_reg + "H, " + hval;
         res.push_back(line12);
       } else {
-        string res_reg = FindRegFor(op.res_arg);
         string line1 = op.res_arg + " = " + op.left_arg;
         res.push_back(line1);
   
+        string res_reg = FindRegFor(op.res_arg);
         string line11 = "mov " + res_reg + ", " +
                         (op.left_arg_is_num ? op.left_arg : FindRegFor(op.left_arg)) +
                         "   " + DumpRegs();
         res.push_back(line11);
       }
-    } else if (!op.left_arg.size()) {  // t1 = -t1
+    } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
       string line1 = op.right_arg + " = " + op.op_name + op.right_arg;
       res.push_back(line1);            // b = t1
       string line2 = op.res_arg + " = " + op.right_arg;
       res.push_back(line2);
 
       res.push_back("asm will be here soon (op.left_arg is empty)");
-    } else {
+    } else {  // arithm ops
       string line1 = op.res_arg + " = " + op.left_arg;
       res.push_back(line1);
       string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;

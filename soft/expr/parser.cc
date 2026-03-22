@@ -80,12 +80,12 @@ Node* prim() {
   Token t = Lexer::instance().currentToken();
   if (t == tNum) {
     int val = Lexer::instance().getIntValue();
-    cout << FuncGuard::stack_str() << "Find num: " << val << endl;
+    //cout << FuncGuard::stack_str() << "Find num: " << val << endl;
     Lexer::instance().consume();
     return new Num(val);
   } else if (t == tName) {
     string str = Lexer::instance().getStrValue();
-    cout << FuncGuard::stack_str() << "Find name: " << str << endl;
+    //cout << FuncGuard::stack_str() << "Find name: " << str << endl;
     Lexer::instance().consume();
     return new Name(str);
   } else if (t == tMinus) {
@@ -116,7 +116,7 @@ Node* term() {
 
   Token t = Lexer::instance().currentToken();
   while (t == tMul || t == tDiv) {
-    cout << FuncGuard::stack_str() << "Okay. Found * or /" << endl;
+    //cout << FuncGuard::stack_str() << "Okay. Found * or /" << endl;
     Token t_op = t;
     Lexer::instance().consume();
 
@@ -142,7 +142,7 @@ Node* expr() {
 
   Token t = Lexer::instance().currentToken();
   while (t == tPlus || t == tMinus) {
-    cout << FuncGuard::stack_str() << "Okay. Found + or -" << endl;
+    //cout << FuncGuard::stack_str() << "Okay. Found + or -" << endl;
     Token t_op = t;
     Lexer::instance().consume();
 
