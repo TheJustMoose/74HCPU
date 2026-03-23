@@ -53,7 +53,11 @@ void BinOp::gen(vector<Operation>& res_code) {
          << right->name() << endl;
   }
   bool r_is_n = right && (right->type() == ntNum);
-  res_code.emplace_back(name(), op(), left->name(), r_is_n, right->name(), true);
+  bool l_is_n = left && (left->type() == ntNum);
+
+  res_code.emplace_back(name(), op(), left->name(),
+                        r_is_n || l_is_n,
+                        right->name(), true);
 }
 
 string BinOp::op() const {
@@ -73,9 +77,11 @@ UnOp::UnOp(string n)
 void UnOp::gen(vector<Operation>& res_code) {
   child->gen(res_code);
 
+  // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
+  bool r_is_n = child && (child->type() == ntNum);
   cout << FuncGuard::stack_str() << name_ << " = "
        << op() << child->name() << " " << endl;
-  res_code.emplace_back(name_, op(), "", false, child->name(), true);
+  res_code.emplace_back(name_, op(), "", r_is_n, child->name(), true);
 }
 
 AssignOp::AssignOp()

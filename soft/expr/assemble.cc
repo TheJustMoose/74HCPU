@@ -13,7 +13,7 @@ using namespace std;
   bool res_in_temp {false};
   std::string op_name {};
   std::string left_arg {};
-  bool left_arg_is_num {false};
+  bool arg_is_num {false};
   std::string right_arg {};
   bool removed {false};
 */
@@ -135,7 +135,7 @@ vector<string> Assemble(vector<Operation> code) {
 
         string lval;
         string hval;
-        if (op.left_arg_is_num) {  // pointer1 = 0x1000
+        if (op.arg_is_num) {  // pointer1 = 0x1000
           int val = std::stoi(op.left_arg);
           lval = ToHexString(val & 0xFF, 3) + "h";
           hval = ToHexString((val >> 8) & 0xFF, 3) + "h";
@@ -158,18 +158,35 @@ vector<string> Assemble(vector<Operation> code) {
   
         string res_reg = FindRegFor(op.res_arg);
         string line11 = "mov " + res_reg + ", " +
-                        (op.left_arg_is_num ? op.left_arg : FindRegFor(op.left_arg)) +
+                        (op.arg_is_num ? op.left_arg : FindRegFor(op.left_arg)) +
                         "   " + DumpRegs();
         res.push_back(line11);
       }
     } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
-      string line1 = op.right_arg + " = " + op.op_name + op.right_arg;
-      res.push_back(line1);            // b = t1
-      string line2 = op.res_arg + " = " + op.right_arg;
-      res.push_back(line2);
+      res.push_back(op.raw());
+      string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
+      res.push_back(line1);
 
-      res.push_back("asm will be here soon (op.left_arg is empty)");
-    } else {  // arithm ops
+      string res_reg = FindRegFor(op.res_arg);  // как бы сделать так, чтобы следующий вызов FindRegFor не сломал res_reg?
+      if (op.arg_is_num) {  // pointer1 = 0x1000
+        res.push_back("Okay, We are in the else branch");
+        /*int val = std::stoi(op.right_arg);
+        val = ~val;
+        val++;  // two's complement negative value!
+        string neg_val = to_string(val);*/
+        string line = "mov " + res_reg + ", " + op.right_arg;
+        res.push_back(line);
+      } else {  // R0 = -R1
+        // mov R0, ~R1; add R0, 1
+        // xor R0, R0; addc R0, ~R1 + 1
+        string line21 = "mov " + res_reg + ", ~" + FindRegFor(op.right_arg);
+        res.push_back(line21);
+        string line22 = "add " + res_reg + ", 1";
+        res.push_back(line22);
+      }
+      // mov R0, ival; add R0, 1
+      // просто пересчитать в компиляторе отрицательное значение в дополнительный код)
+    } else {  // arithm ops (left_arg is not empty)
       // c = a + b   -->   c = a, c += b
       string line1 = op.res_arg + " = " + op.left_arg;  // c = a
       res.push_back(line1);

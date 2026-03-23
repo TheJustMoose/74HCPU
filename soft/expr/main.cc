@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
     if (statements[i])
       PrintTree(statements[i]);
 
-  cout << "| res | = | left|l_isn|  op |right| tmp |" << endl;
+  cout << "| res | = | left|isNum|  op |right| tmp |" << endl;
   for (auto& r : res_code)
     cout << r.raw() << endl;
 
