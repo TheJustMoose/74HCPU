@@ -794,7 +794,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0 270)
-			(size 1.7 1.7)
+			(size 1.8 1.7)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -3666,7 +3666,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.7)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -3675,7 +3675,7 @@
 		)
 		(pad "2" thru_hole circle
 			(at 0 2.54)
-			(size 1.7 1.7)
+			(size 1.8 1.8)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -3684,7 +3684,7 @@
 		)
 		(pad "3" thru_hole circle
 			(at 0 5.08)
-			(size 1.7 1.7)
+			(size 1.8 1.8)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -4013,7 +4013,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.5)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -4342,7 +4342,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.5)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -4911,7 +4911,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.5)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -4920,16 +4920,16 @@
 		)
 		(pad "2" thru_hole circle
 			(at 0 2.54)
-			(size 1.7 1.7)
+			(size 1.8 1.8)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 17 "/S1.1")
 			(uuid "de2783fc-5a85-4357-b063-fb6141355894")
 		)
-		(pad "3" thru_hole circle
+		(pad "3" thru_hole oval
 			(at 0 5.08)
-			(size 1.7 1.7)
+			(size 1.8 1.5)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -5258,7 +5258,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.5)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -5587,7 +5587,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.5)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -6588,7 +6588,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.5)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -6917,7 +6917,7 @@
 		)
 		(pad "1" thru_hole rect
 			(at 0 0)
-			(size 1.7 1.7)
+			(size 1.8 1.7)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
@@ -6944,7 +6944,7 @@
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor handsolder")
 		(property "Reference" "R1"
-			(at 0 -1.65 90)
+			(at 3.14 0 90)
 			(layer "F.SilkS")
 			(uuid "98ec8e92-5a1d-488f-82d2-74b572eea64f")
 			(effects
@@ -7138,9 +7138,8 @@
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor handsolder")
 		(property "Reference" "R2"
-			(at 0 -1.65 90)
+			(at -3.445 0 90)
 			(layer "F.SilkS")
-			(hide yes)
 			(uuid "199d48a0-4c82-40f8-8f73-3cf44c0ae255")
 			(effects
 				(font
@@ -7718,6 +7717,22 @@
 			)
 		)
 	)
+	(via
+		(at 101.6 48.5775)
+		(size 1.3)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(net 0)
+		(uuid "602be6b2-2934-433a-9853-002b05aa1afc")
+	)
+	(via
+		(at 65.405 47.3075)
+		(size 1.3)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(net 0)
+		(uuid "9572f3b4-11f0-4650-8d11-afe82622f851")
+	)
 	(segment
 		(start 75.4175 44.3025)
 		(end 75.565 44.45)
@@ -7801,7 +7816,7 @@
 	(segment
 		(start 140.405 50.815)
 		(end 144.215 50.815)
-		(width 0.5)
+		(width 0.45)
 		(layer "F.Cu")
 		(net 1)
 		(uuid "6c042f9a-203d-4e52-88c9-9285e0973551")
@@ -7952,8 +7967,8 @@
 	)
 	(segment
 		(start 144.145 48.26)
-		(end 135.5725 48.26)
-		(width 0.5)
+		(end 140.335 48.26)
+		(width 0.45)
 		(layer "F.Cu")
 		(net 2)
 		(uuid "66b740ed-3cd4-464d-8b7e-040fa4e13371")
@@ -7981,6 +7996,14 @@
 		(layer "F.Cu")
 		(net 2)
 		(uuid "b00641d6-4f06-44e1-9b7c-c530540a319e")
+	)
+	(segment
+		(start 140.335 48.26)
+		(end 135.5725 48.26)
+		(width 0.6)
+		(layer "F.Cu")
+		(net 2)
+		(uuid "b4aa6013-684b-408c-9927-19ab4d09bcc5")
 	)
 	(segment
 		(start 66.675 42.2275)
