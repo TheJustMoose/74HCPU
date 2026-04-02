@@ -1,5 +1,6 @@
 #include "assemble.h"
 #include "parser.h"
+#include "regs_bank.h"
 
 #include <algorithm>
 #include <iostream>
@@ -21,68 +22,11 @@ using namespace std;
   b = t1
 */
 
-class RegsBank0 {
- public:
-  const size_t RegCnt {8};
-
-  void Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res);
-  string FindRegFor(string var_name, vector<string> &res);
-  string DumpRegs();
-
-  string operator[](size_t idx) {
-    return bank0[idx];
-  }
-
- private:
-  vector<string> bank0 {RegCnt};
-};
 
 RegsBank0 bank0;
 
 size_t reg_cnt = 8;
 vector<string> bank1(reg_cnt);
-
-void RegsBank0::Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) {
-  // add instruction to spilling reg
-  // ptr V = find_addr_of(some_var_name?)
-
-  string line = "ST V, " + reg_idx;
-  res.push_back(line);
-}
-
-string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
-  static size_t last_used_register_idx {255};
-  // check existing pair var:reg
-  for (size_t i = 0; i < RegCnt; i++)
-    if (bank0[i] == var_name) {
-      last_used_register_idx = i;
-      return "R" + to_string(i);
-    }
-
-  // try to insert new pair var:reg
-  for (size_t i = 0; i < RegCnt; i++)
-    if (!bank0[i].size()) {
-      bank0[i] = var_name;
-      last_used_register_idx = i;
-      return "R" + to_string(i);
-    }
-
-  // TODO: add unit tests for this function
-
-  // no free registers, have to spill something
-  if (last_used_register_idx == 255) {  // no index of last used register
-    last_used_register_idx = 0;
-  } else if (last_used_register_idx == 7) {
-    Spill(0, res);
-    last_used_register_idx = 0;
-  } else {
-    last_used_register_idx++;
-    Spill(last_used_register_idx, res);
-  }
-
-  string reg = "R" + to_string(last_used_register_idx);
-  return reg;
-}
 
 string FindPtrFor(string var_name) {
   // check existing pair ptr:reg
@@ -103,19 +47,6 @@ string FindPtrFor(string var_name) {
 
   // oops
   return "";
-}
-
-string RegsBank0::DumpRegs() {
-  string res {"  // "};
-  for (size_t i = 0; i < 8; i++) {
-    res += "R" + to_string(i);
-    res += ": ";
-    res += bank0[i].size() ? bank0[i] : "-";
-    if (i != 7)
-      res += ", ";
-  }
-
-  return res;
 }
 
 // copied from asm

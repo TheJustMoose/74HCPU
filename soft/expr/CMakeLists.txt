@@ -28,6 +28,8 @@ add_executable(simple_expr
 	parser.cc
 	print_tree.h
 	print_tree.cc
+	regs_bank.h
+	regs_bank.cc
 	token.h
 	token2node_type.h
 	token2node_type.cc
@@ -61,6 +63,8 @@ add_executable(simple_expr_unit_tests
 	parser.cc
 	print_tree.h
 	print_tree.cc
+	regs_bank.h
+	regs_bank.cc
 	simple_expr_unit_tests.cc
 	token.h
 	token2node_type.h
