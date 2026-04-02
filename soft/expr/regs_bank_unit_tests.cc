@@ -1,4 +1,8 @@
 #include <doctest.h>
+#include <trompeloeil.hpp>
+#include <doctest/trompeloeil.hpp>  // doctest adapter
+
+using trompeloeil::_;
 
 #include "regs_bank.h"
 
@@ -27,7 +31,7 @@ TEST_CASE("check RegsBank0::FindRegFor") {
   CHECK_EQ(reg, "R3");  // have to get same register for same variable
 }
 
-TEST_CASE("check FindRegFor with many variables") {
+TEST_CASE("check RegsBank0::FindRegFor with many variables") {
   RegsBank0 rb;
   vector<string> res_code;
   string reg;
@@ -40,4 +44,8 @@ TEST_CASE("check FindRegFor with many variables") {
     else
       CHECK_EQ(reg, "R" + si);
   }
+}
+
+TEST_CASE("check RegsBank0::Spill") {
+  CHECK(false);
 }

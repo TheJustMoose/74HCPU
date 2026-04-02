@@ -41,6 +41,8 @@ add_executable(simple_expr
 
 include_directories("../doctest/doctest")
 
+include_directories("../trompeloeil/include")
+
 project(unit_tests CXX)
 add_executable(simple_expr_unit_tests
 	assemble.h
