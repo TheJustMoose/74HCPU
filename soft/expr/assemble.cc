@@ -1,6 +1,7 @@
 #include "assemble.h"
 #include "parser.h"
 #include "regs_bank.h"
+#include "spill.h"
 
 #include <algorithm>
 #include <iostream>
@@ -22,8 +23,21 @@ using namespace std;
   b = t1
 */
 
+class RegSpillable: public ISpillable {
+ public:
+  void Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res) override;
+};
 
-RegsBank0 bank0;
+void RegSpillable::Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res) {
+  // add instruction to spilling reg
+  // ptr V = find_addr_of(some_var_name?)
+
+  //string line = "ST V, " + reg_idx;
+  //res.push_back(line);
+}
+
+RegSpillable reg_spillable;
+RegsBank0 bank0(&reg_spillable);
 
 size_t reg_cnt = 8;
 vector<string> bank1(reg_cnt);

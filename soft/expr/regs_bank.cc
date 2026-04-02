@@ -1,13 +1,13 @@
+#include <iostream>
+
 #include "regs_bank.h"
+#include "spill.h"
 
 using namespace std;
 
 void RegsBank0::Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) {
-  // add instruction to spilling reg
-  // ptr V = find_addr_of(some_var_name?)
-
-  string line = "ST V, " + reg_idx;
-  res.push_back(line);
+  if (pSpill_)
+    pSpill_->Spill(reg_idx, res);
 }
 
 string RegsBank0::FindRegFor(string var_name, vector<string> &res) {

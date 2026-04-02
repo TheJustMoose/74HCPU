@@ -9,7 +9,7 @@ using trompeloeil::_;
 using namespace std;
 
 TEST_CASE("check RegsBank0::FindRegFor") {
-  RegsBank0 rb;
+  RegsBank0 rb {nullptr};
   CHECK(rb[0].empty());
   CHECK(rb[7].empty());
 
@@ -32,7 +32,7 @@ TEST_CASE("check RegsBank0::FindRegFor") {
 }
 
 TEST_CASE("check RegsBank0::FindRegFor with many variables") {
-  RegsBank0 rb;
+  RegsBank0 rb {nullptr};
   vector<string> res_code;
   string reg;
 
@@ -45,7 +45,15 @@ TEST_CASE("check RegsBank0::FindRegFor with many variables") {
       CHECK_EQ(reg, "R" + si);
   }
 }
+/*
+class MockSpillable : public ISpillable {
+ public:
+  // this macros will create mock method:
+  MAKE_MOCK2(Spill, void(size_t reg_idx, vector<string> &res), override);
+};
 
 TEST_CASE("check RegsBank0::Spill") {
+
   CHECK(false);
 }
+*/

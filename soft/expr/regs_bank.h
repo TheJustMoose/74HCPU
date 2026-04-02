@@ -1,16 +1,18 @@
 #pragma once
 
-#include <cstring>
+#include <cstdint>
 #include <string>
 #include <vector>
 
-#include "spill.h"
+class ISpillable;
 
-class RegsBank0: public ISpillable {
+class RegsBank0 {
  public:
   const size_t RegCnt {8};
 
-  void Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res) override;
+  RegsBank0(ISpillable* pSpill): pSpill_(pSpill) {}
+
+  void Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res);
 
   std::string FindRegFor(std::string var_name, std::vector<std::string> &res);
   std::string DumpRegs();
@@ -20,5 +22,6 @@ class RegsBank0: public ISpillable {
   }
 
  private:
+  ISpillable* pSpill_ {nullptr};
   std::vector<std::string> bank0 {RegCnt};
 };
