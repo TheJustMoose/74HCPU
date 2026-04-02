@@ -21,11 +21,28 @@ using namespace std;
   b = t1
 */
 
+class RegsBank0 {
+ public:
+  const size_t RegCnt {8};
+
+  void Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res);
+  string FindRegFor(string var_name, vector<string> &res);
+  string DumpRegs();
+
+  string operator[](size_t idx) {
+    return bank0[idx];
+  }
+
+ private:
+  vector<string> bank0 {RegCnt};
+};
+
+RegsBank0 bank0;
+
 size_t reg_cnt = 8;
-vector<string> bank0(reg_cnt);
 vector<string> bank1(reg_cnt);
 
-void Spill(size_t reg_idx, string some_var_name, vector<string> &res) {
+void RegsBank0::Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) {
   // add instruction to spilling reg
   // ptr V = find_addr_of(some_var_name?)
 
@@ -33,17 +50,17 @@ void Spill(size_t reg_idx, string some_var_name, vector<string> &res) {
   res.push_back(line);
 }
 
-string FindRegFor(string var_name, vector<string> &res) {
+string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
   static size_t last_used_register_idx {255};
   // check existing pair var:reg
-  for (size_t i = 0; i < reg_cnt; i++)
+  for (size_t i = 0; i < RegCnt; i++)
     if (bank0[i] == var_name) {
       last_used_register_idx = i;
       return "R" + to_string(i);
     }
 
   // try to insert new pair var:reg
-  for (size_t i = 0; i < reg_cnt; i++)
+  for (size_t i = 0; i < RegCnt; i++)
     if (!bank0[i].size()) {
       bank0[i] = var_name;
       last_used_register_idx = i;
@@ -56,11 +73,11 @@ string FindRegFor(string var_name, vector<string> &res) {
   if (last_used_register_idx == 255) {  // no index of last used register
     last_used_register_idx = 0;
   } else if (last_used_register_idx == 7) {
-    Spill(0);
+    Spill(0, res);
     last_used_register_idx = 0;
   } else {
     last_used_register_idx++;
-    Spill(last_used_register_idx);
+    Spill(last_used_register_idx, res);
   }
 
   string reg = "R" + to_string(last_used_register_idx);
@@ -88,7 +105,7 @@ string FindPtrFor(string var_name) {
   return "";
 }
 
-string DumpRegs() {
+string RegsBank0::DumpRegs() {
   string res {"  // "};
   for (size_t i = 0; i < 8; i++) {
     res += "R" + to_string(i);
@@ -172,10 +189,10 @@ vector<string> Assemble(vector<Operation> code) {
         string line1 = op.res_arg + " = " + op.left_arg;
         res.push_back(line1);
   
-        string res_reg = FindRegFor(op.res_arg, res);
+        string res_reg = bank0.FindRegFor(op.res_arg, res);
         string line11 = "mov " + res_reg + ", " +
-                        (op.arg_is_num ? op.left_arg : FindRegFor(op.left_arg, res)) +
-                        "   " + DumpRegs();
+                        (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg, res)) +
+                        "   " + bank0.DumpRegs();
         res.push_back(line11);
       }
     } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
@@ -183,14 +200,14 @@ vector<string> Assemble(vector<Operation> code) {
       string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
       res.push_back(line1);
 
-      string res_reg = FindRegFor(op.res_arg, res);
+      string res_reg = bank0.FindRegFor(op.res_arg, res);
       if (op.arg_is_num) {  // pointer1 = 0x1000
         string line = "mov " + res_reg + ", " + op.right_arg;
         res.push_back(line);
       } else {  // R0 = -R1
         // mov R0, ~R1; add R0, 1
         // xor R0, R0; addc R0, ~R1 + 1
-        string line21 = "mov " + res_reg + ", ~" + FindRegFor(op.right_arg, res);
+        string line21 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg, res);
         res.push_back(line21);
         string line22 = "add " + res_reg + ", 1";
         res.push_back(line22);
@@ -205,9 +222,9 @@ vector<string> Assemble(vector<Operation> code) {
       res.push_back(line2);
 
       // what about var_size ?
-      string res_reg = FindRegFor(op.res_arg, res);
-      string line11 = "mov " + res_reg + ", " + FindRegFor(op.left_arg, res)
-                    + "   " + DumpRegs();
+      string res_reg = bank0.FindRegFor(op.res_arg, res);
+      string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg, res)
+                    + "   " + bank0.DumpRegs();
       res.push_back(line11);
 
       string cmd {"unk"};
@@ -220,8 +237,8 @@ vector<string> Assemble(vector<Operation> code) {
       else if (op.op_name == "/")
         cmd = "/ - not implemented!";
 
-      string line21 = cmd + " " + res_reg + ", " + FindRegFor(op.right_arg, res)
-                    + "   " + DumpRegs();
+      string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg, res)
+                    + "   " + bank0.DumpRegs();
       res.push_back(line21);
     }
   }
