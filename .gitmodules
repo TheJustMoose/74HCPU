@@ -13,3 +13,6 @@
 [submodule "soft/doctest"]
 	path = soft/doctest
 	url = https://github.com/doctest/doctest.git
+[submodule "soft/trompeloeil"]
+	path = soft/trompeloeil
+	url = https://github.com/rollbear/trompeloeil.git
