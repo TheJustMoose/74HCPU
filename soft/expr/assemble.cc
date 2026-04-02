@@ -1,7 +1,7 @@
 #include "assemble.h"
 #include "parser.h"
 #include "regs_bank.h"
-#include "spill.h"
+#include "spillable.h"
 
 #include <algorithm>
 #include <iostream>

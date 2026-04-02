@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "regs_bank.h"
-#include "spill.h"
+#include "spillable.h"
 
 using namespace std;
 
