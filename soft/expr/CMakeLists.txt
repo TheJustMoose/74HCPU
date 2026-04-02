@@ -65,6 +65,7 @@ add_executable(simple_expr_unit_tests
 	print_tree.cc
 	regs_bank.h
 	regs_bank.cc
+	regs_bank_unit_tests.cc
 	simple_expr_unit_tests.cc
 	token.h
 	token2node_type.h
