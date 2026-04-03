@@ -57,11 +57,12 @@ TEST_CASE("check RegsBank0::Spill") {
   MockSpillable mockSpill;
   RegsBank0 rb {&mockSpill};
 
-  // mockSpill::Spill should be called with any args (trompeloeil::_) two times
-  REQUIRE_CALL(mockSpill, Spill(trompeloeil::_, trompeloeil::_)).TIMES(2);
+  // mockSpill::Spill should be called two times
+  REQUIRE_CALL(mockSpill, Spill(0, trompeloeil::_)).TIMES(1);  // first time with reg_idx == 0
+  REQUIRE_CALL(mockSpill, Spill(1, trompeloeil::_)).TIMES(1);  // and second time with reg_idx == 1
 
   vector<string> res_code;
   for (int i = 0; i < 10; i++) {
-    string reg = rb.FindRegFor("var" + to_string(i), res_code);
+    rb.FindRegFor("var" + to_string(i), res_code);
   }
 }
