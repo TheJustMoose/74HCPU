@@ -43,6 +43,16 @@ string new_tmp() {
 
 vector<Var> vars {};
 
+size_t getVarCount() {
+  return vars.size();
+}
+
+Var getVar(size_t idx) {
+  if (idx < vars.size())
+    return vars[idx];
+  return {};
+}
+
 bool isDeclared(string var_name, uint8_t* var_size) {
   for (const Var& v : vars)
     if (v.name == var_name) {
@@ -237,7 +247,7 @@ Node* declare() {
         Lexer::instance().consume();
         int val = Lexer::instance().getIntValue();
         cout << var_name << " := " << val << "  // initialization" << endl;
-        // TODO: put var value into some place/vector/class...
+        // TODO: try to put var value into **vars** vector (see above)
       } else {
         cout << "Error. Only initialization by numbers is supported now." << endl;
       }

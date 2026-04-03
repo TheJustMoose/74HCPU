@@ -2,6 +2,7 @@
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
+#include "nodes.h"
 #include "optimize.h"
 #include "parser.h"
 #include "print_tree.h"
@@ -50,6 +51,14 @@ int main(int argc, char* argv[]) {
   vector<Node*> statements;
   if (!stmts(statements))
     return 1;
+
+  cout << "decls:" << endl;
+  for (size_t i = 0; i < getVarCount(); i++) {
+    Var v = getVar(i);
+    cout << "vad decl: " << v.name << ": "
+         << GetDataTypeName(v.data_type) << (v.is_ptr ? "@" : "")
+         << endl;
+  }
 
   cout << "nodes:" << endl;
   vector<Operation> res_code;
