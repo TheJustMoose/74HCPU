@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <vector>
 
@@ -52,12 +53,19 @@ int main(int argc, char* argv[]) {
   if (!stmts(statements))
     return 1;
 
+  map<string, uint16_t> var_addrs;
+
   cout << "decls:" << endl;
+  uint16_t addr {0};
   for (size_t i = 0; i < getVarCount(); i++) {
     Var v = getVar(i);
     cout << "vad decl: " << v.name << ": "
          << GetDataTypeName(v.data_type) << (v.is_ptr ? "@" : "")
+         << ", addr: " << addr
          << endl;
+
+    var_addrs[v.name] = addr;
+    addr += v.size();
   }
 
   cout << "nodes:" << endl;
@@ -99,7 +107,7 @@ int main(int argc, char* argv[]) {
   printVars();
 
   cout << endl << "final asm:" << endl;
-  vector<string> res_asm = Assemble(res_code);
+  vector<string> res_asm = Assemble(res_code, var_addrs);
   for (string& s : res_asm)
     cout << s << endl;
 

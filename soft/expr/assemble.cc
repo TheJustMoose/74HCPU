@@ -25,10 +25,10 @@ using namespace std;
 
 class RegSpillable: public ISpillable {
  public:
-  void Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res) override;
+  void Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) override;
 };
 
-void RegSpillable::Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res) {
+void RegSpillable::Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) {
   // add instruction to spilling reg
   // ptr V = find_addr_of(some_var_name?)
 
@@ -95,7 +95,7 @@ void SwitchToBank1(vector<string> &res) {
   res.push_back("out  CPU_FLAGS, 0");
 }
 
-vector<string> Assemble(vector<Operation> code) {
+vector<string> Assemble(vector<Operation> code, map<string, uint16_t> var_addrs) {
   vector<string> res;
 
   for (Operation op : code) {
