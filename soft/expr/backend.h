@@ -12,8 +12,13 @@ class Backend {
   Backend(std::map<std::string, uint16_t> var_addrs)
     : var_addrs_(var_addrs) {}
 
-  std::vector<std::string> GenerateCode(std::vector<Operation> code);
+  void GenerateCode(std::vector<Operation> code);
+
+  std::vector<std::string> GetResAsm() {
+    return res_asm_;
+  }
 
  private:
   std::map<std::string, uint16_t> var_addrs_;
+  std::vector<std::string> res_asm_;
 };
