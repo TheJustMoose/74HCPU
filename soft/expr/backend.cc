@@ -134,22 +134,7 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
       }
 }
 
-void Backend::GenerateCode(vector<Operation> code) {
-  RegSpillable reg_spillable(var_addrs_);
-  RegsBank0 bank0(&reg_spillable);
-
-  res_asm_.clear();
-
-  for (Operation op : code) {
-    cout << op.raw() << " " << op.str() << endl;
-    if (!op.op_name.size()) {  // empty op_name means assignment
-      Var v;
-      if (!getVar(op.res_arg, v)) {
-        cout << "Variable " << op.res_arg << " was not declared" << endl;
-        continue;
-      }
-      GenerateAssignment(bank0, op, v);
-    } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
+void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
       res_asm_.push_back(op.raw());
       string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
       res_asm_.push_back(line1);
@@ -168,6 +153,25 @@ void Backend::GenerateCode(vector<Operation> code) {
       }
       // mov R0, ival; add R0, 1
       // просто пересчитать в компиляторе отрицательное значение в дополнительный код)
+}
+
+void Backend::GenerateCode(vector<Operation> code) {
+  RegSpillable reg_spillable(var_addrs_);
+  RegsBank0 bank0(&reg_spillable);
+
+  res_asm_.clear();
+
+  for (Operation op : code) {
+    cout << op.raw() << " " << op.str() << endl;
+    if (!op.op_name.size()) {  // empty op_name means assignment
+      Var v;
+      if (!getVar(op.res_arg, v)) {
+        cout << "Variable " << op.res_arg << " was not declared" << endl;
+        continue;
+      }
+      GenerateAssignment(bank0, op, v);
+    } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
+      GenerateInvertion(bank0, op);
     } else {  // arithm ops (left_arg is not empty)
       // c = a + b   -->   c = a, c += b
       string line1 = op.res_arg + " = " + op.left_arg;  // c = a
