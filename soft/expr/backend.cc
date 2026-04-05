@@ -99,88 +99,88 @@ void SwitchToBank1(vector<string> &res) {
 }
 
 void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
-      if (v.is_ptr) {  // pointer ops
-        string line1 = op.res_arg + " = " + op.left_arg;
-        res_asm_.push_back(line1);
+  if (v.is_ptr) {  // pointer ops
+    string line1 = op.res_arg + " = " + op.left_arg;
+    res_asm_.push_back(line1);
 
-        string lval;
-        string hval;
-        if (op.arg_is_num) {  // pointer1 = 0x1000
-          int val = std::stoi(op.left_arg);
-          lval = ToHexString(val & 0xFF, 3) + "h";
-          hval = ToHexString((val >> 8) & 0xFF, 3) + "h";
-        } else {  // pointer1 = pointer2
-          string left = FindPtrFor(op.left_arg);
-          lval = left + "L";
-          hval = left + "H";
-        }
+    string lval;
+    string hval;
+    if (op.arg_is_num) {  // pointer1 = 0x1000
+      int val = std::stoi(op.left_arg);
+      lval = ToHexString(val & 0xFF, 3) + "h";
+      hval = ToHexString((val >> 8) & 0xFF, 3) + "h";
+    } else {  // pointer1 = pointer2
+      string left = FindPtrFor(op.left_arg);
+      lval = left + "L";
+      hval = left + "H";
+    }
 
-        string res_reg = FindPtrFor(op.res_arg);
-        SwitchToBank1(res_asm_);
-        string line11 = "mov " + res_reg + "L, " + lval;
-        res_asm_.push_back(line11);
-        string line12 = "mov " + res_reg + "H, " + hval;
-        res_asm_.push_back(line12);
-        SwitchToBank0(res_asm_);
-      } else {  // ordinary regs
-        string line1 = op.res_arg + " = " + op.left_arg;
-        res_asm_.push_back(line1);
-  
-        string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
-        string line11 = "mov " + res_reg + ", " +
-                        (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg, res_asm_)) +
-                        "   " + bank0.DumpRegs();
-        res_asm_.push_back(line11);
-      }
+    string res_reg = FindPtrFor(op.res_arg);
+    SwitchToBank1(res_asm_);
+    string line11 = "mov " + res_reg + "L, " + lval;
+    res_asm_.push_back(line11);
+    string line12 = "mov " + res_reg + "H, " + hval;
+    res_asm_.push_back(line12);
+    SwitchToBank0(res_asm_);
+  } else {  // ordinary regs
+    string line1 = op.res_arg + " = " + op.left_arg;
+    res_asm_.push_back(line1);
+
+    string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
+    string line11 = "mov " + res_reg + ", " +
+                    (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg, res_asm_)) +
+                    "   " + bank0.DumpRegs();
+    res_asm_.push_back(line11);
+  }
 }
 
 void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
-      res_asm_.push_back(op.raw());
-      string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
-      res_asm_.push_back(line1);
+  res_asm_.push_back(op.raw());
+  string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
+  res_asm_.push_back(line1);
 
-      string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
-      if (op.arg_is_num) {  // pointer1 = 0x1000
-        string line = "mov " + res_reg + ", " + op.right_arg;
-        res_asm_.push_back(line);
-      } else {  // R0 = -R1
-        // mov R0, ~R1; add R0, 1
-        // xor R0, R0; addc R0, ~R1 + 1
-        string line21 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg, res_asm_);
-        res_asm_.push_back(line21);
-        string line22 = "add " + res_reg + ", 1";
-        res_asm_.push_back(line22);
-      }
-      // mov R0, ival; add R0, 1
-      // просто пересчитать в компиляторе отрицательное значение в дополнительный код)
+  string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
+  if (op.arg_is_num) {  // pointer1 = 0x1000
+    string line = "mov " + res_reg + ", " + op.right_arg;
+    res_asm_.push_back(line);
+  } else {  // R0 = -R1
+    // mov R0, ~R1; add R0, 1
+    // xor R0, R0; addc R0, ~R1 + 1
+    string line21 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg, res_asm_);
+    res_asm_.push_back(line21);
+    string line22 = "add " + res_reg + ", 1";
+    res_asm_.push_back(line22);
+  }
+  // mov R0, ival; add R0, 1
+  // просто пересчитать в компиляторе отрицательное значение в дополнительный код)
 }
 
 void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
-      // c = a + b   -->   c = a, c += b
-      string line1 = op.res_arg + " = " + op.left_arg;  // c = a
-      res_asm_.push_back(line1);
-      string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
-      res_asm_.push_back(line2);
+  // c = a + b   -->   c = a, c += b
+  string line1 = op.res_arg + " = " + op.left_arg;  // c = a
+  res_asm_.push_back(line1);
+  string line2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
+  res_asm_.push_back(line2);
 
-      // what about var_size ?
-      string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
-      string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg, res_asm_)
-                    + "   " + bank0.DumpRegs();
-      res_asm_.push_back(line11);
+  // what about var_size ?
+  string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
+  string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg, res_asm_)
+                + "   " + bank0.DumpRegs();
+  res_asm_.push_back(line11);
 
-      string cmd {"unk"};
-      if (op.op_name == "+")
-        cmd = "add";
-      else if (op.op_name == "-")
-        cmd = "sub";
-      else if (op.op_name == "*")
-        cmd = "mul";
-      else if (op.op_name == "/")
-        cmd = "/ - not implemented!";
+  string cmd {"unk"};
+  if (op.op_name == "+")
+    cmd = "add";
+  else if (op.op_name == "-")
+    cmd = "sub";
+  else if (op.op_name == "*")
+    cmd = "mul";
+  else if (op.op_name == "/")
+    cmd = "/ - not implemented!";
 
-      string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg, res_asm_)
-                    + "   " + bank0.DumpRegs();
-      res_asm_.push_back(line21);
+  string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg, res_asm_)
+                + "   " + bank0.DumpRegs();
+  res_asm_.push_back(line21);
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
