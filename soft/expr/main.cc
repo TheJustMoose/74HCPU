@@ -107,7 +107,8 @@ int main(int argc, char* argv[]) {
   printVars();
 
   cout << endl << "final asm:" << endl;
-  vector<string> res_asm = GenerateCode(res_code, var_addrs);
+  Backend bcknd;
+  vector<string> res_asm = bcknd.GenerateCode(res_code, var_addrs);
   for (string& s : res_asm)
     cout << s << endl;
 

@@ -7,5 +7,8 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> GenerateCode(std::vector<Operation> code,
-                                      std::map<std::string, uint16_t> var_addrs);
+class Backend {
+ public:
+  std::vector<std::string> GenerateCode(std::vector<Operation> code,
+                                        std::map<std::string, uint16_t> var_addrs);
+};
