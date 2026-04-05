@@ -57,9 +57,10 @@ int main(int argc, char* argv[]) {
 
   cout << "decls:" << endl;
   uint16_t addr {0};
+  cout << "| var | data_type | addr |" << endl;
   for (size_t i = 0; i < getVarCount(); i++) {
     Var v = getVar(i);
-    cout << "vad decl: " << v.name << ": "
+    cout << "var decl: " << v.name << ": "
          << GetDataTypeName(v.data_type) << (v.is_ptr ? "@" : "")
          << ", addr: " << addr
          << endl;
@@ -107,8 +108,8 @@ int main(int argc, char* argv[]) {
   printVars();
 
   cout << endl << "final asm:" << endl;
-  Backend bcknd;
-  vector<string> res_asm = bcknd.GenerateCode(res_code, var_addrs);
+  Backend bcknd(var_addrs);
+  vector<string> res_asm = bcknd.GenerateCode(res_code);
   for (string& s : res_asm)
     cout << s << endl;
 
