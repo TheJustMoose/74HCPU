@@ -7,8 +7,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "../../Release")
 
 project(simple_expr CXX)
 add_executable(simple_expr
-	assemble.h
-	assemble.cc
+	backend.h
+	backend.cc
 	data_type.h
 	data_type.cc
 	func_guard.h
@@ -46,8 +46,8 @@ include_directories("../trompeloeil/include")
 
 project(unit_tests CXX)
 add_executable(simple_expr_unit_tests
-	assemble.h
-	assemble.cc
+	backend.h
+	backend.cc
 	data_type.h
 	data_type.cc
 	func_guard.h
