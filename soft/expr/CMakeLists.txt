@@ -30,6 +30,7 @@ add_executable(simple_expr
 	print_tree.cc
 	regs_bank.h
 	regs_bank.cc
+	spillable.h
 	token.h
 	token2node_type.h
 	token2node_type.cc
@@ -69,6 +70,7 @@ add_executable(simple_expr_unit_tests
 	regs_bank.cc
 	regs_bank_unit_tests.cc
 	simple_expr_unit_tests.cc
+	spillable.h
 	token.h
 	token2node_type.h
 	token2node_type.cc

@@ -27,8 +27,6 @@ string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
       return "R" + to_string(i);
     }
 
-  // TODO: add unit tests for this function
-
   // no free registers, have to spill something
   if (last_used_register_idx == 255) {  // no index of last used register
     last_used_register_idx = 0;

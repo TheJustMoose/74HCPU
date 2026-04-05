@@ -95,7 +95,8 @@ void SwitchToBank1(vector<string> &res) {
   res.push_back("out  CPU_FLAGS, 0");
 }
 
-vector<string> Assemble(vector<Operation> code, map<string, uint16_t> var_addrs) {
+vector<string> Assemble(vector<Operation> code,
+                        map<string, uint16_t> var_addrs) {
   vector<string> res;
 
   for (Operation op : code) {
