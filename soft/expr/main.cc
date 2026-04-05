@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
   printVars();
 
   cout << endl << "final asm:" << endl;
-  vector<string> res_asm = Assemble(res_code, var_addrs);
+  vector<string> res_asm = GenerateCode(res_code, var_addrs);
   for (string& s : res_asm)
     cout << s << endl;
 
