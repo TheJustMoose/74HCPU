@@ -25,7 +25,13 @@ using namespace std;
 
 class RegSpillable: public ISpillable {
  public:
+  RegSpillable(map<string, uint16_t>& var_addrs)
+    : var_addrs_(var_addrs) {}
+
   void Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) override;
+
+ private:
+  map<string, uint16_t>& var_addrs_;
 };
 
 void RegSpillable::Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) {
@@ -35,9 +41,6 @@ void RegSpillable::Spill(size_t reg_idx, /*string some_var_name,*/ vector<string
   //string line = "ST V, " + reg_idx;
   //res.push_back(line);
 }
-
-RegSpillable reg_spillable;
-RegsBank0 bank0(&reg_spillable);
 
 size_t reg_cnt = 8;
 vector<string> bank1(reg_cnt);
@@ -96,6 +99,9 @@ void SwitchToBank1(vector<string> &res) {
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
+  RegSpillable reg_spillable(var_addrs_);
+  RegsBank0 bank0(&reg_spillable);
+
   res_asm_.clear();
 
   for (Operation op : code) {
