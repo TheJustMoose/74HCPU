@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+class RegsBank0;
+class Var;
+
 class Backend {
  public:
   Backend(std::map<std::string, uint16_t> var_addrs)
@@ -17,6 +20,9 @@ class Backend {
   std::vector<std::string> GetResAsm() {
     return res_asm_;
   }
+
+ protected:
+  void GenerateAssignment(RegsBank0& bank0, Operation op, Var& v);
 
  private:
   std::map<std::string, uint16_t> var_addrs_;

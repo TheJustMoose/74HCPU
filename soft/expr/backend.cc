@@ -98,21 +98,7 @@ void SwitchToBank1(vector<string> &res) {
   res.push_back("out  CPU_FLAGS, 0");
 }
 
-void Backend::GenerateCode(vector<Operation> code) {
-  RegSpillable reg_spillable(var_addrs_);
-  RegsBank0 bank0(&reg_spillable);
-
-  res_asm_.clear();
-
-  for (Operation op : code) {
-    cout << op.raw() << " " << op.str() << endl;
-    if (!op.op_name.size()) {  // empty op_name means assignment
-      Var v;
-      if (!getVar(op.res_arg, v)) {
-        cout << "Variable " << op.res_arg << " was not declared" << endl;
-        continue;
-      }
-
+void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
       if (v.is_ptr) {  // pointer ops
         string line1 = op.res_arg + " = " + op.left_arg;
         res_asm_.push_back(line1);
@@ -146,6 +132,23 @@ void Backend::GenerateCode(vector<Operation> code) {
                         "   " + bank0.DumpRegs();
         res_asm_.push_back(line11);
       }
+}
+
+void Backend::GenerateCode(vector<Operation> code) {
+  RegSpillable reg_spillable(var_addrs_);
+  RegsBank0 bank0(&reg_spillable);
+
+  res_asm_.clear();
+
+  for (Operation op : code) {
+    cout << op.raw() << " " << op.str() << endl;
+    if (!op.op_name.size()) {  // empty op_name means assignment
+      Var v;
+      if (!getVar(op.res_arg, v)) {
+        cout << "Variable " << op.res_arg << " was not declared" << endl;
+        continue;
+      }
+      GenerateAssignment(bank0, op, v);
     } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
       res_asm_.push_back(op.raw());
       string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
