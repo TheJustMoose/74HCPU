@@ -23,6 +23,7 @@ class Backend {
 
  protected:
   void AddAsmInstruction(std::string instr);
+  void AddComment(std::string instr);
 
   void SwitchToBank0();
   void SwitchToBank1();
