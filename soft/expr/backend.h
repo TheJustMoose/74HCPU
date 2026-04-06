@@ -22,6 +22,11 @@ class Backend {
   }
 
  protected:
+  void AddAsmInstruction(std::string instr);
+
+  void SwitchToBank0();
+  void SwitchToBank1();
+
   void GenerateAssignment(RegsBank0& bank0, Operation op, Var& v);
   void GenerateInvertion(RegsBank0& bank0, Operation op);
   void GenerateArithmOps(RegsBank0& bank0, Operation op);
