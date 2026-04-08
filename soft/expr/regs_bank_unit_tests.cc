@@ -2,6 +2,11 @@
 #include <trompeloeil.hpp>
 #include <doctest/trompeloeil.hpp>  // doctest adapter
 
+#include <cstdint>
+#include <map>
+#include <string>
+#include <vector>
+
 using trompeloeil::_;
 
 #include "regs_bank.h"
@@ -10,7 +15,8 @@ using trompeloeil::_;
 using namespace std;
 
 TEST_CASE("check RegsBank0::FindRegFor") {
-  RegsBank0 rb {nullptr};
+  map<string, uint16_t> var_addrs;
+  RegsBank0 rb {nullptr, var_addrs};
   CHECK(rb[0].empty());
   CHECK(rb[7].empty());
 
@@ -33,7 +39,8 @@ TEST_CASE("check RegsBank0::FindRegFor") {
 }
 
 TEST_CASE("check RegsBank0::FindRegFor with many variables") {
-  RegsBank0 rb {nullptr};
+  map<string, uint16_t> var_addrs;
+  RegsBank0 rb {nullptr, var_addrs};
   vector<string> res_code;
   string reg;
 
@@ -55,7 +62,8 @@ class MockSpillable : public ISpillable {
 
 TEST_CASE("check RegsBank0::Spill") {
   MockSpillable mockSpill;
-  RegsBank0 rb {&mockSpill};
+  map<string, uint16_t> var_addrs;
+  RegsBank0 rb {&mockSpill, var_addrs};
 
   // mockSpill::Spill should be called two times
   REQUIRE_CALL(mockSpill, Spill(0, trompeloeil::_)).TIMES(1);  // first time with reg_idx == 0

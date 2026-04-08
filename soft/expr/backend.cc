@@ -25,13 +25,9 @@ using namespace std;
 
 class RegSpillable: public ISpillable {
  public:
-  RegSpillable(map<string, uint16_t>& var_addrs)
-    : var_addrs_(var_addrs) {}
+  RegSpillable() {}
 
   void Spill(size_t reg_idx, vector<string> &res) override;
-
- private:
-  map<string, uint16_t>& var_addrs_;
 };
 
 void RegSpillable::Spill(size_t reg_idx, vector<string> &res) {
@@ -144,7 +140,7 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
 
 void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
   AddComment(op.raw());
-  string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
+  string line1 = op.res_arg + " = " + op.op_name + op.right_arg;
   AddComment(line1);
   // TODO: check it!
   if (op.arg_is_num &&
@@ -197,8 +193,8 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
-  RegSpillable reg_spillable(var_addrs_);
-  RegsBank0 bank0(&reg_spillable);
+  RegSpillable reg_spillable;
+  RegsBank0 bank0(&reg_spillable, var_addrs_);
 
   res_asm_.clear();
 
