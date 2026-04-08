@@ -146,14 +146,19 @@ void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
   AddComment(op.raw());
   string line1 = op.res_arg + " = " + op.op_name + op.right_arg + " <<<<<";
   AddComment(line1);
+  // TODO: check it!
+  if (op.arg_is_num &&
+      op.right_arg.size() &&
+      op.op_name == "-")
+    op.right_arg = "-" + op.right_arg;
 
   string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
   if (op.arg_is_num) {  // pointer1 = 0x1000
     string line = "mov " + res_reg + ", " + op.right_arg;
     AddAsmInstruction(line);
   } else {  // R0 = -R1
-    // mov R0, ~R1; add R0, 1
-    // xor R0, R0; addc R0, ~R1 + 1
+    // mov R0, ~R1; add R0, 1        // v1
+    // xor R0, R0; addc R0, ~R1 + 1  // v2
     string line21 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg, res_asm_);
     AddAsmInstruction(line21);
     string line22 = "add " + res_reg + ", 1";
