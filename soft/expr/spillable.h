@@ -7,5 +7,5 @@
 class ISpillable {
  public:
   virtual ~ISpillable() = default;
-  virtual void Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res) = 0;
+  virtual void Spill(size_t reg_idx, std::vector<std::string> &res) = 0;
 };

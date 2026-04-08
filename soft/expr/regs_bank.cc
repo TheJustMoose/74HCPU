@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void RegsBank0::Spill(size_t reg_idx, /*string some_var_name,*/ vector<string> &res) {
+void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
   if (pSpill_)
     pSpill_->Spill(reg_idx, res);
 }

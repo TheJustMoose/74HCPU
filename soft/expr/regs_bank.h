@@ -12,7 +12,7 @@ class RegsBank0 {
 
   RegsBank0(ISpillable* pSpill): pSpill_(pSpill) {}
 
-  void Spill(size_t reg_idx, /*string some_var_name,*/ std::vector<std::string> &res);
+  void Spill(size_t reg_idx, std::vector<std::string> &res);
 
   std::string FindRegFor(std::string var_name, std::vector<std::string> &res);
   std::string DumpRegs();
