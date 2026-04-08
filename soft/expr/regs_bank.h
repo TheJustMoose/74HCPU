@@ -20,11 +20,11 @@ class RegsBank0 {
   std::string DumpRegs();
 
   std::string operator[](size_t idx) {
-    return bank0[idx];
+    return bank0_[idx];
   }
 
  private:
   ISpillable* pSpill_ {nullptr};
-  std::vector<std::string> bank0 {RegCnt};
+  std::vector<std::string> bank0_ {RegCnt};
   std::map<std::string, uint16_t>& var_addrs_;
 };
