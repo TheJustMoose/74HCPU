@@ -27,22 +27,17 @@ class RegSpillable: public ISpillable {
  public:
   RegSpillable() {}
 
-  void Spill(size_t reg_idx, string var_name,
-             vector<string> &res,
-             map<string, uint16_t>& var_addrs) override;
+  void Spill(size_t reg_idx, uint16_t var_addr,
+             vector<string> &res) override;
 };
 
-void RegSpillable::Spill(size_t reg_idx, string var_name,
-                         vector<string> &res,
-                         map<string, uint16_t>& var_addrs) {
+void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
+                         vector<string> &res) {
   // add instruction to spilling reg
   // ptr V = find_addr_of(some_var_name?)
-  //if (var_addrs_.find(??) != var_addrs_.end())
-  //  ;
 
-  cout << "// No free registers. Will spill R" << reg_idx << " which store " << var_name << endl;
-  uint16_t addr = var_addrs[var_name];
-  cout << "// " << var_name << " addr is " << addr << endl;
+  cout << "// No free registers. Will spill R" << reg_idx
+       << " to addr " << var_addr << endl;
 
   //string line = "ST V, " + reg_idx;
   //res.push_back(line);
