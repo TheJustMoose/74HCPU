@@ -7,7 +7,7 @@
 using namespace std;
 
 void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
-  if (!pSpill_)
+  if (!p_spill_)
     return;
 
   assert(reg_idx < bank0_.size());
@@ -18,7 +18,7 @@ void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
   assert(var_addrs_.find(var_name) != var_addrs_.end());
   uint16_t var_addr = var_addrs_[var_name];
 
-  pSpill_->Spill(reg_idx, var_addr, res);
+  p_spill_->Spill(reg_idx, var_addr, res);
 }
 
 string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
