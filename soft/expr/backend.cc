@@ -27,11 +27,13 @@ class RegSpillable: public ISpillable {
  public:
   RegSpillable() {}
 
-  void Spill(size_t reg_idx, vector<string> &res,
+  void Spill(size_t reg_idx, string var_name,
+             vector<string> &res,
              map<string, uint16_t>& var_addrs) override;
 };
 
-void RegSpillable::Spill(size_t reg_idx, vector<string> &res,
+void RegSpillable::Spill(size_t reg_idx, string var_name,
+                         vector<string> &res,
                          map<string, uint16_t>& var_addrs) {
   // add instruction to spilling reg
   // ptr V = find_addr_of(some_var_name?)

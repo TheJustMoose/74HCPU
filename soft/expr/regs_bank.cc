@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 
 #include "regs_bank.h"
 #include "spillable.h"
@@ -6,8 +7,11 @@
 using namespace std;
 
 void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
-  if (pSpill_)
-    pSpill_->Spill(reg_idx, res, var_addrs_);
+  if (!pSpill_)
+    return;
+
+  assert(reg_idx < bank0_.size());
+  pSpill_->Spill(reg_idx, bank0_[reg_idx], res, var_addrs_);
 }
 
 string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
