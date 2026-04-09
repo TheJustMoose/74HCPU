@@ -40,6 +40,9 @@ void RegSpillable::Spill(size_t reg_idx, string var_name,
   //if (var_addrs_.find(??) != var_addrs_.end())
   //  ;
 
+  cout << "// No free registers. Will spill R" << reg_idx << " which store " << var_name << endl;
+  uint16_t addr = var_addrs[var_name];
+  cout << "// " << var_name << " addr is " << addr << endl;
 
   //string line = "ST V, " + reg_idx;
   //res.push_back(line);

@@ -43,6 +43,7 @@ string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
   }
 
   string reg = "R" + to_string(last_used_register_idx);
+  cout << "// FindRegFor(" << var_name << "), return " << reg << endl;
   return reg;
 }
 
