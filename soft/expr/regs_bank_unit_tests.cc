@@ -69,9 +69,9 @@ TEST_CASE("check RegsBank0::Spill") {
 
   // mockSpill::Spill should be called two times
   // first call: var8 will stored in R0, R0/var0 have to be spilled into RAM
-  REQUIRE_CALL(mockSpill, Spill( trompeloeil::eq(0), trompeloeil::eq("var0"), trompeloeil::_, trompeloeil::_ )).TIMES(1);
+  REQUIRE_CALL(mockSpill, Spill( 0, "var0", trompeloeil::_, trompeloeil::_ )).TIMES(1);
   // second call: var9 will stored in R1, R1/var1 have to be spilled into RAM
-  REQUIRE_CALL(mockSpill, Spill( trompeloeil::eq(1), trompeloeil::eq("var1"), trompeloeil::_, trompeloeil::_ )).TIMES(1);
+  REQUIRE_CALL(mockSpill, Spill( 1, "var1", trompeloeil::_, trompeloeil::_ )).TIMES(1);
 
   vector<string> res_code;
   for (int i = 0; i < 10; i++) {
