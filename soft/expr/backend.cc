@@ -60,8 +60,16 @@ void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
     backend_->AddAsmInstruction(string("mov XL, 0x") + ToHexString(var_addr & 0xFF));
     backend_->AddAsmInstruction(string("mov XH, 0x") + ToHexString((var_addr >> 8) & 0xFF));
     backend_->SwitchToBank0();
-    backend_->AddAsmInstruction(string("ST X, R") + to_string(reg_idx));
+    backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx));
   }
+
+/*
+TODO: конвертнуть вот это в макрос:
+out  CPU_FLAGS, 0
+mov XL, 0x0002
+mov XH, 0x0000
+out  CPU_FLAGS, 0x40
+*/
 }
 
 size_t reg_cnt = 8;
@@ -88,15 +96,6 @@ string FindPtrFor(string var_name) {
   return "";
 }
 
-/*
-out  CPU_FLAGS, 0x40  ; BF = 1
-mov  SPL, 0xFF    ; init stack
-mov  SPH, 0xFF
-mov  VL, 0        ; init Video RAM ptr
-mov  VH, 0
-out  CPU_FLAGS, 0 ; BF = 0
-*/
-
 void Backend::AddAsmInstruction(string instr) {
   res_asm_.push_back(instr);
 }
@@ -115,9 +114,6 @@ void Backend::SwitchToBank1() {
 
 void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
   if (v.is_ptr) {  // pointer ops
-    string cmnt1 = op.res_arg + " = " + op.left_arg;
-    AddComment(cmnt1);
-
     string lval;
     string hval;
     if (op.arg_is_num) {  // pointer1 = 0x1000
@@ -137,21 +133,22 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
     string line12 = "mov " + res_reg + "H, " + hval;
     AddAsmInstruction(line12);
     SwitchToBank0();
-  } else {  // ordinary regs
+
     string cmnt1 = op.res_arg + " = " + op.left_arg;
     AddComment(cmnt1);
-
+  } else {  // ordinary regs
     string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
     string line11 = "mov " + res_reg + ", " +
                     (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg, res_asm_)) +
                     "   " + bank0.DumpRegs();
     AddAsmInstruction(line11);
+
+    string cmnt1 = op.res_arg + " = " + op.left_arg;
+    AddComment(cmnt1);
   }
 }
 
 void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
-  string cmnt1 = op.res_arg + " = " + op.op_name + op.right_arg;
-  AddComment(cmnt1);
   // TODO: check it!
   if (op.arg_is_num &&
       op.right_arg.size() &&
@@ -170,20 +167,23 @@ void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
     string line22 = "add " + res_reg + ", 1";
     AddAsmInstruction(line22);
   }
+
+  string cmnt1 = op.res_arg + " = " + op.right_arg;
+  AddComment(cmnt1);
 }
 
 void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
-  // c = a + b   -->   c = a, c += b
-  string cmnt1 = op.res_arg + " = " + op.left_arg;  // c = a
-  AddComment(cmnt1);
-  string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
-  AddComment(cmnt2);
-
   // what about var_size ?
   string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
   string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg, res_asm_)
                 + "   " + bank0.DumpRegs();
   AddAsmInstruction(line11);
+
+  // c = a + b   -->   c = a, c += b
+  string cmnt1 = op.res_arg + " = " + op.left_arg;  // c = a
+  AddComment(cmnt1);
+  string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
+  AddComment(cmnt2);
 
   string cmd {"unk"};
   if (op.op_name == "+")
