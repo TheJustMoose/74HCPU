@@ -24,8 +24,8 @@ class Backend {
   void SwitchToBank0();
   void SwitchToBank1();
 
-  void AddAsmInstruction(std::string instr);
-  void AddComment(std::string instr);
+  void AddAsmInstruction(std::string instr, std::string cmnt = "");
+  void AddComment(std::string cmnt);
 
  protected:
   void GenerateAssignment(RegsBank0& bank0, Operation op, Var& v);

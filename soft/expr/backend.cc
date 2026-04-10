@@ -96,12 +96,12 @@ string FindPtrFor(string var_name) {
   return "";
 }
 
-void Backend::AddAsmInstruction(string instr) {
+void Backend::AddAsmInstruction(string instr, string cmnt) {
   res_asm_.push_back(instr);
 }
 
-void Backend::AddComment(string instr) {
-  res_asm_.push_back(instr);
+void Backend::AddComment(string cmnt) {
+  res_asm_.push_back(cmnt);
 }
 
 void Backend::SwitchToBank0() {
@@ -179,12 +179,6 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
                 + "   " + bank0.DumpRegs();
   AddAsmInstruction(line11);
 
-  // c = a + b   -->   c = a, c += b
-  string cmnt1 = op.res_arg + " = " + op.left_arg;  // c = a
-  AddComment(cmnt1);
-  string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
-  AddComment(cmnt2);
-
   string cmd {"unk"};
   if (op.op_name == "+")
     cmd = "add";
@@ -195,9 +189,15 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
 
-  string cmnt21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg, res_asm_)
+  string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg, res_asm_)
                 + "   " + bank0.DumpRegs();
-  AddComment(cmnt21);
+  AddAsmInstruction(line21);
+
+  // c = a + b   -->   c = a, c += b
+  string cmnt1 = op.res_arg + " = " + op.left_arg;  // c = a
+  AddComment(cmnt1);
+  string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
+  AddComment(cmnt2);
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
