@@ -18,7 +18,9 @@ void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
   assert(var_addrs_.find(var_name) != var_addrs_.end());
   uint16_t var_addr = var_addrs_[var_name];
 
+  cout << DumpRegs() << endl;
   p_spill_->Spill(reg_idx, var_addr, res);
+  bank0_[reg_idx] = "";  // mark register as free
 }
 
 string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
@@ -55,7 +57,7 @@ string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
 }
 
 string RegsBank0::DumpRegs() {
-  string res {"  // "};
+  string res {"// "};
   for (size_t i = 0; i < 8; i++) {
     res += "R" + to_string(i);
     res += ": ";
