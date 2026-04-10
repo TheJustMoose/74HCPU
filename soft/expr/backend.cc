@@ -23,24 +23,45 @@ using namespace std;
   b = t1
 */
 
+// copied from asm
+string ToUpper(string s) {
+  transform(s.begin(), s.end(), s.begin(), ::toupper);
+  return s;
+}
+
+string ToHexString(int value, int width = 4) {
+  stringstream ss;
+  ss << hex << value;
+  string res = ToUpper(ss.str());
+  while (res.size() < width)
+    res = "0" + res;
+  return res;
+}
+
 class RegSpillable: public ISpillable {
  public:
-  RegSpillable() {}
+  RegSpillable(Backend* backend)
+    : backend_(backend) {}
 
   void Spill(size_t reg_idx, uint16_t var_addr,
              vector<string> &res) override;
+
+ private:
+  Backend* backend_ {nullptr};
 };
 
 void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
                          vector<string> &res) {
-  // add instruction to spilling reg
-  // ptr V = find_addr_of(some_var_name?)
-
   cout << "// No free registers. Will spill R" << reg_idx
        << " to addr " << var_addr << endl;
+  cout << "//" << endl;
 
-  //string line = "ST V, " + reg_idx;
-  //res.push_back(line);
+  if (backend_) {
+    backend_->SwitchToBank1();
+    backend_->AddAsmInstruction(string("mov X, 0x") + ToHexString(var_addr));
+    backend_->SwitchToBank0();
+    backend_->AddAsmInstruction(string("ST X, R") + to_string(reg_idx));
+  }
 }
 
 size_t reg_cnt = 8;
@@ -65,21 +86,6 @@ string FindPtrFor(string var_name) {
 
   // oops
   return "";
-}
-
-// copied from asm
-string ToUpper(string s) {
-  transform(s.begin(), s.end(), s.begin(), ::toupper);
-  return s;
-}
-
-string ToHexString(int value, int width) {
-  stringstream ss;
-  ss << hex << value;
-  string res = ToUpper(ss.str());
-  while (res.size() < width)
-    res = "0" + res;
-  return res;
 }
 
 /*
@@ -198,7 +204,7 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
-  RegSpillable reg_spillable;
+  RegSpillable reg_spillable(this);
   RegsBank0 bank0(&reg_spillable, var_addrs_);
 
   res_asm_.clear();
