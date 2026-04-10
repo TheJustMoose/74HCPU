@@ -45,7 +45,4 @@ void Optimize(vector<Operation>& res_code) {
     //     << "  " << res_code[*it].str() << endl;
     res_code.erase(res_code.begin() + *it);
   }
-
-  for (size_t i = 0; i < res_code.size(); i++)
-    cout << "res_code: " << res_code[i].str() << endl;
 }
