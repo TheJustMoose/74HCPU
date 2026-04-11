@@ -19,19 +19,17 @@ void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
   uint16_t var_addr = var_addrs_[var_name];
 
   cout << DumpRegs() << endl;
-  p_spill_->Spill(reg_idx, var_addr, res);
+  p_spill_->Spill(reg_idx, var_addr, res, var_name);
   bank0_[reg_idx] = "";  // mark register as free
 }
 
 string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
-  cout << "FindRegFor(" << var_name << ")" << endl;
-
   static size_t last_used_register_idx {255};
   // check existing pair var:reg
   for (size_t i = 0; i < RegCnt; i++)
     if (bank0_[i] == var_name) {
       last_used_register_idx = i;
-      cout << "return existent R" << i << endl;
+      cout << "return existent R" << i << " for " << var_name << endl;
       return "R" + to_string(i);
     }
 
@@ -40,7 +38,7 @@ string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
     if (!bank0_[i].size()) {
       bank0_[i] = var_name;
       last_used_register_idx = i;
-      cout << "return empty R" << i << endl;
+      cout << "return empty R" << i << " for " << var_name << endl;
       return "R" + to_string(i);
     }
 
@@ -50,20 +48,18 @@ string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
     cout << "Why I am here????!!!" << endl;
     throw "Error happened. last_used_register_idx is empty but should be initialized!";
   } else if (last_used_register_idx == 7) {
-    last_used_register_idx = 0;                 // remember!
-    Spill(last_used_register_idx, res);         // free
-    bank0_[last_used_register_idx] = var_name;  // occupy
-    cout << "Spill and return R0" << endl;
+    last_used_register_idx = 0;                    // remember!
+    Spill(last_used_register_idx, res);            // free
+    bank0_[last_used_register_idx] = var_name;     // occupy
+    cout << "Spill and return R0" << " for " << var_name << endl;
   } else {
     last_used_register_idx++;  // now "last" used register must be different
-    Spill(last_used_register_idx, res);         // free
-    bank0_[last_used_register_idx] = var_name;  // occupy
-    cout << "Spill and return R" << last_used_register_idx << endl;
+    Spill(last_used_register_idx, res);            // free
+    bank0_[last_used_register_idx] = var_name;     // occupy
+    cout << "Spill and return R" << last_used_register_idx << " for " << var_name << endl;
   }
 
-  string reg = "R" + to_string(last_used_register_idx);
-  cout << "// FindRegFor(" << var_name << "), return " << reg << endl;
-  return reg;
+  return "R" + to_string(last_used_register_idx);
 }
 
 string RegsBank0::DumpRegs() {

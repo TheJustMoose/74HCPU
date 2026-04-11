@@ -29,13 +29,25 @@ string ToUpper(string s) {
   return s;
 }
 
-string ToHexString(int value, int width = 4) {
-  stringstream ss;
-  ss << hex << value;
-  string res = ToUpper(ss.str());
+string AlignNumber(string s, int width) {
+  string res {s};
   while (res.size() < width)
     res = "0" + res;
   return res;
+}
+
+string AlignByWidth(string s, int width, char c = ' ') {
+  string res {s};
+  string fll({c});
+  while (res.size() < width)
+    res += fll;
+  return res;
+}
+
+string ToHexString(int value, int width = 4) {
+  stringstream ss;
+  ss << hex << value;
+  return AlignNumber(ToUpper(ss.str()), width);
 }
 
 class RegSpillable: public ISpillable {
@@ -44,15 +56,16 @@ class RegSpillable: public ISpillable {
     : backend_(backend) {}
 
   void Spill(size_t reg_idx, uint16_t var_addr,
-             vector<string> &res) override;
+             vector<string> &res, string var_name) override;
 
  private:
   Backend* backend_ {nullptr};
 };
 
 void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
-                         vector<string> &res) {
+                         vector<string> &res, string var_name) {
   cout << "// No free registers. Will spill R" << reg_idx
+       << " with " << var_name
        << " to addr " << var_addr << endl;
 
   if (backend_) {
@@ -60,11 +73,11 @@ void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
     backend_->AddAsmInstruction(string("mov XL, 0x") + ToHexString(var_addr & 0xFF));
     backend_->AddAsmInstruction(string("mov XH, 0x") + ToHexString((var_addr >> 8) & 0xFF));
     backend_->SwitchToBank0();
-    backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx));
+    backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx), var_name);
   }
 
 /*
-TODO: конвертнуть вот это в макрос:
+TODO: конвертнуть вот это в макрос (или в функцию):
 out  CPU_FLAGS, 0
 mov XL, 0x0002
 mov XH, 0x0000
@@ -96,10 +109,15 @@ string FindPtrFor(string var_name) {
   return "";
 }
 
-void Backend::AddAsmInstruction(string instr, string cmnt) {
-  if (cmnt.size())
-    instr += "  // " + cmnt;
-  res_asm_.push_back(instr);
+void Backend::AddAsmInstruction(string instr, string cmnt, string cmnt2) {
+  string res {instr};
+  if (cmnt.size()) {
+    res = AlignByWidth(res, 22);
+    res += "// ";
+    res += AlignByWidth(cmnt, 10);
+    res += cmnt2;
+  }
+  res_asm_.push_back(res);
 }
 
 void Backend::SwitchToBank0() {
@@ -139,7 +157,7 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
     string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
     string line11 = "mov " + res_reg + ", " +
                     (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg, res_asm_));
-    AddAsmInstruction(line11, cmnt1 + bank0.DumpRegs());
+    AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
   }
 }
 
@@ -173,7 +191,7 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
 
   string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
   string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg, res_asm_);
-  AddAsmInstruction(line11, cmnt1 + bank0.DumpRegs());
+  AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
 
   string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
 
@@ -182,13 +200,13 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
     cmd = "add";
   else if (op.op_name == "-")
     cmd = "sub";
-  else if (op.op_name == "*")
-    cmd = "mul";
+  else if (op.op_name == "*")  // TODO: хорошо бы сделать так, чтобы a*=5 превращалась в mul a, 5 , а не как сейчас!
+    cmd = "mul";               // а ещё надо что-то делать с тем фактом, что mul расходует два регистра для результата
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
 
   string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg, res_asm_);
-  AddAsmInstruction(line21, cmnt2 + bank0.DumpRegs());
+  AddAsmInstruction(line21, cmnt2, bank0.DumpRegs());
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
