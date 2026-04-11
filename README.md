@@ -27,9 +27,6 @@ Not a very scary instruction set discrete logic processor.
 ## Instruction list
 *The words 'instruction' and 'command' mean the same thing.*
 
-  { "INV", cUNO }, { "SWAP", cUNO }, { "LSR", cUNO }, { "LSRC", cUNO },
-
-
 ```
 |----------------------------------------------|f|---------------------------------------------------------|
 |   HIGH BYTE    |    LOW BYTE   |  HIGH BYTE  |l|                                                         |
