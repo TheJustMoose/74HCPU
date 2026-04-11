@@ -28,48 +28,48 @@ Not a very scary instruction set discrete logic processor.
 *The words 'instruction' and 'command' mean the same thing.*
 
 ```
-|----------------------------------------------|f|---------------------------------------------------------|
-|   HIGH BYTE    |    LOW BYTE   |  HIGH BYTE  |l|                                                         |
-|F E D C  B A 9 8 7 6 5 4 3 2 1 0|   (again)   |a|                  SHORT DESCRIPTION                      |
-|   4   +   3 + 1 + 3  +    5    = 16          |g|                                                         |
-|----------------------------------------------|s|---------------------------------------------------------|
-|   ADD |  DST |1|    CONST or   | 01 0000 0001|*| Add a constant to a register                            |
-|   ADD |  DST |0| SRC |-|Z|z|I|i| 00 0000 0000|*| Add a register to a register (same OpCode)              |
-|----------------------------------------------| |---------------------------------------------------------|
-|  ADDC |  DST |C| SRC |F|Z|z|I|i| 10 0001 0000|*| ADD a constant or register and CARRY FLAG to a register |
-|   AND |  DST |C| SRC |-|Z|z|I|i| 20 0010 0000|*| Bitwise AND a constant or register with a register      |
-|    OR |  DST |C| SRC |-|Z|z|I|i| 30 0011 0000|*| Bitwise OR a constant or register with a register       |
-|   XOR |  DST |C| SRC |-|Z|z|I|i| 40 0100 0000|*| Bitwise XOR a constant or register with a register      |
-|   MUL |  DST |C| SRC |-|Z|z|I|i| 50 0101 0000|*| MULtiply a constant or register by a register.          |
-|   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*| Unary commands INV, SWAP, LSR, LSRC                     |
-|   MOV |  DST |C| SRC |*|Z|z|I|i| 70 0111 0000| | MOV a constant or register to a register                |
-|   LPM |  DST |0|EXT|D|U|-|-|-|W| 80 1000 0000| | Load Program Memory - Read data from [commands] ROM     |
-|    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| | LoaD data from RAM to a register                        |
-|    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| | INput data from port to a register                      |
-|--------------|8-7-6-5-4|-------|-------------| |---------------------------------------------------------|
-|   OUT | PORT |1|    CONST or   | B1 1011 0001| | Output const to a port                                  |
-|   OUT | PORT |0| SRC |PRT|X|O|o| B0 1011 0000| | Output register to a port (same OpCode)                 |
-|----------------------------------------------| |---------------------------------------------------------|
-|    ST |  SRC |V|EXT|D|U|OFFSET4| C0 1100 0000| | STore a register to a RAM                               |
-|   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+| CoMPare a constant or register with a register          |
-|  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+| Check flags then execute CMP                            |
-| BRNCH |  CALL  | 8 bit OFFSET  | F0 1111 0000| | CALL a function with a relative address (offset)        |
-| BRNCH |   JMP  | 8 bit OFFSET  | F1 1111 0001| | JMP to a relative address                               |
-| BRNCH |   RET  | 8 bit +STACK  | F2 1111 0010| | RETurn from function                                    |
-| BRNCH |  RETI  | 8 bit OFFSET  | F3 1111 0011| | RETurn from Interrupt                                   |
-| BRNCH |    JL  | 8 bit OFFSET  | F4 1111 0100| | Jump if Less                                            |
-| BRNCH |    JE  | 8 bit OFFSET  | F5 1111 0101| | Jump if Equal                                           |
-| BRNCH |   JNE  | 8 bit OFFSET  | F6 1111 0110| | Jump if Not Equal                                       |
-| BRNCH |    JG  | 8 bit OFFSET  | F7 1111 0111| | Jump if greater                                         |
-| BRNCH |    JZ  | 8 bit OFFSET  | F8 1111 1000| | Jump if Zero                                            |
-| BRNCH |   JNZ  | 8 bit OFFSET  | F9 1111 1001| | Jump If Not Zero                                        |
-| BRNCH |    JC  | 8 bit OFFSET  | FA 1111 1010| | Jump if Carry flag is set (one)                         |
-| BRNCH |   JNC  | 8 bit OFFSET  | FB 1111 1011| | Jump if Carry flag is not set (zero)                    |
-| BRNCH |   JHC  | 8 bit OFFSET  | FC 1111 1100| | Jump if Half Carry is set (one)                         |
-| BRNCH |  JNHC  | 8 bit OFFSET  | FD 1111 1101| | Jump if Half Carry is not set (zero)                    |
-| BRNCH | AFCALL | Hi 8 bit ADDR | FE 1111 1110| | Absolute Far Call (call a function at a 16-bit address) |
-| BRNCH |NOP/STOP|   1111 111x   | FF 1111 1111| | No OPeration (LSB is 0) or STOP CPU (LSB is 1)          |
-|----------------------------------------------|-|---------------------------------------------------------|
+|----------------------------------------------|f|-------------------------------------------------------------|
+|   HIGH BYTE    |    LOW BYTE   |  HIGH BYTE  |l|                                                             |
+|F E D C  B A 9 8 7 6 5 4 3 2 1 0|   (again)   |a|                    SHORT DESCRIPTION                        |
+|   4   +   3 + 1 + 3  +    5    = 16          |g|                                                             |
+|----------------------------------------------|s|-------------------------------------------------------------|
+|   ADD |  DST |1|    CONST or   | 01 0000 0001|*| Add a constant to a register (This is one command, not two) |
+|   ADD |  DST |0| SRC |-|Z|z|I|i| 00 0000 0000|*| Add a register to a register (same OpCode, different bit 8) |
+|----------------------------------------------| |-------------------------------------------------------------|
+|  ADDC |  DST |C| SRC |F|Z|z|I|i| 10 0001 0000|*| ADD a constant or register and CARRY FLAG to a register     |
+|   AND |  DST |C| SRC |-|Z|z|I|i| 20 0010 0000|*| Bitwise AND a constant or register with a register          |
+|    OR |  DST |C| SRC |-|Z|z|I|i| 30 0011 0000|*| Bitwise OR a constant or register with a register           |
+|   XOR |  DST |C| SRC |-|Z|z|I|i| 40 0100 0000|*| Bitwise XOR a constant or register with a register          |
+|   MUL |  DST |C| SRC |-|Z|z|I|i| 50 0101 0000|*| MULtiply a constant or register by a register.              |
+|   UNO |  DST |0|-|TYP|F|-|-|-|-| 60 0110 0000|*| Unary commands INV, SWAP, LSR, LSRC                         |
+|   MOV |  DST |C| SRC |*|Z|z|I|i| 70 0111 0000| | MOV a constant or register to a register                    |
+|   LPM |  DST |0|EXT|D|U|-|-|-|W| 80 1000 0000| | Load Program Memory - Read data from [commands] ROM         |
+|    LD |  DST |V|EXT|D|U|OFFSET4| 90 1001 0000| | LoaD data from RAM to a register                            |
+|    IN |  DST |  PORT   |Z|z|I|i| A0 1010 0000| | INput data from port to a register                          |
+|--------------|8-7-6-5-4|-------|-------------| |-------------------------------------------------------------|
+|   OUT | PORT |1|    CONST or   | B1 1011 0001| | Output const to a port (This is one command, not two)       |
+|   OUT | PORT |0| SRC |PRT|X|O|o| B0 1011 0000| | Output register to a port (same OpCode, different bit 8)    |
+|----------------------------------------------| |-------------------------------------------------------------|
+|    ST |  SRC |V|EXT|D|U|OFFSET4| C0 1100 0000| | STore a register to a RAM                                   |
+|   CMP |  DST |C| SRC |-|   -   | D0 1101 0000|+| CoMPare a constant or register with a register              |
+|  CMPC |  DST |C| SRC |-|   -   | E0 1110 0000|+| Check flags then execute CMP                                |
+| BRNCH |  CALL  | 8 bit OFFSET  | F0 1111 0000| | CALL a function with a relative address (offset)            |
+| BRNCH |   JMP  | 8 bit OFFSET  | F1 1111 0001| | JMP to a relative address                                   |
+| BRNCH |   RET  | 8 bit +STACK  | F2 1111 0010| | RETurn from function                                        |
+| BRNCH |  RETI  | 8 bit OFFSET  | F3 1111 0011| | RETurn from Interrupt                                       |
+| BRNCH |    JL  | 8 bit OFFSET  | F4 1111 0100| | Jump if Less                                                |
+| BRNCH |    JE  | 8 bit OFFSET  | F5 1111 0101| | Jump if Equal                                               |
+| BRNCH |   JNE  | 8 bit OFFSET  | F6 1111 0110| | Jump if Not Equal                                           |
+| BRNCH |    JG  | 8 bit OFFSET  | F7 1111 0111| | Jump if greater                                             |
+| BRNCH |    JZ  | 8 bit OFFSET  | F8 1111 1000| | Jump if Zero                                                |
+| BRNCH |   JNZ  | 8 bit OFFSET  | F9 1111 1001| | Jump If Not Zero                                            |
+| BRNCH |    JC  | 8 bit OFFSET  | FA 1111 1010| | Jump if Carry flag is set (one)                             |
+| BRNCH |   JNC  | 8 bit OFFSET  | FB 1111 1011| | Jump if Carry flag is not set (zero)                        |
+| BRNCH |   JHC  | 8 bit OFFSET  | FC 1111 1100| | Jump if Half Carry is set (one)                             |
+| BRNCH |  JNHC  | 8 bit OFFSET  | FD 1111 1101| | Jump if Half Carry is not set (zero)                        |
+| BRNCH | AFCALL | Hi 8 bit ADDR | FE 1111 1110| | Absolute Far Call (call a function at a 16-bit address)     |
+| BRNCH |NOP/STOP|   1111 111x   | FF 1111 1111| | No OPeration (LSB is 0) or STOP CPU (LSB is 1)              |
+|----------------------------------------------|-|-------------------------------------------------------------|
 ```
 \* - means ZF, CF, HCF [flags](#flags-register), \+ - means GF, EQ, LF flags
 
