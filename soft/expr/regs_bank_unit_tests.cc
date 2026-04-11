@@ -3,6 +3,7 @@
 #include <doctest/trompeloeil.hpp>  // doctest adapter
 
 #include <cstdint>
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -77,6 +78,8 @@ TEST_CASE("check RegsBank0::Spill") {
     {"var9", 100}  // R9
   };
 
+  cout << endl << "check RegsBank0::Spill" << endl;
+
   RegsBank0 rb {&mockSpill, var_addrs};
 
   // mockSpill::Spill should be called two times
@@ -89,4 +92,6 @@ TEST_CASE("check RegsBank0::Spill") {
   for (int i = 0; i < 10; i++) {
     rb.FindRegFor("var" + to_string(i), res_code);
   }
+
+  cout << "check RegsBank0::Spill finished" << endl;
 }

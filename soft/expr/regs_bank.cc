@@ -24,11 +24,14 @@ void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
 }
 
 string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
+  cout << "FindRegFor(" << var_name << ")" << endl;
+
   static size_t last_used_register_idx {255};
   // check existing pair var:reg
   for (size_t i = 0; i < RegCnt; i++)
     if (bank0_[i] == var_name) {
       last_used_register_idx = i;
+      cout << "return existent R" << i << endl;
       return "R" + to_string(i);
     }
 
@@ -37,18 +40,25 @@ string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
     if (!bank0_[i].size()) {
       bank0_[i] = var_name;
       last_used_register_idx = i;
+      cout << "return empty R" << i << endl;
       return "R" + to_string(i);
     }
 
   // no free registers, have to spill something
   if (last_used_register_idx == 255) {  // no index of last used register
     last_used_register_idx = 0;
+    cout << "Why I am here????!!!" << endl;
+    throw "Error happened. last_used_register_idx is empty but should be initialized!";
   } else if (last_used_register_idx == 7) {
-    Spill(0, res);
-    last_used_register_idx = 0;
+    last_used_register_idx = 0;                 // remember!
+    Spill(last_used_register_idx, res);         // free
+    bank0_[last_used_register_idx] = var_name;  // occupy
+    cout << "Spill and return R0" << endl;
   } else {
-    last_used_register_idx++;
-    Spill(last_used_register_idx, res);
+    last_used_register_idx++;  // now "last" used register must be different
+    Spill(last_used_register_idx, res);         // free
+    bank0_[last_used_register_idx] = var_name;  // occupy
+    cout << "Spill and return R" << last_used_register_idx << endl;
   }
 
   string reg = "R" + to_string(last_used_register_idx);
