@@ -104,6 +104,9 @@ void PrintTree(Node* n) {
     if (const AssignOp* assop_node = dynamic_cast<const AssignOp*>(n))
       name = assop_node->op();
 
+    if (const UnOp* unop_node = dynamic_cast<const UnOp*>(n))
+      name = unop_node->name();
+
     TypeStringIntoTheBuffer(
         line,
         GetNodeTypeName(n->type()) + " (" + name + ")",  // to_string(gNodeOffset[n])
