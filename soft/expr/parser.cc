@@ -12,6 +12,7 @@
 #include "var.h"
 #include "var_size.h"
 
+#include <assert.h>
 #include <cstdint>
 #include <iostream>
 #include <map>
@@ -53,7 +54,7 @@ Var getVar(size_t idx) {
   return {};
 }
 
-bool isDeclared(string var_name, uint8_t* var_size) {
+bool isDeclared(string var_name, uint8_t* var_size, DataType* dt) {
   for (const Var& v : vars)
     if (v.name == var_name) {
       if (var_size != nullptr) {
@@ -62,6 +63,8 @@ bool isDeclared(string var_name, uint8_t* var_size) {
         else
           *var_size = v.size();
       }
+      if (dt)
+        *dt = v.data_type;
       return true;
     }
 
@@ -95,11 +98,18 @@ Node* prim() {
   } else if (t == tName) {
     string str = Lexer::instance().getStrValue();
     Lexer::instance().consume();
-    return new Name(str);
+
+    DataType dt {dtNotInitialize};
+    if (isDeclared(str, nullptr, &dt))
+      return new Name(str, dt);
+    else
+      return new Name(str);
   } else if (t == tMinus) {
     Lexer::instance().consume();
     UnOp* n = new UnOp(new_tmp());
     n->child = prim();
+    assert(n->child);
+    vars.emplace_back(n->name(), n->data_type(), false); // is_ptr ?
     return n;
   } else if (t == tLBracket) {
     Lexer::instance().consume();
@@ -134,6 +144,7 @@ Node* term() {
     op->left = left;
     op->right = right;
     left = op;
+    vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
     t = Lexer::instance().currentToken();
   }
 
@@ -159,6 +170,7 @@ Node* expr() {
     op->left = left;
     op->right = right;
     left = op;
+    vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
     t = Lexer::instance().currentToken();
   }
 

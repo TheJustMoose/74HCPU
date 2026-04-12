@@ -23,6 +23,10 @@ Name::Name(string value)
   : Node(ntName), value_(value) {
 }
 
+Name::Name(string value, DataType dt)
+  : Node(ntName), value_(value), data_type_(dt) {
+}
+
 void Name::init_size(uint8_t size) {
   cached_size_ = size;
 }
@@ -70,6 +74,15 @@ string BinOp::op() const {
   }
 }
 
+DataType BinOp::data_type() {
+  if (!left || !right)
+    return dtNotInitialize;
+
+  DataType ldt = left->data_type();
+  DataType rdt = right->data_type();
+  return max(ldt, rdt);
+}
+
 UnOp::UnOp(string n)
   : Node(ntUMinus), name_(n) {
 }
@@ -82,6 +95,13 @@ void UnOp::gen(vector<Operation>& res_code) {
   cout << FuncGuard::stack_str() << name_ << " = "
        << op() << child->name() << " " << endl;
   res_code.emplace_back(name_, op(), "", r_is_n, child->name(), true);
+}
+
+DataType UnOp::data_type() {
+  if (child)
+    return child->data_type();
+  else
+    return dtNotInitialize;
 }
 
 AssignOp::AssignOp()
@@ -112,6 +132,13 @@ void AssignOp::gen(vector<Operation>& res_code) {
   res_code.emplace_back(name_node->name(), "", right->name(), r_is_n, "");
 }
 
+DataType AssignOp::data_type() {
+  if (right)
+    return right->data_type();
+  else
+    return dtNotInitialize;
+}
+
 VarDecl::VarDecl(DataType dt, bool is_ptr)
   : Node(ntVarDecl), data_type_(dt), is_pointer(is_ptr) {}
 
@@ -129,4 +156,17 @@ void VarDecl::gen(vector<Operation>& res_code) {
 // that you have pointer "a" and char "b".
 uint8_t VarDecl::var_size() {
   return ::var_size(data_type(), is_pointer);
+}
+
+string VarDecl::var_names() const {
+  string res;
+  for (string s : names) {
+    res += s;
+    res += ",";
+  }
+
+  if (res.size() && *res.rbegin() == ',')
+    res.resize(res.size() - 1);
+
+  return res;
 }

@@ -29,17 +29,19 @@ class Num: public Node {
 class Name: public Node {
  public:
   Name(std::string value);
+  Name(std::string value, DataType dt);
 
   void init_size(uint8_t size);
   void gen(std::vector<Operation>& res_code) override;
   std::string name() const override { return value_; }
   uint8_t cached_size();
 
-  DataType data_type() override { return dtNotInitialize; }
+  DataType data_type() override { return data_type_; }
 
  private:
   std::string value_ {""};
   uint8_t cached_size_ {0};
+  DataType data_type_ {dtNotInitialize};
 };
 
 class BinOp: public Node {
@@ -53,7 +55,7 @@ class BinOp: public Node {
   Node* left {nullptr};
   Node* right {nullptr};
 
-  DataType data_type() override { return dtNotInitialize; }
+  DataType data_type() override;
 
  private:
   std::string name_ {"bo"};
@@ -69,7 +71,7 @@ class UnOp: public Node {
 
   Node* child {nullptr};
 
-  DataType data_type() override { return dtNotInitialize; }
+  DataType data_type() override;
 
  private:
   std::string name_{"um"};
@@ -83,7 +85,7 @@ class AssignOp: public Node {
   std::string op() const override { return "="; }
   std::string name() const override { return left ? left->name() : "eq"; }
 
-  DataType data_type() override { return dtNotInitialize; }
+  DataType data_type() override;
 
   Node* left {nullptr};
   Node* right {nullptr};
@@ -96,6 +98,8 @@ class VarDecl: public Node {
   void gen(std::vector<Operation>& res_code) override;
   uint8_t var_size();
   std::string name() const override { return "de"; }
+
+  std::string var_names() const;
 
   DataType data_type() override { return data_type_; }
 

@@ -107,6 +107,9 @@ void PrintTree(Node* n) {
     if (const UnOp* unop_node = dynamic_cast<const UnOp*>(n))
       name = unop_node->name();
 
+    if (const VarDecl* vard_node = dynamic_cast<const VarDecl*>(n))
+      name = vard_node->var_names();
+
     TypeStringIntoTheBuffer(
         line,
         GetNodeTypeName(n->type()) + " (" + name + ")",  // to_string(gNodeOffset[n])
