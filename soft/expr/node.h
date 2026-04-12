@@ -1,5 +1,6 @@
 #pragma once
 
+#include "data_type.h"
 #include "node_type.h"
 #include "operation.h"
 
@@ -17,6 +18,8 @@ class Node {
   virtual std::string name() const { return "??"; }
 
   NodeType type() const { return type_; }
+
+  virtual DataType data_type() = 0;
 
  protected:
   NodeType type_ {ntUnknown};
