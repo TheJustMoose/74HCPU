@@ -53,7 +53,9 @@ int main(int argc, char* argv[]) {
   if (!stmts(statements))
     return 1;
 
+  // сделать из этого класс? с методом add_var
   map<string, uint16_t> var_addrs;
+  map<string, size_t> var_idxs;
 
   cout << "decls:" << endl;
   uint16_t addr {0};
@@ -66,6 +68,7 @@ int main(int argc, char* argv[]) {
          << endl;
 
     var_addrs[v.name] = addr;
+    var_idxs[v.name] = i;  // для bitset/vector с живыми перемеными
     addr += v.size();
   }
 
@@ -84,7 +87,7 @@ int main(int argc, char* argv[]) {
       PrintTree(statements[i]);
 
   cout << "| res | = | left|isNum|  op |right| tmp |" << endl;
-  for (auto& r : res_code)
+  for (Operation& r : res_code)
     cout << r.raw() << endl;
 
   cout << endl;
@@ -92,6 +95,10 @@ int main(int argc, char* argv[]) {
   cout << "try to optimize:" << endl;
   Optimize(res_code);
   cout << "res_code.size(): " << res_code.size() << endl;
+
+  cout << "| res | = | left|isNum|  op |right| tmp |" << endl;
+  for (Operation& r : res_code)
+    cout << r.raw() << endl;
 
   cout << endl << "final IR:" << endl;
   for (Operation& n : res_code) {
@@ -106,6 +113,44 @@ int main(int argc, char* argv[]) {
 
   cout << endl << "vars:" << endl;
   printVars();
+
+/*
+  Нуууу, где-то здесь надо пройтись по IR с конца в начало,
+  и разметить переменные как живые и мёртвые. Для каждой строки.
+
+  А ещё, это хорошее место, чтобы попробовать сделать из map-ы
+  var_addrs нормальную структуру с описанием переменных.
+  (найти бы ещё, где там её копия с адресами)
+*/
+
+  vector<bool> live_vars(var_idxs.size(), false);
+  //vector<Operation> res_code;
+  for (int i = res_code.size() - 1; i >= 0; i--) {
+    Operation& op = res_code[i];
+
+    //map<string, size_t> var_idxs;
+    auto res_it = var_idxs.find(op.res_arg);
+    auto left_it = var_idxs.find(op.left_arg);
+    auto right_it = var_idxs.find(op.right_arg);
+
+    op.live_out_vars = live_vars;
+
+    // -res, +left, +right
+    if (res_it != var_idxs.end())
+      live_vars[res_it->second] = false;
+    if (left_it != var_idxs.end())
+      live_vars[left_it->second] = true;
+    if (right_it != var_idxs.end())
+      live_vars[right_it->second] = true;
+
+    op.live_in_vars = live_vars;
+  }
+
+  cout << "| res | = | left|isNum|  op |right| tmp |" << endl;
+  for (Operation& r : res_code) {
+    cout << r.raw() << endl;
+    cout << r.live_vars_str() << endl;
+  }
 
   Backend bcknd(var_addrs);
   bcknd.GenerateCode(res_code);

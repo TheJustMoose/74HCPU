@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 struct Operation {
   std::string res_arg {};
@@ -10,6 +11,9 @@ struct Operation {
   bool arg_is_num {false};   // the table contains: res|left|op|right
   std::string right_arg {};  // so when we have x = a + b, a is left
   bool removed {false};      // but when x = a, a is left again!
+
+  std::vector<bool> live_in_vars;   // live vars before Operation executing (LIVE_in)
+  std::vector<bool> live_out_vars;  // live vars after Operation executing (LIVE_out)
 
   Operation(std::string res, std::string op, std::string l, bool has_num,
             std::string r, bool in_temp = false)
@@ -40,6 +44,14 @@ struct Operation {
            (arg_is_num ? " num" : "    ") + " |" +
            align(op_name) + " |" + align(right_arg) + " | " +
            (res_in_temp ? "tmp" : "var") + " |";
+  }
+
+  std::string live_vars_str() {
+    std::string res;
+    res.resize(live_out_vars.size());
+    for (size_t i = 0; i < live_out_vars.size(); i++)
+      res[i] = live_out_vars[i] ? '1' : '0';
+    return res;
   }
 
   int argNum() {
