@@ -56,6 +56,7 @@ int main(int argc, char* argv[]) {
   // сделать из этого класс? с методом add_var
   map<string, uint16_t> var_addrs;
   map<string, size_t> var_idxs;
+  map<size_t, string> idx_to_var;
 
   cout << "decls:" << endl;
   uint16_t addr {0};
@@ -69,6 +70,7 @@ int main(int argc, char* argv[]) {
 
     var_addrs[v.name] = addr;
     var_idxs[v.name] = i;  // для bitset/vector с живыми перемеными
+    idx_to_var[i] = v.name;
     addr += v.size();
   }
 
@@ -86,7 +88,7 @@ int main(int argc, char* argv[]) {
     if (statements[i])
       PrintTree(statements[i]);
 
-  cout << "| res | = | left|isNum|  op |right| tmp |" << endl;
+  cout << "| res | = | left|isNum|  op |right|" << endl;
   for (Operation& r : res_code)
     cout << r.raw() << endl;
 
@@ -96,7 +98,7 @@ int main(int argc, char* argv[]) {
   Optimize(res_code);
   cout << "res_code.size(): " << res_code.size() << endl;
 
-  cout << "| res | = | left|isNum|  op |right| tmp |" << endl;
+  cout << "| res | = | left|isNum|  op |right|" << endl;
   for (Operation& r : res_code)
     cout << r.raw() << endl;
 
@@ -115,7 +117,7 @@ int main(int argc, char* argv[]) {
   printVars();
 
 /*
-  Нуууу, где-то здесь надо пройтись по IR с конца в начало,
+  +Нуууу, где-то здесь надо пройтись по IR с конца в начало,
   и разметить переменные как живые и мёртвые. Для каждой строки.
 
   А ещё, это хорошее место, чтобы попробовать сделать из map-ы
@@ -123,8 +125,8 @@ int main(int argc, char* argv[]) {
   (найти бы ещё, где там её копия с адресами)
 */
 
+  cout << endl << "processing live&dead vars..." << endl;
   vector<bool> live_vars(var_idxs.size(), false);
-  //vector<Operation> res_code;
   for (int i = res_code.size() - 1; i >= 0; i--) {
     Operation& op = res_code[i];
 
@@ -146,11 +148,13 @@ int main(int argc, char* argv[]) {
     op.live_in_vars = live_vars;
   }
 
-  cout << "| res | = | left|isNum|  op |right| tmp |" << endl;
+  cout << endl << "printing live&dead vars..." << endl;
+  cout << "| res | = | left|isNum|  op |right|" << endl;
   for (Operation& r : res_code) {
     cout << r.raw() << endl;
-    cout << r.live_vars_str() << endl;
+    cout << r.live_vars_str(idx_to_var) << endl;  // отпечатать переменные, вместо единичек!
   }
+  cout << "finished" << endl << endl;
 
   Backend bcknd(var_addrs);
   bcknd.GenerateCode(res_code);

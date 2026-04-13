@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -42,8 +43,7 @@ struct Operation {
   std::string raw() {
     return "|" + align(res_arg) + " | = |" + align(left_arg) + " |" +
            (arg_is_num ? " num" : "    ") + " |" +
-           align(op_name) + " |" + align(right_arg) + " | " +
-           (res_in_temp ? "tmp" : "var") + " |";
+           align(op_name) + " |" + align(right_arg) + " |";
   }
 
   std::string live_vars_str() {
@@ -51,6 +51,23 @@ struct Operation {
     res.resize(live_out_vars.size());
     for (size_t i = 0; i < live_out_vars.size(); i++)
       res[i] = live_out_vars[i] ? '1' : '0';
+    return res;
+  }
+
+  std::string live_vars_str(std::map<size_t, std::string> idx_to_var) {
+    std::string res("{");
+
+    for (size_t i = 0; i < live_out_vars.size(); i++)
+      if (live_out_vars[i]) {
+        res += idx_to_var[i];
+        res += ",";
+      }
+
+    if (*res.rbegin() == ',')  // res has at least 1 char
+      *res.rbegin() = '}';
+    else
+      res += "}";
+
     return res;
   }
 
