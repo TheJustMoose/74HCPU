@@ -23,6 +23,11 @@ void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
   bank0_[reg_idx] = "";  // mark register as free
 }
 
+void RegsBank0::FreeTheRegister(size_t reg_idx) {
+  bank0_[reg_idx] = "";  // mark register as free
+  cout << "Register " << reg_idx << " was released" << endl;
+}
+
 string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
   static size_t last_used_register_idx {255};
   // check existing pair var:reg
@@ -73,4 +78,11 @@ string RegsBank0::DumpRegs() {
   }
 
   return res;
+}
+
+size_t RegsBank0::GetIndexOfVar(std::string name) {
+  for (size_t i = 0; i < bank0_.size(); i++)
+    if (bank0_[i] == name)
+      return i;
+  return npos;
 }

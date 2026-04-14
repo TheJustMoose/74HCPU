@@ -91,3 +91,47 @@ TEST_CASE("check RegsBank0::Spill") {
     rb.FindRegFor("var" + to_string(i), res_code);
   }
 }
+
+TEST_CASE("check RegsBank0::DumpRegs") {
+  map<string, uint16_t> var_addrs;
+  RegsBank0 rb {nullptr, var_addrs};
+
+  vector<string> res;
+  rb.FindRegFor("abc", res);
+  rb.FindRegFor("i", res);
+  rb.FindRegFor("j", res);
+  rb.FindRegFor("str", res);
+  rb.FindRegFor("array", res);
+  rb.FindRegFor("t0", res);
+  rb.FindRegFor("t1", res);
+  rb.FindRegFor("__x", res);
+
+  CHECK_EQ(rb[0], "abc");  // also check operator[]
+  CHECK_EQ(rb[7], "__x");
+
+  CHECK_EQ(rb.DumpRegs(), "// R0: abc, R1: i, R2: j, R3: str, R4: array, R5: t0, R6: t1, R7: __x");
+}
+
+TEST_CASE("check RegsBank0::FreeTheRegister") {
+  map<string, uint16_t> var_addrs;
+  RegsBank0 rb {nullptr, var_addrs};
+
+  vector<string> res;
+  rb.FindRegFor("abc", res);
+  CHECK_EQ(rb[0], "abc");
+
+  rb.FreeTheRegister(0);
+  CHECK_EQ(rb[0], "");
+}
+
+TEST_CASE("check RegsBank0::GetIndexOfVar") {
+  map<string, uint16_t> var_addrs;
+  RegsBank0 rb {nullptr, var_addrs};
+
+  vector<string> res;
+  rb.FindRegFor("x", res);  // 0
+  rb.FindRegFor("y", res);  // 1
+  rb.FindRegFor("z", res);  // 2
+
+  CHECK_EQ(rb.GetIndexOfVar("y"), 1);
+}
