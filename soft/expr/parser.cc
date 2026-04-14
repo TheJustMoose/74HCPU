@@ -109,7 +109,7 @@ Node* prim() {
     UnOp* n = new UnOp(new_tmp());
     n->child = prim();
     assert(n->child);
-    vars.emplace_back(n->name(), n->data_type(), false); // is_ptr ?
+    vars.emplace_back(n->name(), n->data_type(), false); // can we set is_ptr to true when argument is pointer?
     return n;
   } else if (t == tLBracket) {
     Lexer::instance().consume();

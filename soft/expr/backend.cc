@@ -10,19 +10,6 @@
 
 using namespace std;
 
-/*
-  b = -t1
-    ?
-  b = 0
-  b -= t1
-    vs
-  b = t1
-  b = -b
-    vs
-  t1 = -t1
-  b = t1
-*/
-
 // copied from asm
 string ToUpper(string s) {
   transform(s.begin(), s.end(), s.begin(), ::toupper);
@@ -75,14 +62,6 @@ void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
     backend_->SwitchToBank0();
     backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx), var_name);
   }
-
-/*
-TODO: конвертнуть вот это в макрос (или в функцию):
-out  CPU_FLAGS, 0
-mov XL, 0x0002
-mov XH, 0x0000
-out  CPU_FLAGS, 0x40
-*/
 }
 
 size_t reg_cnt = 8;
@@ -126,6 +105,20 @@ void Backend::SwitchToBank0() {
 
 void Backend::SwitchToBank1() {
   AddAsmInstruction("out  CPU_FLAGS, 0", "switch to bank 0");
+}
+
+void Backend::FreeTheRegisters(RegsBank0& bank0, const Operation& op) {
+  size_t var_cnt = op.live_out_vars.size();  // this variables are still alive after instruction
+  for (size_t i = 0; i < var_cnt; i++) {
+    if (op.live_in_vars[i] && !op.live_out_vars[i]) {  // var has died
+      cout << "variable with idx == " << i << " has died" << endl;
+      string reg_name = idx_to_var_[i];
+      size_t idx = bank0.GetIndexOfVar(reg_name);
+      cout << "reg_name: " << reg_name << ", reg_idx: " << idx << endl;
+      bank0.FreeTheRegister(idx);
+      cout << bank0.DumpRegs() << endl;
+    }
+  }
 }
 
 void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
@@ -200,8 +193,8 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
     cmd = "add";
   else if (op.op_name == "-")
     cmd = "sub";
-  else if (op.op_name == "*")  // TODO: хорошо бы сделать так, чтобы a*=5 превращалась в mul a, 5 , а не как сейчас!
-    cmd = "mul";               // а ещё надо что-то делать с тем фактом, что mul расходует два регистра для результата
+  else if (op.op_name == "*")
+    cmd = "mul";
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
 
@@ -216,7 +209,6 @@ void Backend::GenerateCode(vector<Operation> code) {
   res_asm_.clear();
 
   for (Operation op : code) {
-    cout << op.raw() << " " << op.str() << endl;
     if (!op.op_name.size()) {  // empty op_name means assignment
       Var v;
       if (!getVar(op.res_arg, v)) {
@@ -229,5 +221,7 @@ void Backend::GenerateCode(vector<Operation> code) {
     } else {  // arithm ops (left_arg is not empty)
       GenerateArithmOps(bank0, op);
     }
+
+    FreeTheRegisters(bank0, op);
   }
 }

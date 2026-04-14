@@ -53,7 +53,6 @@ int main(int argc, char* argv[]) {
   if (!stmts(statements))
     return 1;
 
-  // сделать из этого класс? с методом add_var
   map<string, uint16_t> var_addrs;
   map<string, size_t> var_idxs;
   map<size_t, string> idx_to_var;
@@ -68,9 +67,9 @@ int main(int argc, char* argv[]) {
          << ", addr: " << addr
          << endl;
 
-    var_addrs[v.name] = addr;
-    var_idxs[v.name] = i;  // для bitset/vector с живыми перемеными
-    idx_to_var[i] = v.name;
+    var_addrs[v.name] = addr;  // var name -> var addr
+    var_idxs[v.name] = i;      // index of variable inside of parser
+    idx_to_var[i] = v.name;    // GetVar duplicate
     addr += v.size();
   }
 
@@ -116,15 +115,6 @@ int main(int argc, char* argv[]) {
   cout << endl << "vars:" << endl;
   printVars();
 
-/*
-  +Нуууу, где-то здесь надо пройтись по IR с конца в начало,
-  и разметить переменные как живые и мёртвые. Для каждой строки.
-
-  А ещё, это хорошее место, чтобы попробовать сделать из map-ы
-  var_addrs нормальную структуру с описанием переменных.
-  (найти бы ещё, где там её копия с адресами)
-*/
-
   cout << endl << "processing live&dead vars..." << endl;
   vector<bool> live_vars(var_idxs.size(), false);
   for (int i = res_code.size() - 1; i >= 0; i--) {
@@ -152,11 +142,11 @@ int main(int argc, char* argv[]) {
   cout << "| res | = | left|isNum|  op |right|" << endl;
   for (Operation& r : res_code) {
     cout << r.raw() << endl;
-    cout << r.live_vars_str(idx_to_var) << endl;  // отпечатать переменные, вместо единичек!
+    cout << r.live_vars_str(idx_to_var) << endl;
   }
   cout << "finished" << endl << endl;
 
-  Backend bcknd(var_addrs);
+  Backend bcknd(var_addrs, idx_to_var);
   bcknd.GenerateCode(res_code);
 
   cout << endl << "final asm:" << endl;
