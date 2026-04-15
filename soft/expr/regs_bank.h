@@ -16,6 +16,7 @@ class RegsBank0 {
     : p_spill_(p_spill), var_addrs_(var_addrs) {}
 
   void Spill(size_t reg_idx, std::vector<std::string> &res);
+  void Fill(std::string var_name);
 
   void FreeTheRegister(size_t reg_idx);
 

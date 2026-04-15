@@ -10,7 +10,7 @@
 
 using namespace std;
 
-
+/*
 mul R7, R5            // t4 *= f   // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: g, R7: t4
 out  CPU_FLAGS, 0     // switch to bank 0
 mov XL, 0x0010
@@ -25,8 +25,7 @@ mov R2, R6            // c = t5    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, 
 add R2, R7            // c += g    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: g
 
 mov R6, R0            // t7 = a    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t7, R7: g
-
-
+*/
 
 // copied from asm
 string ToUpper(string s) {

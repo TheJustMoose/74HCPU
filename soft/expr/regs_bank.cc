@@ -23,6 +23,9 @@ void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
   bank0_[reg_idx] = "";  // mark register as free
 }
 
+void RegsBank0::Fill(string var_name) {
+}
+
 void RegsBank0::FreeTheRegister(size_t reg_idx) {
   bank0_[reg_idx] = "";  // mark register as free
   cout << "Register " << reg_idx << " was released" << endl;
