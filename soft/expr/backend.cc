@@ -10,6 +10,24 @@
 
 using namespace std;
 
+
+mul R7, R5            // t4 *= f   // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: g, R7: t4
+out  CPU_FLAGS, 0     // switch to bank 0
+mov XL, 0x0010
+mov XH, 0x0000
+out  CPU_FLAGS, 0x40  // switch to bank 1
+st X, R6              // g
+mov R6, R0            // t5 = a    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: t4
+add R6, R7            // t5 += t4  // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: t4
+mov R2, R6            // c = t5    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: -
+
+// а не надо ли где-то здесь читать переменную g обратно из памяти ???
+add R2, R7            // c += g    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: g
+
+mov R6, R0            // t7 = a    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t7, R7: g
+
+
+
 // copied from asm
 string ToUpper(string s) {
   transform(s.begin(), s.end(), s.begin(), ::toupper);
@@ -55,13 +73,16 @@ void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
        << " with " << var_name
        << " to addr " << var_addr << endl;
 
-  if (backend_) {
-    backend_->SwitchToBank1();
-    backend_->AddAsmInstruction(string("mov XL, 0x") + ToHexString(var_addr & 0xFF));
-    backend_->AddAsmInstruction(string("mov XH, 0x") + ToHexString((var_addr >> 8) & 0xFF));
-    backend_->SwitchToBank0();
-    backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx), var_name);
+  if (!backend_) {
+    cout << "backend_ is NULL" << endl;
+    return;
   }
+
+  backend_->SwitchToBank1();
+  backend_->AddAsmInstruction(string("mov XL, 0x") + ToHexString(var_addr & 0xFF));
+  backend_->AddAsmInstruction(string("mov XH, 0x") + ToHexString((var_addr >> 8) & 0xFF));
+  backend_->SwitchToBank0();
+  backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx), var_name);
 }
 
 size_t reg_cnt = 8;
@@ -111,9 +132,10 @@ void Backend::FreeTheRegisters(RegsBank0& bank0, const Operation& op) {
   size_t var_cnt = op.live_out_vars.size();  // this variables are still alive after instruction
   for (size_t i = 0; i < var_cnt; i++) {
     if (op.live_in_vars[i] && !op.live_out_vars[i]) {  // var has died
-      cout << "variable with idx == " << i << " has died" << endl;
       string reg_name = idx_to_var_[i];
       size_t idx = bank0.GetIndexOfVar(reg_name);
+      cout << "variable with idx == " << i
+           << ", var_name: " << bank0[idx] << " has died" << endl;
       cout << "reg_name: " << reg_name << ", reg_idx: " << idx << endl;
       bank0.FreeTheRegister(idx);
       cout << bank0.DumpRegs() << endl;
