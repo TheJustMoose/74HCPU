@@ -62,6 +62,8 @@ class RegSpillable: public ISpillable {
   void Spill(size_t reg_idx, uint16_t var_addr,
              vector<string> &res, string var_name) override;
 
+  void Fill(string var_name) override;
+
  private:
   Backend* backend_ {nullptr};
 };
@@ -82,6 +84,9 @@ void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
   backend_->AddAsmInstruction(string("mov XH, 0x") + ToHexString((var_addr >> 8) & 0xFF));
   backend_->SwitchToBank0();
   backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx), var_name);
+}
+
+void RegSpillable::Fill(string var_name) {
 }
 
 size_t reg_cnt = 8;
@@ -168,9 +173,9 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
   } else {  // ordinary regs
     string cmnt1 = op.res_arg + " = " + op.left_arg;
 
-    string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
+    string res_reg = bank0.FindRegFor(op.res_arg);
     string line11 = "mov " + res_reg + ", " +
-                    (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg, res_asm_));
+                    (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg));
     AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
   }
 }
@@ -184,14 +189,14 @@ void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
 
   string cmnt1 = op.res_arg + " = " + op.right_arg;
 
-  string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
+  string res_reg = bank0.FindRegFor(op.res_arg);
   if (op.arg_is_num) {  // pointer1 = 0x1000
     string line = "mov " + res_reg + ", " + op.right_arg;
     AddAsmInstruction(line, cmnt1);
   } else {  // R0 = -R1
     // mov R0, ~R1; add R0, 1        // v1
     // xor R0, R0; addc R0, ~R1 + 1  // v2
-    string line21 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg, res_asm_);
+    string line21 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg);
     AddAsmInstruction(line21, cmnt1);
     string line22 = "add " + res_reg + ", 1";
     AddAsmInstruction(line22);
@@ -203,8 +208,8 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
   // what about var_size ?
   string cmnt1 = op.res_arg + " = " + op.left_arg;  // c = a
 
-  string res_reg = bank0.FindRegFor(op.res_arg, res_asm_);
-  string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg, res_asm_);
+  string res_reg = bank0.FindRegFor(op.res_arg);
+  string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg);
   AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
 
   string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
@@ -219,13 +224,13 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
 
-  string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg, res_asm_);
+  string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg);
   AddAsmInstruction(line21, cmnt2, bank0.DumpRegs());
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
   RegSpillable reg_spillable(this);
-  RegsBank0 bank0(&reg_spillable, var_addrs_);
+  RegsBank0 bank0(&reg_spillable, var_addrs_, res_asm_);
 
   res_asm_.clear();
 

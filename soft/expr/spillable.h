@@ -14,4 +14,6 @@ class ISpillable {
                      uint16_t var_addr,  // to this addr
                      std::vector<std::string> &res,
                      std::string var_name) = 0;
+
+  virtual void Fill(std::string var_name) = 0;
 };

@@ -17,37 +17,37 @@ using namespace std;
 
 TEST_CASE("check RegsBank0::FindRegFor") {
   map<string, uint16_t> var_addrs;
-  RegsBank0 rb {nullptr, var_addrs};
+  vector<string> res_code;
+  RegsBank0 rb {nullptr, var_addrs, res_code};
   CHECK(rb[0].empty());
   CHECK(rb[7].empty());
 
-  vector<string> res_code;
 
-  string reg = rb.FindRegFor("var", res_code);
+  string reg = rb.FindRegFor("var");
   CHECK_EQ(reg, "R0");
 
-  reg = rb.FindRegFor("abc", res_code);
+  reg = rb.FindRegFor("abc");
   CHECK_EQ(reg, "R1");
 
-  reg = rb.FindRegFor("def", res_code);
+  reg = rb.FindRegFor("def");
   CHECK_EQ(reg, "R2");
 
-  reg = rb.FindRegFor("i", res_code);
+  reg = rb.FindRegFor("i");
   CHECK_EQ(reg, "R3");
 
-  reg = rb.FindRegFor("i", res_code);
+  reg = rb.FindRegFor("i");
   CHECK_EQ(reg, "R3");  // have to get same register for same variable
 }
 
 TEST_CASE("check RegsBank0::FindRegFor with many variables") {
   map<string, uint16_t> var_addrs;
-  RegsBank0 rb {nullptr, var_addrs};
   vector<string> res_code;
+  RegsBank0 rb {nullptr, var_addrs, res_code};
   string reg;
 
   for (int i = 0; i < 10; i++) {
     string si = to_string(i);
-    reg = rb.FindRegFor("var" + si, res_code);
+    reg = rb.FindRegFor("var" + si);
     if (i >= 8)
       CHECK_EQ(reg,  "R" + to_string(i % 8));  // use registers in a circle
     else
@@ -61,6 +61,9 @@ class MockSpillable : public ISpillable {
   MAKE_MOCK4(Spill, void(size_t reg_idx, uint16_t var_addr,
                          vector<string> &res, string var_name),
                     override);
+
+  MAKE_MOCK1(Fill, void (string var_name),
+                   override);
 };
 
 TEST_CASE("check RegsBank0::Spill") {
@@ -78,7 +81,8 @@ TEST_CASE("check RegsBank0::Spill") {
     {"var9", 100}  // R9
   };
 
-  RegsBank0 rb {&mockSpill, var_addrs};
+  vector<string> res_code;
+  RegsBank0 rb {&mockSpill, var_addrs, res_code};
 
   // mockSpill::Spill should be called two times
   // first call: var8 will stored in R0, R0/var0 have to be spilled into RAM
@@ -86,25 +90,24 @@ TEST_CASE("check RegsBank0::Spill") {
   // second call: var9 will stored in R1, R1/var1 have to be spilled into RAM
   REQUIRE_CALL(mockSpill, Spill( 1, 20, trompeloeil::_, "var1" )).TIMES(1);
 
-  vector<string> res_code;
   for (int i = 0; i < 10; i++) {
-    rb.FindRegFor("var" + to_string(i), res_code);
+    rb.FindRegFor("var" + to_string(i));
   }
 }
 
 TEST_CASE("check RegsBank0::DumpRegs") {
   map<string, uint16_t> var_addrs;
-  RegsBank0 rb {nullptr, var_addrs};
-
   vector<string> res;
-  rb.FindRegFor("abc", res);
-  rb.FindRegFor("i", res);
-  rb.FindRegFor("j", res);
-  rb.FindRegFor("str", res);
-  rb.FindRegFor("array", res);
-  rb.FindRegFor("t0", res);
-  rb.FindRegFor("t1", res);
-  rb.FindRegFor("__x", res);
+  RegsBank0 rb {nullptr, var_addrs, res};
+
+  rb.FindRegFor("abc");
+  rb.FindRegFor("i");
+  rb.FindRegFor("j");
+  rb.FindRegFor("str");
+  rb.FindRegFor("array");
+  rb.FindRegFor("t0");
+  rb.FindRegFor("t1");
+  rb.FindRegFor("__x");
 
   CHECK_EQ(rb[0], "abc");  // also check operator[]
   CHECK_EQ(rb[7], "__x");
@@ -114,10 +117,10 @@ TEST_CASE("check RegsBank0::DumpRegs") {
 
 TEST_CASE("check RegsBank0::FreeTheRegister") {
   map<string, uint16_t> var_addrs;
-  RegsBank0 rb {nullptr, var_addrs};
-
   vector<string> res;
-  rb.FindRegFor("abc", res);
+  RegsBank0 rb {nullptr, var_addrs, res};
+
+  rb.FindRegFor("abc");
   CHECK_EQ(rb[0], "abc");
 
   rb.FreeTheRegister(0);
@@ -126,12 +129,12 @@ TEST_CASE("check RegsBank0::FreeTheRegister") {
 
 TEST_CASE("check RegsBank0::GetIndexOfVar") {
   map<string, uint16_t> var_addrs;
-  RegsBank0 rb {nullptr, var_addrs};
-
   vector<string> res;
-  rb.FindRegFor("x", res);  // 0
-  rb.FindRegFor("y", res);  // 1
-  rb.FindRegFor("z", res);  // 2
+  RegsBank0 rb {nullptr, var_addrs, res};
+
+  rb.FindRegFor("x");  // 0
+  rb.FindRegFor("y");  // 1
+  rb.FindRegFor("z");  // 2
 
   CHECK_EQ(rb.GetIndexOfVar("y"), 1);
 }

@@ -1,0 +1,25 @@
+
+C:\PROJECT\github\74HCPU\soft\expr>git submodule update 
+
+C:\PROJECT\github\74HCPU\soft\expr>md bin 
+
+C:\PROJECT\github\74HCPU\soft\expr>cd bin 
+
+C:\PROJECT\github\74HCPU\soft\expr\bin>del "..\..\Release\simple_expr.exe" 
+
+C:\PROJECT\github\74HCPU\soft\expr\bin>del "..\..\Release\simple_expr_unit_tests.exe" 
+
+C:\PROJECT\github\74HCPU\soft\expr\bin>cmake .. 
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.19045.
+-- Configuring done (0.0s)
+-- Generating done (0.1s)
+-- Build files have been written to: C:/PROJECT/github/74HCPU/soft/expr/bin
+
+C:\PROJECT\github\74HCPU\soft\expr\bin>cmake --build . --config Release 
+Версия MSBuild 17.14.40+3e7442088 для .NET Framework
+
+  simple_expr.vcxproj -> C:\PROJECT\github\74HCPU\soft\Release\simple_expr.exe
+  regs_bank_unit_tests.cc
+  simple_expr_unit_tests.vcxproj -> C:\PROJECT\github\74HCPU\soft\Release\simple_expr_unit_tests.exe
+
+C:\PROJECT\github\74HCPU\soft\expr\bin>REM cmake --build . --config Debug 

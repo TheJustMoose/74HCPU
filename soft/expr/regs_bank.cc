@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
+void RegsBank0::Spill(size_t reg_idx) {
   if (!p_spill_)
     return;
 
@@ -14,16 +14,22 @@ void RegsBank0::Spill(size_t reg_idx, vector<string> &res) {
 
   string var_name = bank0_[reg_idx];
   assert(var_name.size());
-
   assert(var_addrs_.find(var_name) != var_addrs_.end());
   uint16_t var_addr = var_addrs_[var_name];
 
   cout << DumpRegs() << endl;
-  p_spill_->Spill(reg_idx, var_addr, res, var_name);
+  p_spill_->Spill(reg_idx, var_addr, res_asm_, var_name);
   bank0_[reg_idx] = "";  // mark register as free
 }
 
 void RegsBank0::Fill(string var_name) {
+  if (var_was_spilled_.find(var_name) == var_was_spilled_.end() ||
+      !var_was_spilled_[var_name]) {
+    cout << "Error. Variable " << var_name << " have to be spilled but was not" << endl;
+    return;
+  }
+
+  p_spill_->Fill(var_name);
 }
 
 void RegsBank0::FreeTheRegister(size_t reg_idx) {
@@ -31,7 +37,7 @@ void RegsBank0::FreeTheRegister(size_t reg_idx) {
   cout << "Register " << reg_idx << " was released" << endl;
 }
 
-string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
+string RegsBank0::FindRegFor(string var_name) {
   static size_t last_used_register_idx {255};
   // check existing pair var:reg
   for (size_t i = 0; i < RegCnt; i++)
@@ -57,12 +63,12 @@ string RegsBank0::FindRegFor(string var_name, vector<string> &res) {
     throw "Error happened. last_used_register_idx is empty but should be initialized!";
   } else if (last_used_register_idx == 7) {
     last_used_register_idx = 0;                    // remember!
-    Spill(last_used_register_idx, res);            // free
+    Spill(last_used_register_idx);                 // free
     bank0_[last_used_register_idx] = var_name;     // occupy
     //cout << "Spill and return R0" << " for " << var_name << endl;
   } else {
     last_used_register_idx++;  // now "last" used register must be different
-    Spill(last_used_register_idx, res);            // free
+    Spill(last_used_register_idx);                 // free
     bank0_[last_used_register_idx] = var_name;     // occupy
     //cout << "Spill and return R" << last_used_register_idx << " for " << var_name << endl;
   }
@@ -83,7 +89,7 @@ string RegsBank0::DumpRegs() {
   return res;
 }
 
-size_t RegsBank0::GetIndexOfVar(std::string name) {
+size_t RegsBank0::GetIndexOfVar(string name) {
   for (size_t i = 0; i < bank0_.size(); i++)
     if (bank0_[i] == name)
       return i;
