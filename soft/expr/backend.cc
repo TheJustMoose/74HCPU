@@ -60,7 +60,7 @@ class RegSpillable: public ISpillable {
     : backend_(backend) {}
 
   void Spill(size_t reg_idx, uint16_t var_addr,
-             vector<string> &res, string var_name) override;
+             string var_name) override;
 
   void Fill(string var_name) override;
 
@@ -69,7 +69,7 @@ class RegSpillable: public ISpillable {
 };
 
 void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
-                         vector<string> &res, string var_name) {
+                         string var_name) {
   cout << "// No free registers. Will spill R" << reg_idx
        << " with " << var_name
        << " to addr " << var_addr << endl;
@@ -87,6 +87,7 @@ void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
 }
 
 void RegSpillable::Fill(string var_name) {
+  // Okay, we already know that var_name was spilled early...
 }
 
 size_t reg_cnt = 8;

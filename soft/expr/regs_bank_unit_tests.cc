@@ -58,12 +58,10 @@ TEST_CASE("check RegsBank0::FindRegFor with many variables") {
 class MockSpillable : public ISpillable {
  public:
   // this macros will create mock method:
-  MAKE_MOCK4(Spill, void(size_t reg_idx, uint16_t var_addr,
-                         vector<string> &res, string var_name),
-                    override);
+  MAKE_MOCK3(Spill, void(size_t reg_idx, uint16_t var_addr,
+                         string var_name), override);
 
-  MAKE_MOCK1(Fill, void (string var_name),
-                   override);
+  MAKE_MOCK1(Fill, void (string var_name), override);
 };
 
 TEST_CASE("check RegsBank0::Spill") {
@@ -86,9 +84,9 @@ TEST_CASE("check RegsBank0::Spill") {
 
   // mockSpill::Spill should be called two times
   // first call: var8 will stored in R0, R0/var0 have to be spilled into RAM
-  REQUIRE_CALL(mockSpill, Spill( 0, 10, trompeloeil::_, "var0" )).TIMES(1);
+  REQUIRE_CALL(mockSpill, Spill( 0, 10, "var0" )).TIMES(1);
   // second call: var9 will stored in R1, R1/var1 have to be spilled into RAM
-  REQUIRE_CALL(mockSpill, Spill( 1, 20, trompeloeil::_, "var1" )).TIMES(1);
+  REQUIRE_CALL(mockSpill, Spill( 1, 20, "var1" )).TIMES(1);
 
   for (int i = 0; i < 10; i++) {
     rb.FindRegFor("var" + to_string(i));

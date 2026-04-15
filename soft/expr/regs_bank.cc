@@ -18,7 +18,7 @@ void RegsBank0::Spill(size_t reg_idx) {
   uint16_t var_addr = var_addrs_[var_name];
 
   cout << DumpRegs() << endl;
-  p_spill_->Spill(reg_idx, var_addr, res_asm_, var_name);
+  p_spill_->Spill(reg_idx, var_addr, var_name);
   bank0_[reg_idx] = "";  // mark register as free
 }
 
