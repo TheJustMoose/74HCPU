@@ -61,7 +61,7 @@ class MockSpillable : public ISpillable {
   MAKE_MOCK3(Spill, void(size_t reg_idx, uint16_t var_addr,
                          string var_name), override);
 
-  MAKE_MOCK1(Fill, void (string var_name), override);
+  MAKE_MOCK2(Fill, void (string var_name, string reg_name), override);
 };
 
 TEST_CASE("check RegsBank0::Spill") {

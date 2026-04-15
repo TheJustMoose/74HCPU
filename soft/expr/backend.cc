@@ -10,23 +10,6 @@
 
 using namespace std;
 
-/*
-mul R7, R5            // t4 *= f   // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: g, R7: t4
-out  CPU_FLAGS, 0     // switch to bank 0
-mov XL, 0x0010
-mov XH, 0x0000
-out  CPU_FLAGS, 0x40  // switch to bank 1
-st X, R6              // g
-mov R6, R0            // t5 = a    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: t4
-add R6, R7            // t5 += t4  // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: t4
-mov R2, R6            // c = t5    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: -
-
-// а не надо ли где-то здесь читать переменную g обратно из памяти ???
-add R2, R7            // c += g    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t5, R7: g
-
-mov R6, R0            // t7 = a    // R0: a, R1: b, R2: c, R3: e, R4: 5, R5: f, R6: t7, R7: g
-*/
-
 // copied from asm
 string ToUpper(string s) {
   transform(s.begin(), s.end(), s.begin(), ::toupper);
@@ -56,16 +39,17 @@ string ToHexString(int value, int width = 4) {
 
 class RegSpillable: public ISpillable {
  public:
-  RegSpillable(Backend* backend)
-    : backend_(backend) {}
+  RegSpillable(Backend* backend, map<string, uint16_t> var_addrs)
+    : backend_(backend), var_addrs_(var_addrs) {}
 
   void Spill(size_t reg_idx, uint16_t var_addr,
              string var_name) override;
 
-  void Fill(string var_name) override;
+  void Fill(string var_name, string reg_name) override;
 
  private:
   Backend* backend_ {nullptr};
+  map<string, uint16_t> var_addrs_;
 };
 
 void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
@@ -86,8 +70,20 @@ void RegSpillable::Spill(size_t reg_idx, uint16_t var_addr,
   backend_->AddAsmInstruction(string("st X, R") + to_string(reg_idx), var_name);
 }
 
-void RegSpillable::Fill(string var_name) {
+void RegSpillable::Fill(string var_name, string reg_name) {
   // Okay, we already know that var_name was spilled early...
+  if (var_addrs_.find(var_name) == var_addrs_.end()) {
+    cout << "Error. Address of variable " << var_name << "was not found" << endl;
+    return;
+  }
+
+  uint16_t var_addr = var_addrs_[var_name];
+
+  backend_->SwitchToBank1();
+  backend_->AddAsmInstruction(string("mov XL, 0x") + ToHexString(var_addr & 0xFF));
+  backend_->AddAsmInstruction(string("mov XH, 0x") + ToHexString((var_addr >> 8) & 0xFF));
+  backend_->SwitchToBank0();
+  backend_->AddAsmInstruction(string("ld ") + reg_name + string(", X"), var_name);
 }
 
 size_t reg_cnt = 8;
@@ -230,7 +226,7 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
-  RegSpillable reg_spillable(this);
+  RegSpillable reg_spillable(this, var_addrs_);
   RegsBank0 bank0(&reg_spillable, var_addrs_, res_asm_);
 
   res_asm_.clear();
