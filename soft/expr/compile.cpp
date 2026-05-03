@@ -58,7 +58,7 @@ int compile(string code) {
     if (statements[i])
       PrintTree(statements[i]);
 
-  cout << "| res | = | left|isNum|  op |right|" << endl;
+  cout << "| res | = | left|  op |right|isNum|" << endl;
   for (Operation& r : res_code)
     cout << r.raw() << endl;
 
@@ -68,7 +68,7 @@ int compile(string code) {
   Optimize(res_code);
   cout << "res_code.size(): " << res_code.size() << endl;
 
-  cout << "| res | = | left|isNum|  op |right|" << endl;
+  cout << "| res | = | left|  op |right|isNum|" << endl;
   for (Operation& r : res_code)
     cout << r.raw() << endl;
 
@@ -110,7 +110,7 @@ int compile(string code) {
   }
 
   cout << endl << "printing live&dead vars..." << endl;
-  cout << "| res | = | left|isNum|  op |right|" << endl;
+  cout << "| res | = | left|  op |right|isNum|" << endl;
   for (Operation& r : res_code) {
     cout << r.raw() << endl;
     cout << r.live_vars_str(idx_to_var) << endl;

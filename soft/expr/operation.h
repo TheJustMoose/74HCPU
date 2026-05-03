@@ -42,8 +42,8 @@ struct Operation {
 
   std::string raw() {
     return "|" + align(res_arg) + " | = |" + align(left_arg) + " |" +
-           (arg_is_num ? " num" : "    ") + " |" +
-           align(op_name) + " |" + align(right_arg) + " |";
+           align(op_name) + " |" + align(right_arg) + " |" +
+           (arg_is_num ? " num" : "    ") + " |";
   }
 
   std::string live_vars_str() {
