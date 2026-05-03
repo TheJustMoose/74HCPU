@@ -21,7 +21,7 @@ struct Operation {
     : res_arg(res), op_name(op), left_arg(l), arg_is_num(has_num),
       right_arg(r), res_in_temp(in_temp) {}
 
-  std::string str() {
+  std::string str() const {
     std::string suffix {res_in_temp ? " (res_in_temp)" : ""};
     if (removed)
       suffix += " - removed";
@@ -33,20 +33,20 @@ struct Operation {
              + op_name + " " + right_arg + suffix;
   }
 
-  std::string align(std::string s) {
+  std::string align(std::string s) const {
     std::string res{s};
     while (res.size() < 4)
       res = " " + res;
     return res;
   }
 
-  std::string raw() {
+  std::string raw() const {
     return "|" + align(res_arg) + " | = |" + align(left_arg) + " |" +
            align(op_name) + " |" + align(right_arg) + " |" +
            (arg_is_num ? " num" : "    ") + " |";
   }
 
-  std::string live_vars_str() {
+  std::string live_vars_str() const {
     std::string res;
     res.resize(live_out_vars.size());
     for (size_t i = 0; i < live_out_vars.size(); i++)
@@ -54,7 +54,7 @@ struct Operation {
     return res;
   }
 
-  std::string live_vars_str(std::map<size_t, std::string> idx_to_var) {
+  std::string live_vars_str(std::map<size_t, std::string> idx_to_var) const {
     std::string res("{");
 
     for (size_t i = 0; i < live_out_vars.size(); i++)
@@ -71,7 +71,7 @@ struct Operation {
     return res;
   }
 
-  int argNum() {
+  int argNum() const {
     return !left_arg.empty() + !right_arg.empty();
   }
 

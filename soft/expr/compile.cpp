@@ -15,6 +15,12 @@
 
 using namespace std;
 
+void Print(const vector<Operation>& res_code) {
+  cout << "| res | = | left|  op |right|isNum|" << endl;
+  for (const Operation& r : res_code)
+    cout << r.raw() << endl;
+}
+
 int compile(string code) {
   FuncGuard fg("compile");
 
@@ -58,19 +64,14 @@ int compile(string code) {
     if (statements[i])
       PrintTree(statements[i]);
 
-  cout << "| res | = | left|  op |right|isNum|" << endl;
-  for (Operation& r : res_code)
-    cout << r.raw() << endl;
-
+  Print(res_code);
   cout << endl;
 
   cout << "try to optimize:" << endl;
   Optimize(res_code);
   cout << "res_code.size(): " << res_code.size() << endl;
 
-  cout << "| res | = | left|  op |right|isNum|" << endl;
-  for (Operation& r : res_code)
-    cout << r.raw() << endl;
+  Print(res_code);
 
   cout << endl << "final IR:" << endl;
   for (Operation& n : res_code) {
