@@ -1,18 +1,10 @@
-#include "backend.h"
+#include "compile.h"
 #include "func_guard.h"
-#include "lexer.h"
-#include "node.h"
-#include "nodes.h"
-#include "optimize.h"
-#include "parser.h"
-#include "print_tree.h"
 
-#include <cstdint>
-#include <fstream>
 #include <iostream>
-#include <map>
+#include <fstream>
 #include <sstream>
-#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -20,11 +12,11 @@ int main(int argc, char* argv[]) {
   FuncGuard fg("main");
   cout << "stack: " << FuncGuard::stack_str() << endl;
   cout << "argc: " << argc << endl;
-  for (int i = 0; i < argc; i++) {
+  for (int i = 0; i < argc; i++)
     cout << "i: " << i << ", arg[i]: " << argv[i] << endl;
-  }
   cout << endl;
 
+  string content;
   if (argc == 3 && argv[1] && argv[2]) {
     string key(argv[1]);
     if (key == "-f") {
@@ -37,123 +29,17 @@ int main(int argc, char* argv[]) {
 
       stringstream buf;
       buf << f.rdbuf();
-      string content = buf.str();
-      Lexer::instance().setInputString(content);
+      content = buf.str();
     }
   } else if (argc == 2 && argv[1]) {
     cout << "Try to process: \"" << argv[1] << "\"" << endl;
-    string s {argv[1]};
-    Lexer::instance().setInputString(s);
+    content =  argv[1];
   } else {
     cout << "Using: simple_expr.exe \"1+2+3\"" << endl;
     return 1;
   }
 
-  vector<Node*> statements;
-  if (!stmts(statements))
-    return 1;
-
-  map<string, uint16_t> var_addrs;
-  map<string, size_t> var_idxs;
-  map<size_t, string> idx_to_var;
-
-  cout << "decls:" << endl;
-  uint16_t addr {0};
-  cout << "| var | data_type | addr |" << endl;
-  for (size_t i = 0; i < getVarCount(); i++) {
-    Var v = getVar(i);
-    cout << "var decl: " << v.name << ": "
-         << GetDataTypeName(v.data_type) << (v.is_ptr ? "@" : "")
-         << ", addr: " << addr
-         << endl;
-
-    var_addrs[v.name] = addr;  // var name -> var addr
-    var_idxs[v.name] = i;      // index of variable inside of parser
-    idx_to_var[i] = v.name;    // GetVar duplicate
-    addr += v.size();
-  }
-
-  cout << "nodes:" << endl;
-  vector<Operation> res_code;
-  for (size_t i = 0; i < statements.size(); i++)
-    if (statements[i])
-      statements[i]->gen(res_code);  // enum tree items, generate three-address code
-    else
-      cout << "statements[i] is null" << endl;
-
-  cout << "res_code.size(): " << res_code.size() << endl << endl;
-
-  for (size_t i = 0; i < statements.size(); i++)
-    if (statements[i])
-      PrintTree(statements[i]);
-
-  cout << "| res | = | left|isNum|  op |right|" << endl;
-  for (Operation& r : res_code)
-    cout << r.raw() << endl;
-
-  cout << endl;
-
-  cout << "try to optimize:" << endl;
-  Optimize(res_code);
-  cout << "res_code.size(): " << res_code.size() << endl;
-
-  cout << "| res | = | left|isNum|  op |right|" << endl;
-  for (Operation& r : res_code)
-    cout << r.raw() << endl;
-
-  cout << endl << "final IR:" << endl;
-  for (Operation& n : res_code) {
-    uint8_t sz {0};
-    if (isDeclared(n.res_arg, &sz))
-      cout << n.str() << "(size: " << static_cast<int>(sz) << ")" << endl;
-    else if (n.res_in_temp)
-      cout << n.str() << endl;
-    else
-      cout << n.str() << "  // was not declared" << endl;
-  }
-
-  cout << endl << "vars:" << endl;
-  printVars();
-
-  cout << endl << "processing live&dead vars..." << endl;
-  vector<bool> live_vars(var_idxs.size(), false);
-  for (int i = res_code.size() - 1; i >= 0; i--) {
-    Operation& op = res_code[i];
-
-    //map<string, size_t> var_idxs;
-    auto res_it = var_idxs.find(op.res_arg);
-    auto left_it = var_idxs.find(op.left_arg);
-    auto right_it = var_idxs.find(op.right_arg);
-
-    op.live_out_vars = live_vars;
-
-    // -res, +left, +right
-    if (res_it != var_idxs.end())
-      live_vars[res_it->second] = false;
-    if (left_it != var_idxs.end())
-      live_vars[left_it->second] = true;
-    if (right_it != var_idxs.end())
-      live_vars[right_it->second] = true;
-
-    op.live_in_vars = live_vars;
-  }
-
-  cout << endl << "printing live&dead vars..." << endl;
-  cout << "| res | = | left|isNum|  op |right|" << endl;
-  for (Operation& r : res_code) {
-    cout << r.raw() << endl;
-    cout << r.live_vars_str(idx_to_var) << endl;
-  }
-  cout << "finished" << endl << endl;
-
-  Backend bcknd(var_addrs, idx_to_var);
-  bcknd.GenerateCode(res_code);
-
-  cout << endl << "final asm:" << endl;
-
-  vector<string> res_asm = bcknd.GetResAsm();
-  for (string& s : res_asm)
-    cout << s << endl;
+  compile(content);
 
   cout << "main finished" << endl;
   return 0;

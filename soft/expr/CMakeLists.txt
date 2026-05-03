@@ -9,6 +9,8 @@ project(simple_expr CXX)
 add_executable(simple_expr
 	backend.h
 	backend.cc
+	compile.h
+	compile.cpp
 	data_type.h
 	data_type.cc
 	func_guard.h
