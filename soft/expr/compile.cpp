@@ -90,21 +90,19 @@ int compile(string code) {
   vector<bool> live_vars(var_idxs.size(), false);
   for (int i = res_code.size() - 1; i >= 0; i--) {
     Operation& op = res_code[i];
-
-    //map<string, size_t> var_idxs;
-    auto res_it = var_idxs.find(op.res_arg);
-    auto left_it = var_idxs.find(op.left_arg);
-    auto right_it = var_idxs.find(op.right_arg);
-
     op.live_out_vars = live_vars;
 
+    auto mark_var = [var_idxs, &live_vars](string name, bool mark) {
+      // map<string, size_t> var_idxs;
+      auto res_it = var_idxs.find(name);
+      if (res_it != var_idxs.end())
+        live_vars[res_it->second] = mark;
+    };
+
     // -res, +left, +right
-    if (res_it != var_idxs.end())
-      live_vars[res_it->second] = false;
-    if (left_it != var_idxs.end())
-      live_vars[left_it->second] = true;
-    if (right_it != var_idxs.end())
-      live_vars[right_it->second] = true;
+    mark_var(op.res_arg, false);
+    mark_var(op.left_arg, true);
+    mark_var(op.right_arg, true);
 
     op.live_in_vars = live_vars;
   }
