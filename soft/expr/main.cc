@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
     cout << "i: " << i << ", arg[i]: " << argv[i] << endl;
   cout << endl;
 
-  string content;
   if (argc == 3 && argv[1] && argv[2]) {
     string key(argv[1]);
     if (key == "-f") {
@@ -29,17 +28,15 @@ int main(int argc, char* argv[]) {
 
       stringstream buf;
       buf << f.rdbuf();
-      content = buf.str();
+      compile(buf.str());
     }
   } else if (argc == 2 && argv[1]) {
     cout << "Try to process: \"" << argv[1] << "\"" << endl;
-    content =  argv[1];
+    compile(argv[1]);
   } else {
-    cout << "Using: simple_expr.exe \"1+2+3\"" << endl;
+    cout << "Using: simple_expr.exe \"1+2+3;\"" << endl;
     return 1;
   }
-
-  compile(content);
 
   cout << "main finished" << endl;
   return 0;
