@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
     cout << "i: " << i << ", arg[i]: " << argv[i] << endl;
   cout << endl;
 
+  int res {0};
   if (argc == 3 && argv[1] && argv[2]) {
     string key(argv[1]);
     if (key == "-f") {
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
   } else if (argc == 2 && argv[1]) {
     cout << "Try to process: \"" << argv[1] << "\"" << endl;
     try {
-      compile(argv[1]);
+      res = compile(argv[1]);
     } catch (const std::exception& e) {
       cout << "Compile error: " << e.what() << endl;
     }
@@ -43,5 +44,5 @@ int main(int argc, char* argv[]) {
   }
 
   cout << "main finished" << endl;
-  return 0;
+  return res;
 }
