@@ -5120,7 +5120,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 59.69 0)
 			(effects
 				(font
@@ -5222,7 +5222,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 72.39 0)
 			(effects
 				(font
@@ -5324,7 +5324,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 85.09 0)
 			(effects
 				(font
@@ -5426,7 +5426,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 97.79 0)
 			(effects
 				(font
@@ -5530,7 +5530,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 201.93 121.92 0)
 			(effects
 				(font
@@ -5632,7 +5632,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 116.84 0)
 			(effects
 				(font
@@ -5734,7 +5734,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 129.54 0)
 			(effects
 				(font
@@ -5836,7 +5836,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 142.24 0)
 			(effects
 				(font
@@ -5938,7 +5938,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 83.82 154.94 0)
 			(effects
 				(font
@@ -6042,7 +6042,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_SO:SO-14_3.9x8.65mm_P1.27mm"
+		(property "Footprint" "Package_DIP:DIP-14_W7.62mm"
 			(at 220.98 121.92 0)
 			(effects
 				(font

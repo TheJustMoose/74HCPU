@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "C:\\PROJECT\\github\\74HCPU\\hard\\!MUL\\MUL1_SMD\\MUL1.kicad_sch")
-    (date "2026-05-04T23:34:59+0300")
+    (date "2026-05-06T08:47:09+0300")
     (tool "Eeschema 9.0.6")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -151,10 +151,10 @@
       (tstamps "00000000-0000-0000-0000-000063ed60d5"))
     (comp (ref "U1")
       (value "74LS08")
-      (footprint "Package_SO:SO-14_3.9x8.65mm_P1.27mm")
+      (footprint "Package_DIP:DIP-14_W7.62mm")
       (datasheet "http://www.ti.com/lit/gpn/sn74LS08")
       (fields
-        (field (name "Footprint") "Package_SO:SO-14_3.9x8.65mm_P1.27mm")
+        (field (name "Footprint") "Package_DIP:DIP-14_W7.62mm")
         (field (name "Datasheet") "http://www.ti.com/lit/gpn/sn74LS08")
         (field (name "Description")))
       (libsource (lib "74xx") (part "74LS08") (description "Quad And2"))
@@ -181,10 +181,10 @@
       (tstamps "00000000-0000-0000-0000-0000636eafc6"))
     (comp (ref "U3")
       (value "74LS08")
-      (footprint "Package_SO:SO-14_3.9x8.65mm_P1.27mm")
+      (footprint "Package_DIP:DIP-14_W7.62mm")
       (datasheet "http://www.ti.com/lit/gpn/sn74LS08")
       (fields
-        (field (name "Footprint") "Package_SO:SO-14_3.9x8.65mm_P1.27mm")
+        (field (name "Footprint") "Package_DIP:DIP-14_W7.62mm")
         (field (name "Datasheet") "http://www.ti.com/lit/gpn/sn74LS08")
         (field (name "Description")))
       (libsource (lib "74xx") (part "74LS08") (description "Quad And2"))
