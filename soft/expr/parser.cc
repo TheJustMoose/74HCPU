@@ -188,6 +188,8 @@ Node* assign() {
     Name* n = dynamic_cast<Name*>(left);
     // вообще, где-то здесь не хватает проверки res_in_temp
     // но этот флажок лежит в таблице со списком операций :(
+    if (!n)
+      throw logic_error("dynamic_cast<Name*> return NULL");
     if (!isDeclared(n->name(), &var_size))
       cout << "You try to assign to variable \"" << n->name()
            << "\" which has not been declared" << endl;
