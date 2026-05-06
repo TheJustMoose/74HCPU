@@ -1,5 +1,5 @@
 #include <iostream>
-#include <assert.h>
+#include <stdexcept>
 
 #include "regs_bank.h"
 #include "spillable.h"
@@ -10,11 +10,18 @@ void RegsBank0::Spill(size_t reg_idx) {
   if (!p_spill_)
     return;
 
-  assert(reg_idx < bank0_.size());
+  if (reg_idx >= bank0_.size())
+    throw logic_error("reg_idx is too large");
 
   string var_name = bank0_[reg_idx];
-  assert(var_name.size());
-  assert(var_addrs_.find(var_name) != var_addrs_.end());
+  if (!var_name.size())
+    throw logic_error(string("var_name with index ") + to_string(reg_idx) + " is empty");
+
+  if (var_addrs_.find(var_name) == var_addrs_.end()) {
+    string msg = string("var_addr for ") + var_name + " was not found";
+    throw logic_error(msg);
+  }
+
   uint16_t var_addr = var_addrs_[var_name];
 
   cout << DumpRegs() << endl;

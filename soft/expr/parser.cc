@@ -12,9 +12,9 @@
 #include "var.h"
 #include "var_size.h"
 
-#include <assert.h>
 #include <cstdint>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -107,7 +107,8 @@ Node* prim() {
     Lexer::instance().consume();
     UnOp* n = new UnOp(new_tmp());
     n->child = prim();
-    assert(n->child);
+    if (!n->child)
+      throw exception("Argument for unary minus was not found");
     vars.emplace_back(n->name(), n->data_type(), false); // can we set is_ptr to true when argument is pointer?
     return n;
   } else if (t == tLBracket) {
