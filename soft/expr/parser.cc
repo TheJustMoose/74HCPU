@@ -15,7 +15,6 @@
 #include <assert.h>
 #include <cstdint>
 #include <iostream>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -256,8 +255,8 @@ Node* declare() {
       Lexer::instance().consume();
       t = Lexer::instance().currentToken();
       if (t == tNum) {
-        Lexer::instance().consume();
         int val = Lexer::instance().getIntValue();
+        Lexer::instance().consume();
         cout << var_name << " := " << val << "  // initialization" << endl;
         // TODO: try to put var value into **vars** vector (see above)
       } else {
