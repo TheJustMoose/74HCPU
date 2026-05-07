@@ -25,16 +25,38 @@ using namespace std;
 //
 
 /*
-name -> id (a few letters)
-prim -> num | name | (expr)
-term -> term * prim
-expr -> expr + term
-assi -> assi = expr | name
+Program         ::= Statement { ';' Statement } [ ';' ]
+                |   ε
+                ;
 
+Statement       ::= Declaration
+                |   Assignment
+                ;
 
-term_rest -> * prim | E
-term -> prim | term_rest
+Declaration     ::= Type [ '@' ] NameList
+                ;
 
+Type            ::= 'int'
+                |   'byte'
+                ;
+
+NameList        ::= name [ '=' num ] { ',' name [ '=' num ] }
+                ;
+
+Assignment      ::= Expression [ '=' Assignment ]
+                ;
+
+Expression      ::= Term { ('+' | '-') Term }
+                ;
+
+Term            ::= Primary { ('*' | '/') Primary }
+                ;
+
+Primary         ::= num
+                |   name
+                |   '-' Primary
+                |   '(' Expression ')'
+                ;
 */
 
 int tmp_var_counter {0};
