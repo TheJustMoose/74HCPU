@@ -109,7 +109,7 @@ unique_ptr<Node> prim() {
     unique_ptr<UnOp> n = make_unique<UnOp>(new_tmp());
     n->child = prim();
     if (!n->child)
-      throw exception("Argument for unary minus was not found");
+      throw logic_error("Argument for unary minus was not found");
     vars.emplace_back(n->name(), n->data_type(), false); // can we set is_ptr to true when argument is pointer?
     return n;
   } else if (t == tLBracket) {
