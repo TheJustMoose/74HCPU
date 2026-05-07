@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <vector>
 
 using namespace std;
@@ -47,7 +48,7 @@ int compile(string code) {
 
   Lexer::instance().setInputString(code);
 
-  vector<Node*> statements;
+  vector<unique_ptr<Node>> statements;
   if (!stmts(statements))
     return 1;
 
@@ -83,7 +84,7 @@ int compile(string code) {
 
   for (size_t i = 0; i < statements.size(); i++)
     if (statements[i])
-      PrintTree(statements[i]);
+      PrintTree(statements[i].get());
 
   Print(res_code);
   cout << endl;

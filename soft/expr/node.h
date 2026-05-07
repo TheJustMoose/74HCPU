@@ -11,6 +11,8 @@ class Node {
  public:
   Node(NodeType nt): type_(nt) {}
 
+  virtual ~Node() = default;
+
   virtual void gen(std::vector<Operation>& res_code) = 0;
 
   virtual std::string op() const { return ""; }

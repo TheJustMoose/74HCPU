@@ -7,6 +7,7 @@
 #include "node_type.h"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -52,8 +53,8 @@ class BinOp: public Node {
   std::string name() const override { return name_; }
   std::string op() const override;
 
-  Node* left {nullptr};
-  Node* right {nullptr};
+  std::unique_ptr<Node> left;
+  std::unique_ptr<Node> right;
 
   DataType data_type() override;
 
@@ -69,7 +70,7 @@ class UnOp: public Node {
   std::string name() const override { return name_; }
   std::string op() const override { return "-"; }
 
-  Node* child {nullptr};
+  std::unique_ptr<Node> child;
 
   DataType data_type() override;
 
@@ -87,8 +88,8 @@ class AssignOp: public Node {
 
   DataType data_type() override;
 
-  Node* left {nullptr};
-  Node* right {nullptr};
+  std::unique_ptr<Node> left;
+  std::unique_ptr<Node> right;
 };
 
 class VarDecl: public Node {

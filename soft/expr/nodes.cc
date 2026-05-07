@@ -115,7 +115,7 @@ void AssignOp::gen(vector<Operation>& res_code) {
     return;
   }
 
-  Name* name_node = dynamic_cast<Name*>(left);
+  Name* name_node = dynamic_cast<Name*>(left.get());
   if (!name_node) {
     cout << FuncGuard::stack_str() << "Error. left node is not variable (Name class)" << endl;
     return;

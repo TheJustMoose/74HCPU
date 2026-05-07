@@ -14,6 +14,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -87,25 +88,25 @@ bool getVar(string var_name, Var& var) {
   return false;
 }
 
-Node* prim() {
+unique_ptr<Node> prim() {
   FuncGuard fg("prim");
   Token t = Lexer::instance().currentToken();
   if (t == tNum) {
     int val = Lexer::instance().getIntValue();
     Lexer::instance().consume();
-    return new Num(val);
+    return make_unique<Num>(val);
   } else if (t == tName) {
     string str = Lexer::instance().getStrValue();
     Lexer::instance().consume();
 
     DataType dt {dtNotInitialize};
     if (isDeclared(str, nullptr, &dt))
-      return new Name(str, dt);
+      return make_unique<Name>(str, dt);
     else
-      return new Name(str);
+      return make_unique<Name>(str);
   } else if (t == tMinus) {
     Lexer::instance().consume();
-    UnOp* n = new UnOp(new_tmp());
+    unique_ptr<UnOp> n = make_unique<UnOp>(new_tmp());
     n->child = prim();
     if (!n->child)
       throw exception("Argument for unary minus was not found");
@@ -113,7 +114,7 @@ Node* prim() {
     return n;
   } else if (t == tLBracket) {
     Lexer::instance().consume();
-    Node* n = expr();
+    unique_ptr<Node> n = expr();
     t = Lexer::instance().currentToken();
     if (t != tRBracket)
       cout << FuncGuard::stack_str()
@@ -122,70 +123,71 @@ Node* prim() {
       Lexer::instance().consume();
     return n;
   } else {
-    return nullptr;
+    return {};
   }
 }
 
-Node* term() {
+unique_ptr<Node> term() {
   FuncGuard fg("term");
-  Node* left = prim();
+  unique_ptr<Node> left = prim();
   if (!left)
-    return nullptr;
+    return {};
 
   Token t = Lexer::instance().currentToken();
   while (t == tMul || t == tDiv) {
     Token t_op = t;
     Lexer::instance().consume();
 
-    Node* right = prim();
-    // prim have already called Lexer::instance().consume();
+    unique_ptr<Node> right = prim();
+    // prim has already called Lexer::instance().consume();
 
-    BinOp* op = new BinOp(t_op, new_tmp());
-    op->left = left;
-    op->right = right;
-    left = op;
+    unique_ptr<BinOp> op = make_unique<BinOp>(t_op, new_tmp());
+    op->left = std::move(left);
+    op->right = std::move(right);
     vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
+
+    left = std::move(op);
     t = Lexer::instance().currentToken();
   }
 
   return left;
 }
 
-Node* expr() {
+unique_ptr<Node> expr() {
   FuncGuard fg("expr");
-  Node* left = term();
-  if (!left) {
-    return nullptr;
-  }
+  unique_ptr<Node> left = term();
+  if (!left)
+    return {};
 
   Token t = Lexer::instance().currentToken();
   while (t == tPlus || t == tMinus) {
     Token t_op = t;
     Lexer::instance().consume();
 
-    Node* right = term();
-    // term have already called Lexer::instance().consume(); in prim()
+    unique_ptr<Node> right = term();
+    // term has already called Lexer::instance().consume(); in prim()
 
-    BinOp* op = new BinOp(t_op, new_tmp());
-    op->left = left;
-    op->right = right;
-    left = op;
+    unique_ptr<BinOp> op = make_unique<BinOp>(t_op, new_tmp());
+    op->left = std::move(left);
+    op->right = std::move(right);
     vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
+
+    left = std::move(op);
     t = Lexer::instance().currentToken();
   }
 
   return left;
 }
 
-Node* assign() {
+unique_ptr<Node> assign() {
   FuncGuard fg("assi");
-  Node* left = expr();  // a
+  unique_ptr<Node> left = expr();  // a
   if (!left)
-    return nullptr;
+    return {};
 
   uint8_t var_size {0};
   if (left->type() == ntName) {
-    Name* n = dynamic_cast<Name*>(left);
+    Name* n = dynamic_cast<Name*>(left.get());
     // вообще, где-то здесь не хватает проверки res_in_temp
     // но этот флажок лежит в таблице со списком операций :(
     if (!n)
@@ -202,26 +204,26 @@ Node* assign() {
   if (t == tEnd)
     return left;
 
-  Node* res {nullptr};
+  unique_ptr<Node> res;
   if (t == tEqual) {
     Lexer::instance().consume();
-    AssignOp* op = new AssignOp();  // =
-    op->left = left;                // a =
+    unique_ptr<AssignOp> op = make_unique<AssignOp>();  // =
+    op->left = std::move(left);     // a =
     op->right = assign();           // a = assign(); // recursion
-    res = op;
+    res = std::move(op);    // remove res, use return op
   } else {
-    res = left;
+    res = std::move(left);  // remove res, use return left
   }
 
   return res;
 }
 
-Node* declare() {
+unique_ptr<Node> declare() {
   FuncGuard fg("decl");
 
   Token t = Lexer::instance().currentToken();
   if (t == tEnd)
-    return nullptr;
+    return {};
 
   DataType dt {dtNotInitialize};
   if (t == tInt) {
@@ -229,7 +231,7 @@ Node* declare() {
   } else if (t == tByte) {
     dt = dtByte;
   } else {
-    return nullptr;
+    return {};
   }
 
   Lexer::instance().consume();  // skip int
@@ -241,7 +243,7 @@ Node* declare() {
     Lexer::instance().consume();
   }
 
-  VarDecl* n = new VarDecl(dt, is_ptr);
+  unique_ptr<VarDecl> n = make_unique<VarDecl>(dt, is_ptr);
 
   // Okay, now try to find variable name[s]
   t = Lexer::instance().currentToken();
@@ -276,23 +278,25 @@ Node* declare() {
     } else {
       cout << "Error. Please add ';' to the end of declaration" << endl;
       cout << "Got token: " << (int)t << endl;
-      return nullptr;
+      return {};
     }
   }
 
-  return nullptr;
+  return {};
 }
 
-Node* stmt() {
+unique_ptr<Node> stmt() {
   // stmt -> assign | declare
-  Node* n = declare();
-  return n ? n : assign();
+  unique_ptr<Node> n = declare();
+  if (!n)
+    n = std::move(assign());
+  return n;
 }
 
-bool stmts(vector<Node*>& statements) {
+bool stmts(vector<unique_ptr<Node>>& statements) {
   FuncGuard fg("stmt");
 
-  Node* n = stmt();
+  unique_ptr<Node> n(stmt());
   Token t = Lexer::instance().currentToken();
   while (n) {
     if (t == tSemicolon) {
@@ -300,7 +304,8 @@ bool stmts(vector<Node*>& statements) {
         cout << "Node == null was returned from stmt()" << endl;
         break;
       }
-      statements.push_back(n);
+
+      statements.push_back(std::move(n));
 
       Lexer::instance().consume();
       n = stmt();

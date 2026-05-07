@@ -32,18 +32,18 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
     //cout << "binop..." << endl;
     lvl++;
     int offset = kWidth / (lvl*2 + 5);
-    Tree2List(bop->left, mid - offset, lvl);
-    Tree2List(bop->right, mid + offset, lvl);
+    Tree2List(bop->left.get(), mid - offset, lvl);
+    Tree2List(bop->right.get(), mid + offset, lvl);
   } else if (AssignOp* aop = dynamic_cast<AssignOp*>(n)) {
     //cout << "assign..." << endl;
     lvl++;
     int offset = kWidth / (lvl*2 + 5);
-    Tree2List(aop->left, mid - offset, lvl);
-    Tree2List(aop->right, mid + offset, lvl);
+    Tree2List(aop->left.get(), mid - offset, lvl);
+    Tree2List(aop->right.get(), mid + offset, lvl);
   } else if (UnOp* uop = dynamic_cast<UnOp*>(n)) {
     //cout << "unary minus..." << endl;
     lvl++;
-    Tree2List(uop->child, mid, lvl);
+    Tree2List(uop->child.get(), mid, lvl);
   } else {
     //cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }
