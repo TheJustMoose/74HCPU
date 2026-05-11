@@ -103,8 +103,11 @@ class VarDecl: public Node {
   std::string var_names() const;
 
   DataType data_type() override { return data_type_; }
+  bool is_pointer() { return is_pointer_; }
 
-  DataType data_type_ {dtNotInitialize};
-  bool is_pointer {false};
   std::vector<std::string> names {};
+
+ private:
+  DataType data_type_ {dtNotInitialize};
+  bool is_pointer_ {false};
 };

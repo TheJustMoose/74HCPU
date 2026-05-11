@@ -6,6 +6,7 @@
 #include "data_type.h"
 #include "var.h"
 
+bool AddVar(std::string var_name, DataType dt, bool is_ptr);
 size_t getVarCount();
 Var getVar(size_t idx);
 bool isDeclared(std::string var_name, uint8_t* var_size = 0, DataType* dt = 0);

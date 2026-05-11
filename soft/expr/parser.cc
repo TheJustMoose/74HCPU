@@ -233,10 +233,7 @@ unique_ptr<Node> declare() {
   while (t == tName) {
     string var_name = Lexer::instance().getStrValue();
     n->names.push_back(var_name);
-    cout << "Int variable \"" << var_name << "\" has been declared" << endl;
 
-    // вынести на потом:
-    //vars.emplace_back(var_name, dt, is_ptr);  // duplicate variable name array
     Lexer::instance().consume();  // skip var name
 
     t = Lexer::instance().currentToken();

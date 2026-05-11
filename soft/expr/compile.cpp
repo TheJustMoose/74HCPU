@@ -53,6 +53,20 @@ int compile(string code) {
   if (!stmts(statements))
     return 1;
 
+  for (size_t i = 0; i < statements.size(); i++) {
+    VarDecl* decl_node = dynamic_cast<VarDecl*>(statements[i].get());
+    if (!decl_node)
+      continue;
+
+    for (string var_name : decl_node->names) {
+      AddVar(var_name, decl_node->data_type(), decl_node->is_pointer());
+      cout << GetDataTypeName(decl_node->data_type())
+           << " variable \"" << var_name
+           << (decl_node->is_pointer() ? "@" : "")
+           << "\" has been declared" << endl;
+    }
+  }
+
   map<string, uint16_t> var_addrs;
   map<string, size_t> var_idxs;
   map<size_t, string> idx_to_var;
@@ -62,10 +76,9 @@ int compile(string code) {
   cout << "| var | data_type | addr |" << endl;
   for (size_t i = 0; i < getVarCount(); i++) {
     Var v = getVar(i);
-    cout << "var decl: " << v.name << ": "
+    cout << "| " << v.name << " | "
          << GetDataTypeName(v.data_type) << (v.is_ptr ? "@" : "")
-         << ", addr: " << addr
-         << endl;
+         << " | " << addr << " | " << endl;
 
     var_addrs[v.name] = addr;  // var name -> var addr
     var_idxs[v.name] = i;      // index of variable inside of parser

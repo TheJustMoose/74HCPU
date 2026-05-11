@@ -9,6 +9,15 @@ using namespace std;
 
 vector<Var> vars {};
 
+bool AddVar(std::string var_name, DataType dt, bool is_ptr) {
+  for (const Var& v : vars)
+    if (v.name == var_name)
+      return false;
+
+  vars.emplace_back(var_name, dt, is_ptr);
+  return true;
+}
+
 size_t getVarCount() {
   return vars.size();
 }

@@ -140,7 +140,7 @@ DataType AssignOp::data_type() {
 }
 
 VarDecl::VarDecl(DataType dt, bool is_ptr)
-  : Node(ntVarDecl), data_type_(dt), is_pointer(is_ptr) {}
+  : Node(ntVarDecl), data_type_(dt), is_pointer_(is_ptr) {}
 
 void VarDecl::gen(vector<Operation>& res_code) {
   // This node is just variable declaration.
@@ -155,7 +155,7 @@ void VarDecl::gen(vector<Operation>& res_code) {
 // In C++ "char* a, b;" means
 // that you have pointer "a" and char "b".
 uint8_t VarDecl::var_size() {
-  return ::var_size(data_type(), is_pointer);
+  return ::var_size(data_type(), is_pointer());
 }
 
 string VarDecl::var_names() const {
