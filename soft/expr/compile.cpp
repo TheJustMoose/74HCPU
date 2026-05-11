@@ -44,7 +44,26 @@ void PrintLiveVars(const vector<Operation>& res_code,
   }
 }
 
-int compile(string code) {
+void CollectVars(Node* n) {
+  if (AssignOp* op = dynamic_cast<AssignOp*>(n)) {
+    CollectVars(op->left.get());
+    CollectVars(op->right.get());
+  }
+
+  if (BinOp* op = dynamic_cast<BinOp*>(n)) {
+    cout << op->name() << " variable found" << endl;
+    AddVar(op->name(), op->data_type(), false);  // is_ptr ?
+    CollectVars(op->left.get());
+    CollectVars(op->right.get());
+  }
+
+  if (UnOp* op = dynamic_cast<UnOp*>(n)) {
+    AddVar(op->name(), op->data_type(), false);  // can we set is_ptr to true when argument is pointer?
+    CollectVars(op->child.get());
+  }
+}
+
+int Compile(string code) {
   FuncGuard fg("compile");
 
   Lexer::instance().setInputString(code);
@@ -66,6 +85,9 @@ int compile(string code) {
            << "\" has been declared" << endl;
     }
   }
+
+  for (size_t i = 0; i < statements.size(); i++)
+    CollectVars(statements[i].get());
 
   map<string, uint16_t> var_addrs;
   map<string, size_t> var_idxs;

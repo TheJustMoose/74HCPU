@@ -86,8 +86,6 @@ unique_ptr<Node> prim() {
     n->child = prim();
     if (!n->child)
       throw logic_error("Argument for unary minus was not found");
-    // вынести на потом
-    //vars.emplace_back(n->name(), n->data_type(), false); // can we set is_ptr to true when argument is pointer?
     return n;
   } else if (t == tLBracket) {
     Lexer::instance().consume();
@@ -121,9 +119,6 @@ unique_ptr<Node> term() {
     unique_ptr<BinOp> op = make_unique<BinOp>(t_op, new_tmp());
     op->left = std::move(left);
     op->right = std::move(right);
-    // вынести на потом:
-    //vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
-
     left = std::move(op);
     t = Lexer::instance().currentToken();
   }
@@ -148,10 +143,6 @@ unique_ptr<Node> expr() {
     unique_ptr<BinOp> op = make_unique<BinOp>(t_op, new_tmp());
     op->left = std::move(left);
     op->right = std::move(right);
-
-    // вынести на потом:
-    //vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
-
     left = std::move(op);
     t = Lexer::instance().currentToken();
   }
