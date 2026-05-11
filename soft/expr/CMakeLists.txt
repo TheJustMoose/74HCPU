@@ -38,6 +38,8 @@ add_executable(simple_expr
 	token2node_type.cc
 	var.h
 	var.cc
+	var_list.h
+	var_list.cpp
 	var_size.h
 	var_size.cc
 )
@@ -78,6 +80,8 @@ add_executable(simple_expr_unit_tests
 	token2node_type.cc
 	var.h
 	var.cc
+	var_list.h
+	var_list.cpp
 	var_size.h
 	var_size.cc
 )

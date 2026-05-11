@@ -1,7 +1,11 @@
 #include "backend.h"
+#include "var_list.h"
 #include "parser.h"
 #include "regs_bank.h"
 #include "spillable.h"
+#include "var.h"
+#include "var_list.h"
+#include "var_size.h"
 
 #include <algorithm>
 #include <iostream>
@@ -9,6 +13,14 @@
 #include <sstream>
 
 using namespace std;
+
+/*
+
+ Добавить юнит тестов для уже написанных Spill / Fill.
+ Сделать какой-то синглтон, из которого торчат переменные, адреса, и степень их заспиленности!
+ Как-то переделать табличку со списком Operation
+
+*/
 
 // copied from asm
 string ToUpper(string s) {

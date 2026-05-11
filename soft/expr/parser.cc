@@ -9,8 +9,6 @@
 #include "node_type.h"
 #include "operation.h"
 #include "token.h"
-#include "var.h"
-#include "var_size.h"
 
 #include <cstdint>
 #include <iostream>
@@ -64,52 +62,6 @@ string new_tmp() {
   return string("t") + to_string(tmp_var_counter++);
 }
 
-vector<Var> vars {};
-
-size_t getVarCount() {
-  return vars.size();
-}
-
-Var getVar(size_t idx) {
-  if (idx < vars.size())
-    return vars[idx];
-  return {};
-}
-
-bool isDeclared(string var_name, uint8_t* var_size, DataType* dt) {
-  for (const Var& v : vars)
-    if (v.name == var_name) {
-      if (var_size != nullptr) {
-        if (v.size() == 0)
-          cout << "Error! var_size return 0!" << endl;
-        else
-          *var_size = v.size();
-      }
-      if (dt)
-        *dt = v.data_type;
-      return true;
-    }
-
-  return false;
-}
-
-void printVars() {
-  for (const Var& v : vars)
-    cout << v.name << ": " << GetDataTypeName(v.data_type)
-         << (v.is_ptr ? "@" : "")
-         << ", size: " << (int)v.size() << endl;
-}
-
-bool getVar(string var_name, Var& var) {
-  for (const Var& v : vars)
-    if (v.name == var_name) {
-      var = v;
-      return true;
-    }
-
-  return false;
-}
-
 unique_ptr<Node> prim() {
   FuncGuard fg("prim");
   Token t = Lexer::instance().currentToken();
@@ -120,19 +72,22 @@ unique_ptr<Node> prim() {
   } else if (t == tName) {
     string str = Lexer::instance().getStrValue();
     Lexer::instance().consume();
-
+    return make_unique<Name>(str);
+/*
     DataType dt {dtNotInitialize};
-    if (isDeclared(str, nullptr, &dt))
+    if (isDeclared(str, nullptr, &dt))  // вынести на потом
       return make_unique<Name>(str, dt);
     else
       return make_unique<Name>(str);
+*/
   } else if (t == tMinus) {
     Lexer::instance().consume();
     unique_ptr<UnOp> n = make_unique<UnOp>(new_tmp());
     n->child = prim();
     if (!n->child)
       throw logic_error("Argument for unary minus was not found");
-    vars.emplace_back(n->name(), n->data_type(), false); // can we set is_ptr to true when argument is pointer?
+    // вынести на потом
+    //vars.emplace_back(n->name(), n->data_type(), false); // can we set is_ptr to true when argument is pointer?
     return n;
   } else if (t == tLBracket) {
     Lexer::instance().consume();
@@ -166,7 +121,8 @@ unique_ptr<Node> term() {
     unique_ptr<BinOp> op = make_unique<BinOp>(t_op, new_tmp());
     op->left = std::move(left);
     op->right = std::move(right);
-    vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
+    // вынести на потом:
+    //vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
 
     left = std::move(op);
     t = Lexer::instance().currentToken();
@@ -192,7 +148,9 @@ unique_ptr<Node> expr() {
     unique_ptr<BinOp> op = make_unique<BinOp>(t_op, new_tmp());
     op->left = std::move(left);
     op->right = std::move(right);
-    vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
+
+    // вынести на потом:
+    //vars.emplace_back(op->name(), op->data_type(), false); // is_ptr ?
 
     left = std::move(op);
     t = Lexer::instance().currentToken();
@@ -214,9 +172,12 @@ unique_ptr<Node> assign() {
     // но этот флажок лежит в таблице со списком операций :(
     if (!n)
       throw logic_error("dynamic_cast<Name*> return NULL");
+/*
+    // вынести на потом:
     if (!isDeclared(n->name(), &var_size))
       cout << "You try to assign to variable \"" << n->name()
            << "\" which has not been declared" << endl;
+*/
   }
 
   // TODO: теперь хорошо бы добавить инициализацию объявляемых переменных
@@ -274,7 +235,8 @@ unique_ptr<Node> declare() {
     n->names.push_back(var_name);
     cout << "Int variable \"" << var_name << "\" has been declared" << endl;
 
-    vars.emplace_back(var_name, dt, is_ptr);  // duplicate variable name array
+    // вынести на потом:
+    //vars.emplace_back(var_name, dt, is_ptr);  // duplicate variable name array
     Lexer::instance().consume();  // skip var name
 
     t = Lexer::instance().currentToken();
@@ -295,7 +257,7 @@ unique_ptr<Node> declare() {
     if (t == tComma) {
       Lexer::instance().consume();  // skip comma
       t = Lexer::instance().currentToken();
-    } else if (t == tSemicolon) {  // replace it to comma later
+    } else if (t == tSemicolon) {
       return n;
     } else {
       cout << "Error. Please add ';' to the end of declaration" << endl;

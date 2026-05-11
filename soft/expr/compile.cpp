@@ -7,6 +7,7 @@
 #include "optimize.h"
 #include "parser.h"
 #include "print_tree.h"
+#include "var_list.h"
 
 #include <cstdint>
 #include <iostream>

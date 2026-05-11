@@ -1,4 +1,4 @@
-git submodule update
+#git submodule update
 mkdir bin
 cd bin
 cmake ..
