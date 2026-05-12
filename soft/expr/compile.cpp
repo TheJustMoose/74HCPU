@@ -44,24 +44,50 @@ void PrintLiveVars(const vector<Operation>& res_code,
   }
 }
 
-void CollectVars(Node* n) {
+class Visitor {
+ public:
+  virtual void Visit(Node* op) {}
+  virtual void Visit(AssignOp* op) {}
+  virtual void Visit(BinOp* op) {}
+  virtual void Visit(UnOp* op) {}
+};
+
+void EnumTree(Node* n, Visitor* v) {
   if (AssignOp* op = dynamic_cast<AssignOp*>(n)) {
-    CollectVars(op->left.get());
-    CollectVars(op->right.get());
-  }
-
-  if (BinOp* op = dynamic_cast<BinOp*>(n)) {
-    cout << op->name() << " variable found" << endl;
-    AddVar(op->name(), op->data_type(), false);  // is_ptr ?
-    CollectVars(op->left.get());
-    CollectVars(op->right.get());
-  }
-
-  if (UnOp* op = dynamic_cast<UnOp*>(n)) {
-    AddVar(op->name(), op->data_type(), false);  // can we set is_ptr to true when argument is pointer?
-    CollectVars(op->child.get());
+    EnumTree(op->left.get(), v);
+    EnumTree(op->right.get(), v);
+    v->Visit(op);
+  } else if (BinOp* op = dynamic_cast<BinOp*>(n)) {
+    EnumTree(op->left.get(), v);
+    EnumTree(op->right.get(), v);
+    v->Visit(op);
+  } else if (UnOp* op = dynamic_cast<UnOp*>(n)) {
+    EnumTree(op->child.get(), v);
+    v->Visit(op);
+  } else {
   }
 }
+
+class VarsCollector: public Visitor {
+  void Visit(BinOp* op) override {
+    if (!op)
+      return;
+    AddVar(op->name(), op->data_type(), false);  // is_ptr ?
+  }
+
+  virtual void Visit(UnOp* op) {
+    if (!op)
+      return;
+    AddVar(op->name(), op->data_type(), false);  // can we set is_ptr to true when argument is pointer?
+  }
+};
+
+void CollectVars(Node* root) {
+  VarsCollector vc;
+  EnumTree(root, &vc);
+}
+
+//SetDataTypes
 
 int Compile(string code) {
   FuncGuard fg("compile");
@@ -85,6 +111,11 @@ int Compile(string code) {
            << "\" has been declared" << endl;
     }
   }
+
+  // где-то здесь надо пройтись по дереву и проставить типы данным всем тем переменным,
+  // которые входят в выражения... фактически, их надо связать с объявлениями!
+  //for (size_t i = 0; i < statements.size(); i++)
+  //  SetDataTypes(statements[i].get());
 
   for (size_t i = 0; i < statements.size(); i++)
     CollectVars(statements[i].get());

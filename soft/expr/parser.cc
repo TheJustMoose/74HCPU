@@ -92,10 +92,8 @@ unique_ptr<Node> prim() {
     unique_ptr<Node> n = expr();
     t = Lexer::instance().currentToken();
     if (t != tRBracket)
-      cout << FuncGuard::stack_str()
-           << "Error. Waiting for right bracket" << endl;
-    else
-      Lexer::instance().consume();
+      throw logic_error("Error. Waiting for right bracket");
+    Lexer::instance().consume();
     return n;
   } else {
     return {};
