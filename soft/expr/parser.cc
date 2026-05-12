@@ -226,6 +226,7 @@ unique_ptr<Node> declare() {
         int val = Lexer::instance().getIntValue();
         Lexer::instance().consume();
         cout << var_name << " := " << val << "  // initialization" << endl;
+        n->values[var_name] = val;
         // TODO: try to put var value into **vars** vector (see above)
       } else {
         cout << "Error. Only initialization by numbers is supported now." << endl;

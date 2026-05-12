@@ -7,6 +7,7 @@
 #include "node_type.h"
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -105,6 +106,7 @@ class VarDecl: public Node {
   bool is_pointer() { return is_pointer_; }
 
   std::vector<std::string> names {};
+  std::map<std::string, int> values {};
 
  private:
   DataType data_type_ {dtNotInitialize};
