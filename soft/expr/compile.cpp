@@ -46,10 +46,11 @@ void PrintLiveVars(const vector<Operation>& res_code,
 
 class Visitor {
  public:
-  virtual void Visit(Node* op) {}
+  virtual void Visit(Node* n) {}
   virtual void Visit(AssignOp* op) {}
   virtual void Visit(BinOp* op) {}
   virtual void Visit(UnOp* op) {}
+  virtual void Visit(Name* n) {}
 };
 
 void EnumTree(Node* n, Visitor* v) {
@@ -64,8 +65,28 @@ void EnumTree(Node* n, Visitor* v) {
   } else if (UnOp* op = dynamic_cast<UnOp*>(n)) {
     EnumTree(op->child.get(), v);
     v->Visit(op);
+  } else if (Name* nm = dynamic_cast<Name*>(n)) {
+    v->Visit(nm);
   } else {
+    v->Visit(n);
   }
+}
+
+class DataTypesSetter: public Visitor {
+ public:
+  void Visit(Name* n) override {
+    if (!n)
+      return;
+
+    Var v;
+    if (getVar(n->name(), v))
+      n->init_data_type(v.data_type);
+  }
+};
+
+void SetDataTypes(Node* root) {
+  DataTypesSetter dts;
+  EnumTree(root, &dts);
 }
 
 class VarsCollector: public Visitor {
@@ -82,12 +103,10 @@ class VarsCollector: public Visitor {
   }
 };
 
-void CollectVars(Node* root) {
+void CollectTempVars(Node* root) {
   VarsCollector vc;
   EnumTree(root, &vc);
 }
-
-//SetDataTypes
 
 int Compile(string code) {
   FuncGuard fg("compile");
@@ -112,13 +131,11 @@ int Compile(string code) {
     }
   }
 
-  // где-то здесь надо пройтись по дереву и проставить типы данным всем тем переменным,
-  // которые входят в выражения... фактически, их надо связать с объявлениями!
-  //for (size_t i = 0; i < statements.size(); i++)
-  //  SetDataTypes(statements[i].get());
+  for (size_t i = 0; i < statements.size(); i++)
+    SetDataTypes(statements[i].get());
 
   for (size_t i = 0; i < statements.size(); i++)
-    CollectVars(statements[i].get());
+    CollectTempVars(statements[i].get());
 
   map<string, uint16_t> var_addrs;
   map<string, size_t> var_idxs;

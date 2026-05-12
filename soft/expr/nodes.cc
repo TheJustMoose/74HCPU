@@ -23,20 +23,8 @@ Name::Name(string value)
   : Node(ntName), value_(value) {
 }
 
-Name::Name(string value, DataType dt)
-  : Node(ntName), value_(value), data_type_(dt) {
-}
-
-void Name::init_size(uint8_t size) {
-  cached_size_ = size;
-}
-
 void Name::gen(vector<Operation>& res_code) {
   // name value will be used by other nodes
-}
-
-uint8_t Name::cached_size() {
-  return cached_size_;
 }
 
 BinOp::BinOp(Token t, string n)

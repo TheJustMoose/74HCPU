@@ -73,13 +73,6 @@ unique_ptr<Node> prim() {
     string str = Lexer::instance().getStrValue();
     Lexer::instance().consume();
     return make_unique<Name>(str);
-/*
-    DataType dt {dtNotInitialize};
-    if (isDeclared(str, nullptr, &dt))  // вынести на потом
-      return make_unique<Name>(str, dt);
-    else
-      return make_unique<Name>(str);
-*/
   } else if (t == tMinus) {
     Lexer::instance().consume();
     unique_ptr<UnOp> n = make_unique<UnOp>(new_tmp());

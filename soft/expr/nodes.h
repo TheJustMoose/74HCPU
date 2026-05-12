@@ -30,18 +30,17 @@ class Num: public Node {
 class Name: public Node {
  public:
   Name(std::string value);
-  Name(std::string value, DataType dt);
+  void init_data_type(DataType dt) {
+    data_type_ = dt;
+  }
 
-  void init_size(uint8_t size);
   void gen(std::vector<Operation>& res_code) override;
   std::string name() const override { return value_; }
-  uint8_t cached_size();
 
   DataType data_type() override { return data_type_; }
 
  private:
   std::string value_ {""};
-  uint8_t cached_size_ {0};
   DataType data_type_ {dtNotInitialize};
 };
 
