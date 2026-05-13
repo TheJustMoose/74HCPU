@@ -29,7 +29,11 @@ int main(int argc, char* argv[]) {
 
       stringstream buf;
       buf << f.rdbuf();
-      Compile(buf.str());
+      try {
+        Compile(buf.str());
+      } catch (const std::exception& e) {
+        cout << "Compile error: " << e.what() << endl;
+      }
     }
   } else if (argc == 2 && argv[1]) {
     cout << "Try to process: \"" << argv[1] << "\"" << endl;
