@@ -183,8 +183,8 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
     string cmnt1 = op.res_arg + " = " + op.left_arg;
 
     string res_reg = bank0.FindRegFor(op.res_arg);
-    string line11 = "mov " + res_reg + ", " +
-                    (op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg));
+    string right_val = op.arg_is_num ? op.left_arg : bank0.FindRegFor(op.left_arg);
+    string line11 = "mov " + res_reg + ", " + right_val;
     AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
   }
 }
@@ -233,7 +233,8 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
 
-  string line21 = cmd + " " + res_reg + ", " + bank0.FindRegFor(op.right_arg);
+  string right_val = op.arg_is_num ? op.right_arg : bank0.FindRegFor(op.right_arg);
+  string line21 = cmd + " " + res_reg + ", " + right_val;
   AddAsmInstruction(line21, cmnt2, bank0.DumpRegs());
 }
 
