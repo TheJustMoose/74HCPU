@@ -50,6 +50,7 @@ void printVars() {
     cout << v.name << ": " << GetDataTypeName(v.data_type)
          << (v.is_ptr ? "@" : "")
          << ", size: " << (int)v.size() << endl;
+  cout << "total: " << vars.size() << endl;
 }
 
 bool getVar(string var_name, Var& var) {
