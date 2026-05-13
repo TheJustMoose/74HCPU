@@ -131,8 +131,9 @@ VarDecl::VarDecl(DataType dt, bool is_ptr)
   : Node(ntVarDecl), data_type_(dt), is_pointer_(is_ptr) {}
 
 void VarDecl::gen(vector<Operation>& res_code) {
-  // This node is just variable declaration.
-  // No machine code to implement it.
+  for (string n : names)
+    if (values.find(n) != values.end())
+      res_code.emplace_back(n, "", to_string(values[n]), true, "");
 }
 
 // This is not the C++!
