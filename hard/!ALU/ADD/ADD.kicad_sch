@@ -4337,7 +4337,7 @@
 		(uuid "8aba5845-453b-43f4-ad6a-9757fa81d751")
 	)
 	(label "UseCF"
-		(at 30.48 134.62 0)
+		(at 30.48 137.16 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4447,7 +4447,7 @@
 		(uuid "ceca49dd-6125-4e83-99e5-a31add9ff51c")
 	)
 	(label "~{OE}"
-		(at 30.48 137.16 0)
+		(at 30.48 134.62 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -5166,7 +5166,7 @@
 			)
 		)
 		(property "Value" "Conn_01x05_Male"
-			(at 28.1432 139.446 0)
+			(at 23.495 131.953 90)
 			(effects
 				(font
 					(size 1.27 1.27)
