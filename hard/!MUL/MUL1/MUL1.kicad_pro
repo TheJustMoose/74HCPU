@@ -648,7 +648,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "MUL1.net",
-      "plot": "",
+      "plot": "gerber/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
