@@ -10665,7 +10665,7 @@
 		)
 	)
 	(gr_text "DST"
-		(at 17.78 63.5 90)
+		(at 18.0975 63.5 90)
 		(layer "F.SilkS")
 		(uuid "d39eb101-d057-4279-9cb4-3647245bc837")
 		(effects
