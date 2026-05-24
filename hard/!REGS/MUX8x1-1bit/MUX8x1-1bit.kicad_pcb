@@ -7514,16 +7514,6 @@
 		(uuid "47f4b8fc-1f0a-4dc6-927e-1bcc1dcaadf3")
 	)
 	(gr_line
-		(start 142.24 25.4)
-		(end 142.24 64.77)
-		(stroke
-			(width 0.12)
-			(type default)
-		)
-		(layer "F.SilkS")
-		(uuid "9c37b4e1-7a38-4295-949f-5497a27377b2")
-	)
-	(gr_line
 		(start 139.065 37.45)
 		(end 139.065 43.8)
 		(stroke
@@ -7595,7 +7585,7 @@
 			)
 		)
 	)
-	(gr_text "02.05.26"
+	(gr_text "24.05.26"
 		(at 35.56 55.88 0)
 		(layer "F.Cu")
 		(uuid "2b0afad9-0571-443b-8faa-29d234f3b8d9")
