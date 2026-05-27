@@ -160,7 +160,7 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
   if (v.is_ptr) {  // pointer ops
     string lval;
     string hval;
-    if (op.arg_is_num()) {  // pointer1 = 0x1000
+    if (op.arg_is_num() == npLeft) {  // pointer1 = 0x1000
       int val = std::stoi(op.left_arg);
       lval = ToHexString(val & 0xFF, 3) + "h";
       hval = ToHexString((val >> 8) & 0xFF, 3) + "h";
@@ -183,24 +183,17 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
     string cmnt1 = op.res_arg + " = " + op.left_arg;
 
     string res_reg = bank0.FindRegFor(op.res_arg);
-    string right_val = op.arg_is_num() ? op.left_arg : bank0.FindRegFor(op.left_arg);
+    string right_val = (op.arg_is_num() == npLeft) ? op.left_arg : bank0.FindRegFor(op.left_arg);
     string line11 = "mov " + res_reg + ", " + right_val;
     AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
   }
 }
 
 void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
-  // TODO: check it!
-  if (op.arg_is_num() &&
-      op.right_arg.size() &&
-      op.op_name == "-")
-    op.right_arg = "-" + op.right_arg;
-
-  string cmnt1 = op.res_arg + " = " + op.right_arg;
-
+  string cmnt1 = op.res_arg + " = " + op.op_name + op.right_arg;
   string res_reg = bank0.FindRegFor(op.res_arg);
-  if (op.arg_is_num()) {  // pointer1 = 0x1000
-    string line = "mov " + res_reg + ", " + op.right_arg;
+  if (op.arg_is_num() == npRight) {  // c = -3
+    string line = "mov " + res_reg + ", " + op.op_name + op.right_arg;
     AddAsmInstruction(line, cmnt1);
   } else {  // R0 = -R1
     // mov R0, ~R1; add R0, 1        // v1
@@ -233,7 +226,7 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
 
-  string right_val = op.arg_is_num() ? op.right_arg : bank0.FindRegFor(op.right_arg);
+  string right_val = (op.arg_is_num() == npRight) ? op.right_arg : bank0.FindRegFor(op.right_arg);
   string line21 = cmd + " " + res_reg + ", " + right_val;
   AddAsmInstruction(line21, cmnt2, bank0.DumpRegs());
 }

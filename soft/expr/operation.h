@@ -4,6 +4,19 @@
 #include <string>
 #include <vector>
 
+// Indicates which column of the Operation structure is filled in.
+enum NumPos {npNone, npLeft, npRight, npBoth};
+
+inline std::string NumPos2String(NumPos np) {
+  switch (np) {
+    case npNone:  return " none";
+    case npLeft:  return " left";
+    case npRight: return "right";
+    case npBoth:  return " both";
+    default: return "NumPos error!";
+  }
+}
+
 struct Operation {
   std::string res_arg {};
   bool res_in_temp {false};
@@ -13,17 +26,17 @@ struct Operation {
   std::string right_arg {};  // so when we have x = a + b, a is left
   bool removed {false};      // but when x = a, a is left again!
 
-  bool arg_is_num_ {false};  // private ;)
+  NumPos arg_is_num_ {npNone};  // private ;)
 
   std::vector<bool> live_in_vars;   // live vars before Operation executing (LIVE_in)
   std::vector<bool> live_out_vars;  // live vars after Operation executing (LIVE_out)
 
-  Operation(std::string res, std::string op, std::string l, bool has_num,
+  Operation(std::string res, std::string op, std::string l, NumPos a_arg_is_num,
             std::string r, bool in_temp = false)
-    : res_arg(res), op_name(op), left_arg(l), arg_is_num_(has_num),
+    : res_arg(res), op_name(op), left_arg(l), arg_is_num_(a_arg_is_num),
       right_arg(r), res_in_temp(in_temp) {}
 
-  bool arg_is_num() {
+  NumPos arg_is_num() {
     return arg_is_num_;
   }
 
@@ -39,17 +52,17 @@ struct Operation {
              + op_name + " " + right_arg + suffix;
   }
 
-  std::string align(std::string s) const {
+  std::string align(std::string s, int maxw = 4) const {
     std::string res{s};
-    while (res.size() < 4)
+    while (res.size() < maxw)
       res = " " + res;
     return res;
   }
 
   std::string raw() const {
     return "|" + align(res_arg) + " | = |" + align(left_arg) + " |" +
-           align(op_name) + " |" + align(right_arg) + " |" +
-           (arg_is_num_ ? " num" : "    ") + " |";
+           align(op_name) + " |" + align(right_arg) + " | " +
+           align(NumPos2String(arg_is_num_)) + " |";
   }
 
   std::string live_vars_str() const {

@@ -19,7 +19,7 @@
 using namespace std;
 
 void Print(const vector<Operation>& res_code) {
-  cout << "| res | = | left|  op |right|isNum|" << endl;
+  cout << "| res | = | left|  op |right| numIn |" << endl;
   for (const Operation& r : res_code)
     cout << r.raw() << endl;
 }
@@ -38,7 +38,7 @@ void PrintIR(const vector<Operation>& res_code) {
 
 void PrintLiveVars(const vector<Operation>& res_code,
                    map<size_t, string> idx_to_var) {
-  cout << "| res | = | left|  op |right|isNum|" << endl;
+  cout << "| res | = | left|  op |right| numIn |" << endl;
   for (const Operation& r : res_code) {
     cout << r.raw() << endl;
     cout << r.live_vars_str(idx_to_var) << endl;

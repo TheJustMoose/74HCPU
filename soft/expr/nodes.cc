@@ -47,9 +47,15 @@ void BinOp::gen(vector<Operation>& res_code) {
   bool r_is_n = right && (right->type() == ntNum);
   bool l_is_n = left && (left->type() == ntNum);
 
-  res_code.emplace_back(name(), op(), left->name(),
-                        r_is_n || l_is_n,
-                        right->name(), true);
+  NumPos np {npNone};
+  if (r_is_n && l_is_n)
+    np = npBoth;
+  else if (r_is_n)
+    np = npRight;
+  else if (l_is_n)
+    np = npLeft;
+
+  res_code.emplace_back(name(), op(), left->name(), np, right->name(), true);
 }
 
 string BinOp::op() const {
@@ -79,10 +85,11 @@ void UnOp::gen(vector<Operation>& res_code) {
   child->gen(res_code);
 
   // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
-  bool r_is_n = child && (child->type() == ntNum);
+  bool is_num = child && (child->type() == ntNum);
   cout << FuncGuard::stack_str() << name_ << " = "
        << op() << child->name() << " " << endl;
-  res_code.emplace_back(name_, op(), "", r_is_n, child->name(), true);
+  NumPos np = is_num ? npRight : npNone;
+  res_code.emplace_back(name_, op(), "", np, child->name(), true);
 }
 
 DataType UnOp::data_type() {
@@ -116,8 +123,9 @@ void AssignOp::gen(vector<Operation>& res_code) {
        << name_node->name() << " = "
        << right->name() << endl;
 
-  bool r_is_n = right && (right->type() == ntNum);
-  res_code.emplace_back(name_node->name(), "", right->name(), r_is_n, "");
+  bool is_num = right && (right->type() == ntNum);
+  NumPos np = is_num ? npLeft : npNone;
+  res_code.emplace_back(name_node->name(), "", right->name(), np, "");
 }
 
 DataType AssignOp::data_type() {
@@ -133,7 +141,7 @@ VarDecl::VarDecl(DataType dt, bool is_ptr)
 void VarDecl::gen(vector<Operation>& res_code) {
   for (string n : names)
     if (values.find(n) != values.end())
-      res_code.emplace_back(n, "", to_string(values[n]), true, "");
+      res_code.emplace_back(n, "", to_string(values[n]), npLeft, "");
 }
 
 // This is not the C++!
