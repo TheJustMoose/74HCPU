@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "print_tree.h"
 #include "var_list.h"
+#include "visitor.h"
 
 #include <cstdint>
 #include <iostream>
@@ -43,15 +44,6 @@ void PrintLiveVars(const vector<Operation>& res_code,
     cout << r.live_vars_str(idx_to_var) << endl;
   }
 }
-
-class Visitor {
- public:
-  virtual void Visit(Node* n) {}
-  virtual void Visit(AssignOp* op) {}
-  virtual void Visit(BinOp* op) {}
-  virtual void Visit(UnOp* op) {}
-  virtual void Visit(Name* n) {}
-};
 
 void EnumTree(Node* n, Visitor* v) {
   if (AssignOp* op = dynamic_cast<AssignOp*>(n)) {
