@@ -1,5 +1,6 @@
 #include "compile.h"
 #include "backend.h"
+#include "enum_tree.h"
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
@@ -42,25 +43,6 @@ void PrintLiveVars(const vector<Operation>& res_code,
   for (const Operation& r : res_code) {
     cout << r.raw() << endl;
     cout << r.live_vars_str(idx_to_var) << endl;
-  }
-}
-
-void EnumTree(Node* n, Visitor* v) {
-  if (AssignOp* op = dynamic_cast<AssignOp*>(n)) {
-    EnumTree(op->left.get(), v);
-    EnumTree(op->right.get(), v);
-    v->Visit(op);
-  } else if (BinOp* op = dynamic_cast<BinOp*>(n)) {
-    EnumTree(op->left.get(), v);
-    EnumTree(op->right.get(), v);
-    v->Visit(op);
-  } else if (UnOp* op = dynamic_cast<UnOp*>(n)) {
-    EnumTree(op->child.get(), v);
-    v->Visit(op);
-  } else if (Name* nm = dynamic_cast<Name*>(n)) {
-    v->Visit(nm);
-  } else {
-    v->Visit(n);
   }
 }
 
