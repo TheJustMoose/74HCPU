@@ -64,13 +64,14 @@ void SetDataTypes(Node* root) {
 }
 
 class VarsCollector: public Visitor {
+ public:
   void Visit(BinOp* op) override {
     if (!op)
       return;
     AddVar(op->name(), op->data_type(), false);  // is_ptr ?
   }
 
-  virtual void Visit(UnOp* op) {
+  void Visit(UnOp* op) override {
     if (!op)
       return;
     AddVar(op->name(), op->data_type(), false);  // can we set is_ptr to true when argument is pointer?
@@ -80,6 +81,35 @@ class VarsCollector: public Visitor {
 void CollectTempVars(Node* root) {
   VarsCollector vc;
   EnumTree(root, &vc);
+}
+
+class CodeCollector: public Visitor {
+ public:
+  CodeCollector(vector<Operation>& a_res_code)
+    : res_code(a_res_code) {}
+
+  void Visit(Node* n) override {
+  }
+
+  void Visit(AssignOp* op) override {
+  }
+
+  void Visit(BinOp* op) override {
+  }
+
+  void Visit(UnOp* op) override {
+  }
+
+  void Visit(Name* n) override {
+  }
+
+ private:
+  vector<Operation>& res_code;
+};
+
+void CollectCode(Node* root, vector<Operation>& res_code) {
+  CodeCollector cc(res_code);
+  EnumTree(root, &cc);
 }
 
 int Compile(string code) {
@@ -133,8 +163,8 @@ int Compile(string code) {
   cout << "nodes:" << endl;
   vector<Operation> res_code;
   for (size_t i = 0; i < statements.size(); i++)
-    if (statements[i])
-      statements[i]->gen(res_code);  // enum tree items, generate three-address code
+    if (statements[i])  // enum tree items, generate three-address code
+      CollectCode(statements[i].get(), res_code);
     else
       cout << "statements[i] is null" << endl;
 
