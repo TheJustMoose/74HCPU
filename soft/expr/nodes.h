@@ -16,7 +16,6 @@ class Num: public Node {
  public:
   Num(int value);
 
-  void gen(std::vector<Operation>& res_code) override;
   std::string name() const override {
     return std::to_string(value_);
   }
@@ -35,7 +34,6 @@ class Name: public Node {
     data_type_ = dt;
   }
 
-  void gen(std::vector<Operation>& res_code) override;
   std::string name() const override { return value_; }
 
   DataType data_type() override { return data_type_; }
@@ -49,7 +47,6 @@ class BinOp: public Node {
  public:
   BinOp(Token t, std::string n);
 
-  void gen(std::vector<Operation>& res_code) override;
   std::string name() const override { return name_; }
   std::string op() const override;
 
@@ -66,7 +63,6 @@ class UnOp: public Node {
  public:
   UnOp(std::string n);  // TODO: add type of unary operation here
 
-  void gen(std::vector<Operation>& res_code) override;
   std::string name() const override { return name_; }
   std::string op() const override { return "-"; }
 
@@ -82,7 +78,6 @@ class AssignOp: public Node {
  public:
   AssignOp();
 
-  void gen(std::vector<Operation>& res_code) override;
   std::string op() const override { return "="; }
   std::string name() const override { return left ? left->name() : "eq"; }
 
@@ -96,7 +91,6 @@ class VarDecl: public Node {
  public:
   VarDecl(DataType dt, bool is_ptr);
 
-  void gen(std::vector<Operation>& res_code) override;
   uint8_t var_size();
   std::string name() const override { return "de"; }
 

@@ -92,15 +92,76 @@ class CodeCollector: public Visitor {
   }
 
   void Visit(AssignOp* op) override {
+  right->gen(res_code);
+  if (!left) {
+    cout << FuncGuard::stack_str() << "left == nullptr" << endl;
+    return;
+  }
+
+  Name* name_node = dynamic_cast<Name*>(left.get());
+  if (!name_node) {
+    cout << FuncGuard::stack_str() << "Error. left node is not variable (Name class)" << endl;
+    return;
+  }
+
+  //left->gen(res_code);
+  //right->gen(res_code);
+
+  cout << FuncGuard::stack_str()
+       << name_node->name() << " = "
+       << right->name() << endl;
+
+  bool is_num = right && (right->type() == ntNum);
+  NumPos np = is_num ? npLeft : npNone;
+  res_code.emplace_back(name_node->name(), "", right->name(), np, "");
   }
 
   void Visit(BinOp* op) override {
+  if (!left)
+    cout << "left node is nullptr" << endl;
+  else if (!right)
+    cout << "right node is nullptr" << endl;
+  else {
+    left->gen(res_code);
+    right->gen(res_code);
+    // Okay, let's put operation result into temp variable
+    cout << FuncGuard::stack_str() << name() << " = "
+         << left->name() << " " << op() << " "
+         << right->name() << endl;
+  }
+  bool r_is_n = right && (right->type() == ntNum);
+  bool l_is_n = left && (left->type() == ntNum);
+
+  NumPos np {npNone};
+  if (r_is_n && l_is_n)
+    np = npBoth;
+  else if (r_is_n)
+    np = npRight;
+  else if (l_is_n)
+    np = npLeft;
+
+  res_code.emplace_back(name(), op(), left->name(), np, right->name(), true);
   }
 
   void Visit(UnOp* op) override {
+  child->gen(res_code);
+
+  // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
+  bool is_num = child && (child->type() == ntNum);
+  cout << FuncGuard::stack_str() << name_ << " = "
+       << op() << child->name() << " " << endl;
+  NumPos np = is_num ? npRight : npNone;
+  res_code.emplace_back(name_, op(), "", np, child->name(), true);
   }
 
   void Visit(Name* n) override {
+    // name value will be used by other nodes
+  }
+
+  void Visit(VarDecl* n) override {
+  for (string n : names)
+    if (values.find(n) != values.end())
+      res_code.emplace_back(n, "", to_string(values[n]), npLeft, "");
   }
 
  private:

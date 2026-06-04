@@ -13,4 +13,5 @@ class Visitor {
   virtual void Visit(BinOp* op) {}
   virtual void Visit(UnOp* op) {}
   virtual void Visit(Name* n) {}
+  virtual void Visit(VarDecl* n) {}
 };

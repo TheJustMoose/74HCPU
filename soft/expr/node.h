@@ -13,8 +13,6 @@ class Node {
 
   virtual ~Node() = default;
 
-  virtual void gen(std::vector<Operation>& res_code) = 0;
-
   virtual std::string op() const { return ""; }
 
   virtual std::string name() const { return "??"; }
