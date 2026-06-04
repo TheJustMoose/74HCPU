@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name MUX16bit-rescue)(type Legacy)(uri ${KIPRJMOD}/MUX16bit-rescue.lib)(options "")(descr ""))
+  (version 7)
+  (lib (name "MUX16bit-rescue")(type "Legacy")(uri "${KIPRJMOD}/MUX16bit-rescue.lib")(options "")(descr ""))
 )
