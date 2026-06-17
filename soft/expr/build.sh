@@ -1,5 +1,5 @@
 #git submodule update
-mkdir bin
-cd bin
+mkdir build
+cd build
 cmake ..
 cmake --build . --config Release

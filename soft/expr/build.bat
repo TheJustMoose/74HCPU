@@ -1,6 +1,6 @@
 git submodule update
-md bin
-cd bin
+md build
+cd build
 del "..\..\Release\simple_expr.exe"
 del "..\..\Release\simple_expr_unit_tests.exe"
 
