@@ -5,6 +5,7 @@
 #include "names.h"
 #include "node.h"
 #include "node_type.h"
+#include "visitor.h"
 
 #include <cstdint>
 #include <map>
@@ -23,6 +24,8 @@ class Num: public Node {
 
   DataType data_type() override { return dtByte; }
 
+  void accept(Visitor* v) override { v->Visit(this); }
+
  private:
   int value_ {0};
 };
@@ -37,6 +40,8 @@ class Name: public Node {
   std::string name() const override { return value_; }
 
   DataType data_type() override { return data_type_; }
+
+  void accept(Visitor* v) override { v->Visit(this); }
 
  private:
   std::string value_ {""};
@@ -55,6 +60,12 @@ class BinOp: public Node {
 
   DataType data_type() override;
 
+  void accept(Visitor* v) override {
+    left->accept(v);
+    right->accept(v);
+    v->Visit(this);
+  }
+
  private:
   std::string name_ {"bo"};
 };
@@ -70,6 +81,11 @@ class UnOp: public Node {
 
   DataType data_type() override;
 
+  void accept(Visitor* v) override {
+    child->accept(v);
+    v->Visit(this);
+  }
+
  private:
   std::string name_{"um"};
 };
@@ -82,6 +98,12 @@ class AssignOp: public Node {
   std::string name() const override { return left ? left->name() : "eq"; }
 
   DataType data_type() override;
+
+  void accept(Visitor* v) override {
+    left->accept(v);
+    right->accept(v);
+    v->Visit(this);
+  }
 
   std::unique_ptr<Node> left;
   std::unique_ptr<Node> right;
@@ -98,6 +120,8 @@ class VarDecl: public Node {
 
   DataType data_type() override { return data_type_; }
   bool is_pointer() { return is_pointer_; }
+
+  void accept(Visitor* v) override { v->Visit(this); }
 
   std::vector<std::string> names {};
   std::map<std::string, int> values {};

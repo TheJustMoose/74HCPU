@@ -1,6 +1,5 @@
 #include "compile.h"
 #include "backend.h"
-#include "enum_tree.h"
 #include "func_guard.h"
 #include "lexer.h"
 #include "node.h"
@@ -60,7 +59,7 @@ class DataTypesSetter: public Visitor {
 
 void SetDataTypes(Node* root) {
   DataTypesSetter dts;
-  EnumTree(root, &dts);
+  root->accept(&dts);
 }
 
 class VarsCollector: public Visitor {
@@ -80,7 +79,7 @@ class VarsCollector: public Visitor {
 
 void CollectTempVars(Node* root) {
   VarsCollector vc;
-  EnumTree(root, &vc);
+  root->accept(&vc);
 }
 
 class CodeCollector: public Visitor {
@@ -92,7 +91,6 @@ class CodeCollector: public Visitor {
   }
 
   void Visit(AssignOp* op) override {
-    Visit(op->right.get());
     if (!op->left) {
       cout << FuncGuard::stack_str() << "left == nullptr" << endl;
       return;
@@ -103,9 +101,6 @@ class CodeCollector: public Visitor {
       cout << FuncGuard::stack_str() << "Error. left node is not variable (Name class)" << endl;
       return;
     }
-
-    //op->left->gen(res_code);
-    //op->right->gen(res_code);
 
     cout << FuncGuard::stack_str()
         << name_node->name() << " = "
@@ -122,12 +117,10 @@ class CodeCollector: public Visitor {
     else if (!op->right)
       cout << "right node is nullptr" << endl;
     else {
-      Visit(op->left.get());
-      Visit(op->right.get());
       // Okay, let's put operation result into temp variable
       cout << FuncGuard::stack_str() << op->name() << " = "
-          << op->left->name() << " " << op->op() << " "
-          << op->right->name() << endl;
+           << op->left->name() << " " << op->op() << " "
+           << op->right->name() << endl;
     }
     bool r_is_n = op->right && (op->right->type() == ntNum);
     bool l_is_n = op->left && (op->left->type() == ntNum);
@@ -144,8 +137,6 @@ class CodeCollector: public Visitor {
   }
 
   void Visit(UnOp* op) override {
-    Visit(op->child.get());
-
     // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
     bool is_num = op->child && (op->child->type() == ntNum);
     cout << FuncGuard::stack_str() << op->name() << " = "
@@ -170,7 +161,7 @@ class CodeCollector: public Visitor {
 
 void CollectCode(Node* root, vector<Operation>& res_code) {
   CodeCollector cc(res_code);
-  EnumTree(root, &cc);
+  root->accept(&cc);
 }
 
 int Compile(string code) {

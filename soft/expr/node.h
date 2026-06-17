@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+class Visitor;
+
 class Node {
  public:
   Node(NodeType nt): type_(nt) {}
@@ -20,6 +22,8 @@ class Node {
   NodeType type() const { return type_; }
 
   virtual DataType data_type() = 0;
+
+  virtual void accept(Visitor* v) = 0;
 
  protected:
   NodeType type_ {ntUnknown};

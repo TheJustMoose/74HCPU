@@ -13,8 +13,6 @@ add_executable(simple_expr
 	compile.cpp
 	data_type.h
 	data_type.cc
-	enum_tree.h
-	enum_tree.cpp
 	func_guard.h
 	func_guard.cc
 	lexer.h
@@ -44,6 +42,7 @@ add_executable(simple_expr
 	var_list.cpp
 	var_size.h
 	var_size.cc
+	visitor.h
 )
 
 include_directories("../doctest/doctest")
@@ -56,8 +55,6 @@ add_executable(simple_expr_unit_tests
 	backend.cc
 	data_type.h
 	data_type.cc
-	enum_tree.h
-	enum_tree.cpp
 	func_guard.h
 	func_guard.cc
 	lexer.h
@@ -88,4 +85,5 @@ add_executable(simple_expr_unit_tests
 	var_list.cpp
 	var_size.h
 	var_size.cc
+	visitor.h
 )

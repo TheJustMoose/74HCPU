@@ -5,6 +5,7 @@ class AssignOp;
 class BinOp;
 class UnOp;
 class Name;
+class VarDecl;
 
 class Visitor {
  public:
