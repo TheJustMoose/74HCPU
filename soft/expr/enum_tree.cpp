@@ -17,6 +17,8 @@ void EnumTree(Node* n, Visitor* v) {
     v->Visit(op);
   } else if (Name* nm = dynamic_cast<Name*>(n)) {
     v->Visit(nm);
+  } else if (VarDecl* vd = dynamic_cast<VarDecl*>(n)) {
+    v->Visit(vd);
   } else {
     v->Visit(n);
   }
