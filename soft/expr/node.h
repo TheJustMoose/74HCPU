@@ -2,10 +2,8 @@
 
 #include "data_type.h"
 #include "node_type.h"
-#include "operation.h"
 
 #include <string>
-#include <vector>
 
 class Visitor;
 
