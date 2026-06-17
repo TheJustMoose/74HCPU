@@ -11,7 +11,7 @@
 
 using namespace std;
 
-const int kWidth = 100;
+const int kWidth = 80;
 
 string dup(char c, int w) {
   string res(w, c);
