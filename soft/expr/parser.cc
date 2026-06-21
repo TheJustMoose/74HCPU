@@ -23,7 +23,16 @@ using namespace std;
 //
 
 /*
-Program         ::= { Statement };
+Program         ::= { TopLevel };
+
+TopLevel        ::= Declaration ';'
+                |   FunctionDefinition
+                ;
+
+FunctionDefinition ::= Type name '(' ParameterList ')' Block;
+
+ParameterList   ::= [ Parameter { ',' Parameter } ];
+Parameter       ::= Type name;
 
 Statement       ::= Assignment ';'
                 |   WhileStatement
