@@ -98,6 +98,8 @@ Term                ::= Primary { ('*' | '/') Primary };
 Primary             ::= num
                     |   name
                     |   '-' Primary
+                    |   '@' Primary
+                    |   '#' name             // address-of only for variables
                     |   '(' Expression ')'
                     ;
 */
