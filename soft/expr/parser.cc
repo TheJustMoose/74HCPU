@@ -23,19 +23,31 @@ using namespace std;
 //
 
 /*
+// --------------------------------------------
+//  Grammar for a C-like language
+//  (with global declarations, functions, return,
+//   while, if, blocks, and bitwise/logical operators)
+// --------------------------------------------
+
+// Program: global variable declarations (only at the top)
+// followed by function definitions.
 Program             ::= GlobalDeclarations FunctionDefinitions;
 
-GlobalDeclarations  ::= { Declaration ';' };      // zero or more var declarations
+GlobalDeclarations  ::= { Declaration ';' };   // zero or more global variable declarations
 
-FunctionDefinitions ::= { FunctionDefinition };    // zero or more function declarations
+FunctionDefinitions ::= { FunctionDefinition }; // zero or more functions
 
+// Function definition: type name(parameters) block
 FunctionDefinition  ::= Type name '(' ParameterList ')' Block;
 
+// Parameter list: possibly empty, separated by commas
 ParameterList       ::= [ Parameter { ',' Parameter } ];
 Parameter           ::= Type name;
 
+// Block: declarations and statements mixed (C99 style)
 Block               ::= '{' { Declaration ';' | Statement } '}';
 
+// Statements: assignment, while, if, block, return
 Statement           ::= Assignment ';'
                     |   WhileStatement
                     |   IfStatement
@@ -51,16 +63,20 @@ WhileStatement      ::= 'while' '(' Expression ')' Statement;
 
 IfStatement         ::= 'if' '(' Expression ')' Statement [ 'else' Statement ];
 
-Declaration         ::= Type [ '@' ] NameList;
+// Declaration: type, optional '@', then a list of variables with optional init
+Declaration         ::= Type [ '@' ] InitDeclaratorList;
 
 Type                ::= 'int'
                     |   'byte'
                     ;
 
-NameList            ::= name [ '=' num ] { ',' name [ '=' num ] };
+// List of variable names, each optionally initialized with a number
+InitDeclaratorList  ::= name [ '=' num ] { ',' name [ '=' num ] };
 
+// Assignment (right-associative, as in C)
 Assignment          ::= Expression [ '=' Assignment ];
 
+// Expression hierarchy (precedence from low to high)
 Expression          ::= LogicalOrExpr;
 
 LogicalOrExpr       ::= LogicalAndExpr { '||' LogicalAndExpr };
