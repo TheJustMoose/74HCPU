@@ -51,7 +51,11 @@ Expression      ::= LogicalOrExpr;
 
 LogicalOrExpr   ::= LogicalAndExpr { '||' LogicalAndExpr };
 
-LogicalAndExpr  ::= EqualityExpr { '&&' EqualityExpr };
+LogicalAndExpr  ::= BitwiseOrExpr { '&&' BitwiseOrExpr };
+
+BitwiseOrExpr   ::= BitwiseAndExpr { '|' BitwiseAndExpr };
+
+BitwiseAndExpr  ::= EqualityExpr { '&' EqualityExpr };
 
 EqualityExpr    ::= RelationalExpr { ('==' | '!=') RelationalExpr };
 
