@@ -23,58 +23,43 @@ using namespace std;
 //
 
 /*
-Program         ::= StatementList   // we can use StatementList for Program
-                |   ε
-                ;
+Program         ::= { Statement };
 
-StatementList   ::= Statement { ';' Statement } [ ';' ]
-                ;
-
-Statement       ::= Declaration
-                |   Assignment
+Statement       ::= Assignment ';'
                 |   WhileStatement
+                |   IfStatement
                 |   Block
                 ;
 
-Block           ::= '{' StatementList '}'
-                ;
+Block           ::= '{' { Declaration ';' | Statement } '}';
 
-WhileStatement  ::= 'while' '(' Expression ')' Statement
-                ;
+WhileStatement  ::= 'while' '(' Expression ')' Statement;
 
-Declaration     ::= Type [ '@' ] NameList
-                ;
+IfStatement     ::= 'if' '(' Expression ')' Statement [ 'else' Statement ];
+
+Declaration     ::= Type [ '@' ] NameList;
 
 Type            ::= 'int'
                 |   'byte'
                 ;
 
-NameList        ::= name [ '=' num ] { ',' name [ '=' num ] }
-                ;
+NameList        ::= name [ '=' num ] { ',' name [ '=' num ] };
 
-Assignment      ::= Expression [ '=' Assignment ]
-                ;
+Assignment      ::= Expression [ '=' Assignment ];
 
-Expression      ::= LogicalOrExpr
-                ;
+Expression      ::= LogicalOrExpr;
 
-LogicalOrExpr   ::= LogicalAndExpr { '||' LogicalAndExpr }
-                ;
+LogicalOrExpr   ::= LogicalAndExpr { '||' LogicalAndExpr };
 
-LogicalAndExpr  ::= EqualityExpr { '&&' EqualityExpr }
-                ;
+LogicalAndExpr  ::= EqualityExpr { '&&' EqualityExpr };
 
-EqualityExpr    ::= RelationalExpr { ('==' | '!=') RelationalExpr }
-                ;
+EqualityExpr    ::= RelationalExpr { ('==' | '!=') RelationalExpr };
 
-RelationalExpr  ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr }
-                ;
+RelationalExpr  ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr };
 
-AdditiveExpr    ::= Term { ('+' | '-') Term }
-                ;
+AdditiveExpr    ::= Term { ('+' | '-') Term };
 
-Term            ::= Primary { ('*' | '/') Primary }
-                ;
+Term            ::= Primary { ('*' | '/') Primary };
 
 Primary         ::= num
                 |   name
