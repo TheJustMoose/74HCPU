@@ -44,7 +44,16 @@ NameList        ::= name [ '=' num ] { ',' name [ '=' num ] }
 Assignment      ::= Expression [ '=' Assignment ]
                 ;
 
-Expression      ::= Term { ('+' | '-') Term }
+Expression      ::= EqualityExpr
+                ;
+
+EqualityExpr    ::= RelationalExpr { ('==' | '!=') RelationalExpr }
+                ;
+
+RelationalExpr  ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr }
+                ;
+
+AdditiveExpr    ::= Term { ('+' | '-') Term }
                 ;
 
 Term            ::= Primary { ('*' | '/') Primary }
