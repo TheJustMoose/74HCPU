@@ -23,8 +23,11 @@ using namespace std;
 //
 
 /*
-Program         ::= Statement { ';' Statement } [ ';' ]
+Program         ::= StatementList   // we can use StatementList for Program
                 |   ε
+                ;
+
+StatementList   ::= Statement { ';' Statement } [ ';' ]
                 ;
 
 Statement       ::= Declaration
@@ -33,7 +36,7 @@ Statement       ::= Declaration
                 |   Block
                 ;
 
-Block           ::= '{' { Statement } '}'   // ноль или более операторов
+Block           ::= '{' StatementList '}'
                 ;
 
 WhileStatement  ::= 'while' '(' Expression ')' Statement
