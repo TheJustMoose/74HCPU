@@ -24,9 +24,15 @@ using namespace std;
 
 /*
 // --------------------------------------------
-//  Grammar for a C-like language
-//  (with global declarations, functions, return,
-//   while, if, blocks, and bitwise/logical operators)
+//  C-like language grammar
+//  - global variable declarations only at top, then functions
+//  - pointers: declared with '@' (e.g., int @p)
+//  - dereference: '@' (unary) in expressions
+//  - address-of: '#' only for variable names
+//  - post-increment '++' allowed only on variable names
+//    and on dereferenced pointer variables (@name++)
+//  - all logical, bitwise, relational, arithmetic operators
+//  - statements: assignment, while, if, block, return
 // --------------------------------------------
 
 // Program: global variable declarations (only at the top)
@@ -96,10 +102,10 @@ AdditiveExpr        ::= Term { ('+' | '-') Term };
 Term                ::= Primary { ('*' | '/') Primary };
 
 Primary             ::= num
-                    |   name
+                    |   name [ '++' ]
                     |   '-' Primary
-                    |   '@' Primary
-                    |   '#' name             // address-of only for variables
+                    |   '@' name [ '++' ]   // dereference then increment pointer
+                    |   '#' name            // address-of, no increment allowed
                     |   '(' Expression ')'
                     ;
 */
