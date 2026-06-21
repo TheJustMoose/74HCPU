@@ -29,6 +29,14 @@ Program         ::= Statement { ';' Statement } [ ';' ]
 
 Statement       ::= Declaration
                 |   Assignment
+                |   WhileStatement
+                |   Block
+                ;
+
+Block           ::= '{' { Statement } '}'   // ноль или более операторов
+                ;
+
+WhileStatement  ::= 'while' '(' Expression ')' Statement
                 ;
 
 Declaration     ::= Type [ '@' ] NameList
@@ -44,7 +52,13 @@ NameList        ::= name [ '=' num ] { ',' name [ '=' num ] }
 Assignment      ::= Expression [ '=' Assignment ]
                 ;
 
-Expression      ::= EqualityExpr
+Expression      ::= LogicalOrExpr
+                ;
+
+LogicalOrExpr   ::= LogicalAndExpr { '||' LogicalAndExpr }
+                ;
+
+LogicalAndExpr  ::= EqualityExpr { '&&' EqualityExpr }
                 ;
 
 EqualityExpr    ::= RelationalExpr { ('==' | '!=') RelationalExpr }
