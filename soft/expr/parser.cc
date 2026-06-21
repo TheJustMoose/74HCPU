@@ -43,8 +43,13 @@ GlobalDeclarations  ::= { Declaration ';' };   // zero or more global variable d
 
 FunctionDefinitions ::= { FunctionDefinition }; // zero or more functions
 
-// Function definition: type name(parameters) block
-FunctionDefinition  ::= Type name '(' ParameterList ')' Block;
+// Function definition: return type (Type or 'none'), name, parameters, block
+FunctionDefinition  ::= ReturnType name '(' ParameterList ')' Block;
+
+// Return type: either a normal Type or 'none'
+ReturnType          ::= Type
+                    |   'none'
+                    ;
 
 // Parameter list: possibly empty, separated by commas
 ParameterList       ::= [ Parameter { ',' Parameter } ];
