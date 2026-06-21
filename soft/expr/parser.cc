@@ -23,62 +23,67 @@ using namespace std;
 //
 
 /*
-Program         ::= { TopLevel };
+Program             ::= GlobalDeclarations FunctionDefinitions;
 
-TopLevel        ::= Declaration ';'
-                |   FunctionDefinition
-                ;
+GlobalDeclarations  ::= { Declaration ';' };      // zero or more var declarations
 
-FunctionDefinition ::= Type name '(' ParameterList ')' Block;
+FunctionDefinitions ::= { FunctionDefinition };    // zero or more function declarations
 
-ParameterList   ::= [ Parameter { ',' Parameter } ];
-Parameter       ::= Type name;
+FunctionDefinition  ::= Type name '(' ParameterList ')' Block;
 
-Statement       ::= Assignment ';'
-                |   WhileStatement
-                |   IfStatement
-                |   Block
-                ;
+ParameterList       ::= [ Parameter { ',' Parameter } ];
+Parameter           ::= Type name;
 
-Block           ::= '{' { Declaration ';' | Statement } '}';
+Block               ::= '{' { Declaration ';' | Statement } '}';
 
-WhileStatement  ::= 'while' '(' Expression ')' Statement;
+Statement           ::= Assignment ';'
+                    |   WhileStatement
+                    |   IfStatement
+                    |   Block
+                    |   ReturnStatement
+                    ;
 
-IfStatement     ::= 'if' '(' Expression ')' Statement [ 'else' Statement ];
+ReturnStatement     ::= 'return' Expression ';'
+                    |   'return' ';'
+                    ;
 
-Declaration     ::= Type [ '@' ] NameList;
+WhileStatement      ::= 'while' '(' Expression ')' Statement;
 
-Type            ::= 'int'
-                |   'byte'
-                ;
+IfStatement         ::= 'if' '(' Expression ')' Statement [ 'else' Statement ];
 
-NameList        ::= name [ '=' num ] { ',' name [ '=' num ] };
+Declaration         ::= Type [ '@' ] NameList;
 
-Assignment      ::= Expression [ '=' Assignment ];
+Type                ::= 'int'
+                    |   'byte'
+                    ;
 
-Expression      ::= LogicalOrExpr;
+NameList            ::= name [ '=' num ] { ',' name [ '=' num ] };
 
-LogicalOrExpr   ::= LogicalAndExpr { '||' LogicalAndExpr };
+Assignment          ::= Expression [ '=' Assignment ];
 
-LogicalAndExpr  ::= BitwiseOrExpr { '&&' BitwiseOrExpr };
+Expression          ::= LogicalOrExpr;
 
-BitwiseOrExpr   ::= BitwiseAndExpr { '|' BitwiseAndExpr };
+LogicalOrExpr       ::= LogicalAndExpr { '||' LogicalAndExpr };
 
-BitwiseAndExpr  ::= EqualityExpr { '&' EqualityExpr };
+LogicalAndExpr      ::= BitwiseOrExpr { '&&' BitwiseOrExpr };
 
-EqualityExpr    ::= RelationalExpr { ('==' | '!=') RelationalExpr };
+BitwiseOrExpr       ::= BitwiseAndExpr { '|' BitwiseAndExpr };
 
-RelationalExpr  ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr };
+BitwiseAndExpr      ::= EqualityExpr { '&' EqualityExpr };
 
-AdditiveExpr    ::= Term { ('+' | '-') Term };
+EqualityExpr        ::= RelationalExpr { ('==' | '!=') RelationalExpr };
 
-Term            ::= Primary { ('*' | '/') Primary };
+RelationalExpr      ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr };
 
-Primary         ::= num
-                |   name
-                |   '-' Primary
-                |   '(' Expression ')'
-                ;
+AdditiveExpr        ::= Term { ('+' | '-') Term };
+
+Term                ::= Primary { ('*' | '/') Primary };
+
+Primary             ::= num
+                    |   name
+                    |   '-' Primary
+                    |   '(' Expression ')'
+                    ;
 */
 
 int tmp_var_counter {0};
