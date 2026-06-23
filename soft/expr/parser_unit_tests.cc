@@ -25,3 +25,15 @@ TEST_CASE("Parser: smoke test") {
   CHECK_EQ(bop->left->type(), ntNum);
   CHECK_EQ(bop->right->type(), ntNum);
 }
+
+TEST_CASE("Parser: address of test") {
+  Lexer::instance().setInputString("int a; #a;");
+
+  vector<unique_ptr<Node>> statements;
+  CHECK(stmts(statements));
+  CHECK_EQ(statements.size(), 2U);  // declaration + address of
+
+  Node* n = statements[1].get();
+  CHECK(n);
+  CHECK_EQ(n->type(), ntAddressOf);
+}

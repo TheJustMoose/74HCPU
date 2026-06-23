@@ -44,6 +44,9 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
     //cout << "unary minus..." << endl;
     lvl++;
     Tree2List(uop->child.get(), mid, lvl);
+  } else if (AddressOf* aof = dynamic_cast<AddressOf*>(n)) {
+    lvl++;
+    Tree2List(aof->child.get(), mid, lvl);
   } else {
     //cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }
@@ -106,6 +109,9 @@ void PrintTree(Node* n) {
 
     if (const UnOp* unop_node = dynamic_cast<const UnOp*>(n))
       name = unop_node->name();
+
+    if (const AddressOf* aof_node = dynamic_cast<const AddressOf*>(n))
+      name = aof_node->name();
 
     if (const VarDecl* vard_node = dynamic_cast<const VarDecl*>(n))
       name = vard_node->var_names();

@@ -14,6 +14,7 @@ map<NodeType, string> NodeName {
   {ntDiv, "ntDiv"},
   {ntUMinus, "ntUMinus"},
   {ntAssign, "ntAssign"},
+  {ntAddressOf, "ntAddressOf"},
   {ntUnknown, "ntUnknown"},
   {ntVarDecl, "ntVarDecl"},
   {ntNull, "ntNull"},
