@@ -8,7 +8,7 @@
 using namespace std;
 
 void RegsBank0::Spill(size_t reg_idx) {
-  cout << "RegsBank0::Spill(" << reg_idx << ")" << endl;
+  //cout << "RegsBank0::Spill(" << reg_idx << ")" << endl;
   if (!p_spill_)
     return;
 
@@ -33,7 +33,7 @@ void RegsBank0::Spill(size_t reg_idx) {
 }
 
 void RegsBank0::Fill(string var_name, string reg_name) {
-  cout << "RegsBank0::Fill(" << var_name << ", " << reg_name << ")" << endl;
+  //cout << "RegsBank0::Fill(" << var_name << ", " << reg_name << ")" << endl;
   if (!p_spill_)
     return;
 
@@ -47,11 +47,11 @@ void RegsBank0::Fill(string var_name, string reg_name) {
 
 void RegsBank0::FreeTheRegister(size_t reg_idx) {
   bank0_[reg_idx] = "";  // mark register as free
-  cout << "Register " << reg_idx << " was released" << endl;
+  //cout << "Register " << reg_idx << " was released" << endl;
 }
 
 string RegsBank0::FindRegFor(string var_name) {
-  cout << "FindRegFor: " << var_name << endl;
+  //cout << "FindRegFor: " << var_name << endl;
   static optional<size_t> last_used_register_idx;
   // check existing pair var:reg
   for (size_t i = 0; i < RegCnt; i++)
@@ -67,25 +67,25 @@ string RegsBank0::FindRegFor(string var_name) {
       bank0_[i] = var_name;
       last_used_register_idx = i;
       string reg_name = "R" + to_string(i);
-      cout << "return empty " << reg_name << " for " << var_name << endl;
+      //cout << "return empty " << reg_name << " for " << var_name << endl;
       Fill(var_name, reg_name);  // probably I should read var from memory
       return reg_name;           // but what if register was really empty? Oo
     }
 
   // no free registers, have to spill something
   if (!last_used_register_idx.has_value()) {  // no index of last used register
-    cout << "last_used_register_idx == 255" << endl;
+    //cout << "last_used_register_idx == 255" << endl;
     last_used_register_idx = 0;
     cout << "Why I am here????!!!" << endl;
     throw "Error happened. last_used_register_idx is empty but should be initialized!";
   } else if (*last_used_register_idx == 7) {
-    cout << "last_used_register_idx == 7" << endl;
+    //cout << "last_used_register_idx == 7" << endl;
     last_used_register_idx = 0;                    // remember!
     Spill(*last_used_register_idx);                // free
     bank0_[*last_used_register_idx] = var_name;    // occupy
     cout << "Spill and return R0" << " for " << var_name << endl;
   } else {
-    cout << "last_used_register_idx == " << *last_used_register_idx << endl;
+    //cout << "last_used_register_idx == " << *last_used_register_idx << endl;
     (*last_used_register_idx)++;    // now "last" used register must be different
     Spill(*last_used_register_idx);                // free
     cout << "Spill finished" << endl;
@@ -95,7 +95,7 @@ string RegsBank0::FindRegFor(string var_name) {
   }
 
   string reg_name = "R" + to_string(*last_used_register_idx);
-  cout << "Okay, will use register " << reg_name << endl;
+  //cout << "Okay, will use register " << reg_name << endl;
   Fill(var_name, reg_name);  // probably I should read var from memory
   return reg_name;
 }
