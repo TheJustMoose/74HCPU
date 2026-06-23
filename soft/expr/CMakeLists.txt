@@ -69,6 +69,7 @@ add_executable(simple_expr_unit_tests
 	optimize.cc
 	parser.h
 	parser.cc
+	parser_unit_tests.cc
 	print_tree.h
 	print_tree.cc
 	regs_bank.h
