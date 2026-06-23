@@ -68,9 +68,29 @@ void Lexer::findNextToken() {
     return;
   }
 
+  if (c == '+') {
+    c = readChar();
+    if (c == '+')
+      current_token_ = tIncrement;
+    else {
+      current_token_ = tPlus;
+      idx_--;
+    }
+    return;
+  }
+
+  if (c == '-') {
+    c = readChar();
+    if (c == '-')
+      current_token_ = tDecrement;
+    else {
+      current_token_ = tMinus;
+      idx_--;
+    }
+    return;
+  }
+
   switch (c) {
-    case '+': current_token_ = tPlus; return;
-    case '-': current_token_ = tMinus; return;
     case '*': current_token_ = tMul; return;
     case '/': current_token_ = tDiv; return;
     case '(': current_token_ = tLBracket; return;
@@ -79,6 +99,7 @@ void Lexer::findNextToken() {
     case ',': current_token_ = tComma; return;
     case ';': current_token_ = tSemicolon; return;
     case '@': current_token_ = tAtSign; return;
+    case '#': current_token_ = tNumberSign; return;
     default: cout << "Lexer::findNextToken> Unknown token: "
                   << int(c) << endl; current_token_ = tError; break;
   }

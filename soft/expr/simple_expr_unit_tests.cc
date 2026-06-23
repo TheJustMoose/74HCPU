@@ -76,8 +76,14 @@ TEST_CASE("check Lexer tokens") {
   Lexer l("+");
   CHECK_EQ(l.currentToken(), tPlus);
 
+  Lexer l12("++");
+  CHECK_EQ(l12.currentToken(), tIncrement);
+
   Lexer l2("-");
   CHECK_EQ(l2.currentToken(), tMinus);
+
+  Lexer l13("--");
+  CHECK_EQ(l13.currentToken(), tDecrement);
 
   Lexer l3("*");
   CHECK_EQ(l3.currentToken(), tMul);
@@ -97,8 +103,14 @@ TEST_CASE("check Lexer tokens") {
   Lexer l8(";");
   CHECK_EQ(l8.currentToken(), tSemicolon);
 
-  Lexer l9("#");
-  CHECK_EQ(l9.currentToken(), tError);
+  Lexer l9("@");
+  CHECK_EQ(l9.currentToken(), tAtSign);
+
+  Lexer l10("#");
+  CHECK_EQ(l10.currentToken(), tNumberSign);
+
+  Lexer l11("$");
+  CHECK_EQ(l11.currentToken(), tError);
 }
 
 TEST_CASE("check Lexer and many long strings") {
