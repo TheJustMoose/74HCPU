@@ -109,6 +109,23 @@ class AssignOp: public Node {
   std::unique_ptr<Node> right;
 };
 
+class AddressOf: public Node {
+ public:
+  AddressOf(std::unique_ptr<Node> n);
+
+  std::string name() const override { return "addrof"; }
+  std::string op() const override { return "#"; }
+
+  DataType data_type() override;
+  bool is_pointer() { return true; }
+
+  void accept(Visitor* v) override {
+    v->Visit(this);
+  }
+
+  std::unique_ptr<Node> child;
+};
+
 class VarDecl: public Node {
  public:
   VarDecl(DataType dt, bool is_ptr);

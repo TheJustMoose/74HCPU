@@ -64,6 +64,17 @@ DataType AssignOp::data_type() {
     return dtNotInitialize;
 }
 
+AddressOf::AddressOf(std::unique_ptr<Node> n)
+  : Node(ntAddressOf), child(std::move(n)) {
+}
+
+DataType AddressOf::data_type() {
+  if (child)
+    return child->data_type();
+  else
+    return dtNotInitialize;
+}
+
 VarDecl::VarDecl(DataType dt, bool is_ptr)
   : Node(ntVarDecl), data_type_(dt), is_pointer_(is_ptr) {}
 

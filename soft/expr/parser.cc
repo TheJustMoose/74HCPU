@@ -138,6 +138,15 @@ unique_ptr<Node> prim() {
     if (!n->child)
       throw logic_error("Argument for unary minus was not found");
     return n;
+  } else if (t == tAtSign) {
+    //
+  } else if (t == tNumberSign) {
+    Lexer::instance().consume();
+    t = Lexer::instance().currentToken();
+    if (t != tName)
+      throw logic_error("Error. Waiting for name. You can get only variables address");
+    unique_ptr<AddressOf> n = make_unique<AddressOf>(prim());
+    return n;
   } else if (t == tLBracket) {
     Lexer::instance().consume();
     unique_ptr<Node> n = expr();
