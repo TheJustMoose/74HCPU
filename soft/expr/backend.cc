@@ -134,11 +134,11 @@ void Backend::AddAsmInstruction(string instr, string cmnt, string cmnt2) {
 }
 
 void Backend::SwitchToBank0() {
-  AddAsmInstruction("out  CPU_FLAGS, 0x40", "switch to bank 1");
+  AddAsmInstruction("out  CPU_FLAGS, 0", "switch to bank 0");
 }
 
 void Backend::SwitchToBank1() {
-  AddAsmInstruction("out  CPU_FLAGS, 0", "switch to bank 0");
+  AddAsmInstruction("out  CPU_FLAGS, 0x40", "switch to bank 1");
 }
 
 void Backend::FreeTheRegisters(RegsBank0& bank0, const Operation& op) {
