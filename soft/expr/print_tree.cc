@@ -47,6 +47,12 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
   } else if (AddressOf* aof = dynamic_cast<AddressOf*>(n)) {
     lvl++;
     Tree2List(aof->child.get(), mid, lvl);
+  } else if (DereferenceOp* dop = dynamic_cast<DereferenceOp*>(n)) {
+    lvl++;
+    Tree2List(dop->child.get(), mid, lvl);
+  } else if (IncrementOp* iop = dynamic_cast<IncrementOp*>(n)) {
+    lvl++;
+    Tree2List(iop->child.get(), mid, lvl);
   } else {
     //cout << "Node: " << GetNodeTypeName(n->type()) << endl;
   }

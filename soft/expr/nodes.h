@@ -72,7 +72,7 @@ class BinOp: public Node {
 
 class UnMinus: public Node {
  public:
-  UnMinus(std::string n);  // TODO: add type of unary operation here
+  UnMinus(std::string n);
 
   std::string name() const override { return name_; }
   std::string op() const override { return "-"; }
@@ -88,6 +88,31 @@ class UnMinus: public Node {
 
  private:
   std::string name_{"um"};
+};
+
+class IncrementOp: public Node {
+ public:
+  IncrementOp(std::unique_ptr<Name> nm);
+
+  std::unique_ptr<Name> child;
+
+  DataType data_type() override;
+
+  void accept(Visitor* v) override {
+    //child->accept(v);
+    //v->Visit(this);
+  }
+};
+
+class DereferenceOp: public Node {
+ public:
+  DereferenceOp(std::unique_ptr<Node> n);
+
+  std::unique_ptr<Node> child;
+
+  DataType data_type() override;
+
+  void accept(Visitor* v) override {}
 };
 
 class AssignOp: public Node {

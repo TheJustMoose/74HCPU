@@ -53,6 +53,25 @@ DataType UnMinus::data_type() {
     return dtNotInitialize;
 }
 
+IncrementOp::IncrementOp(unique_ptr<Name> nm)
+  : Node(ntIncrement), child(std::move(nm)) {
+}
+
+DataType IncrementOp::data_type() {
+  return child->data_type();
+}
+
+DereferenceOp::DereferenceOp(unique_ptr<Node> n)
+  : Node(ntDereference), child(std::move(n)) {
+}
+
+DataType DereferenceOp::data_type() {
+/*  if (child)
+    return child->data_type();
+  else*/
+    return dtNotInitialize;
+}
+
 AssignOp::AssignOp()
   : Node(ntAssign) {
 }

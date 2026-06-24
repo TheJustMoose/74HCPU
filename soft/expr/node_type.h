@@ -7,6 +7,8 @@ enum NodeType {
   ntAssign,      // a = b;
   ntAddressOf,   // #
   ntDereference, // @
+  ntIncrement,   // ++
+  ntDecrement,   // --
   ntUnknown,     // we do not know now what is it
   ntVarDecl,     // variable declaration node
   ntNull
