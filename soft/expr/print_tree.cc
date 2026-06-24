@@ -40,7 +40,7 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
     int offset = kWidth / (lvl*2 + 5);
     Tree2List(aop->left.get(), mid - offset, lvl);
     Tree2List(aop->right.get(), mid + offset, lvl);
-  } else if (UnOp* uop = dynamic_cast<UnOp*>(n)) {
+  } else if (UnMinus* uop = dynamic_cast<UnMinus*>(n)) {
     //cout << "unary minus..." << endl;
     lvl++;
     Tree2List(uop->child.get(), mid, lvl);
@@ -107,8 +107,8 @@ void PrintTree(Node* n) {
     if (const AssignOp* assop_node = dynamic_cast<const AssignOp*>(n))
       name = assop_node->op();
 
-    if (const UnOp* unop_node = dynamic_cast<const UnOp*>(n))
-      name = unop_node->name();
+    if (const UnMinus* unminus_node = dynamic_cast<const UnMinus*>(n))
+      name = unminus_node->name();
 
     if (const AddressOf* aof_node = dynamic_cast<const AddressOf*>(n))
       name = aof_node->name();

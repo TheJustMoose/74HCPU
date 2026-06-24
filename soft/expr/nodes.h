@@ -70,9 +70,9 @@ class BinOp: public Node {
   std::string name_ {"bo"};
 };
 
-class UnOp: public Node {
+class UnMinus: public Node {
  public:
-  UnOp(std::string n);  // TODO: add type of unary operation here
+  UnMinus(std::string n);  // TODO: add type of unary operation here
 
   std::string name() const override { return name_; }
   std::string op() const override { return "-"; }

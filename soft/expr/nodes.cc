@@ -42,11 +42,11 @@ DataType BinOp::data_type() {
   return max(ldt, rdt);
 }
 
-UnOp::UnOp(string n)
+UnMinus::UnMinus(string n)
   : Node(ntUMinus), name_(n) {
 }
 
-DataType UnOp::data_type() {
+DataType UnMinus::data_type() {
   if (child)
     return child->data_type();
   else

@@ -70,7 +70,7 @@ class VarsCollector: public Visitor {
     AddVar(op->name(), op->data_type(), false);  // is_ptr ?
   }
 
-  void Visit(UnOp* op) override {
+  void Visit(UnMinus* op) override {
     if (!op)
       return;
     AddVar(op->name(), op->data_type(), false);  // can we set is_ptr to true when argument is pointer?
@@ -136,7 +136,7 @@ class CodeCollector: public Visitor {
     res_code.emplace_back(op->name(), op->op(), op->left->name(), np, op->right->name(), true);
   }
 
-  void Visit(UnOp* op) override {
+  void Visit(UnMinus* op) override {
     // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
     bool is_num = op->child && (op->child->type() == ntNum);
     cout << FuncGuard::stack_str() << op->name() << " = "

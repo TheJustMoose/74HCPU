@@ -3,7 +3,7 @@
 class Node;
 class AssignOp;
 class BinOp;
-class UnOp;
+class UnMinus;
 class Name;
 class VarDecl;
 
@@ -12,7 +12,7 @@ class Visitor {
   virtual void Visit(Node* n) {}
   virtual void Visit(AssignOp* op) {}
   virtual void Visit(BinOp* op) {}
-  virtual void Visit(UnOp* op) {}
+  virtual void Visit(UnMinus* op) {}
   virtual void Visit(Name* n) {}
   virtual void Visit(VarDecl* n) {}
 };
