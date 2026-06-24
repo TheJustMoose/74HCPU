@@ -35,28 +35,50 @@ using namespace std;
 //  - statements: assignment, while, if, block, return
 // --------------------------------------------
 
-// Program: global variable declarations (only at the top)
-// followed by function definitions.
-Program             ::= GlobalDeclarations FunctionDefinitions;
-
-GlobalDeclarations  ::= { Declaration ';' };   // zero or more global variable declarations
-
-FunctionDefinitions ::= { FunctionDefinition }; // zero or more functions
-
-// Function definition: return type (Type or 'none'), name, parameters, block
-FunctionDefinition  ::= ReturnType name '(' ParameterList ')' Block;
-
-// Return type: either a normal Type or 'none'
-ReturnType          ::= Type
-                    |   'none'
+Primary             ::= num
+                    |   name [ '++' ]
+                    |   '-' Primary
+                    |   '@' name [ '++' ]   // dereference then increment pointer
+                    |   '#' name            // address-of, no increment allowed
+                    |   '(' Expression ')'
                     ;
 
-// Parameter list: possibly empty, separated by commas
-ParameterList       ::= [ Parameter { ',' Parameter } ];
-Parameter           ::= Type name;
+Term                ::= Primary { ('*' | '/') Primary };
 
-// Block: declarations and statements mixed (C99 style)
-Block               ::= '{' { Declaration ';' | Statement } '}';
+AdditiveExpr        ::= Term { ('+' | '-') Term };
+
+RelationalExpr      ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr };
+
+EqualityExpr        ::= RelationalExpr { ('==' | '!=') RelationalExpr };
+
+BitwiseAndExpr      ::= EqualityExpr { '&' EqualityExpr };
+
+BitwiseOrExpr       ::= BitwiseAndExpr { '|' BitwiseAndExpr };
+
+LogicalAndExpr      ::= BitwiseOrExpr { '&&' BitwiseOrExpr };
+
+LogicalOrExpr       ::= LogicalAndExpr { '||' LogicalAndExpr };
+
+// Expression hierarchy (precedence from low to high)
+Expression          ::= LogicalOrExpr;
+
+// Assignment (right-associative, as in C)
+Assignment          ::= Expression [ '=' Assignment ];
+
+// List of variable names, each optionally initialized with a number
+InitDeclaratorList  ::= name [ '=' num ] { ',' name [ '=' num ] };
+
+// Declaration: type, optional '@', then a list of variables with optional init
+Declaration         ::= Type [ '@' ] InitDeclaratorList;
+Type                ::= 'int'  |  'byte';
+
+IfStatement         ::= 'if' '(' Expression ')' Statement [ 'else' Statement ];
+
+WhileStatement      ::= 'while' '(' Expression ')' Statement;
+
+ReturnStatement     ::= 'return' Expression ';'
+                    |   'return' ';'
+                    ;
 
 // Statements: assignment, while, if, block, return
 Statement           ::= Assignment ';'
@@ -66,53 +88,27 @@ Statement           ::= Assignment ';'
                     |   ReturnStatement
                     ;
 
-ReturnStatement     ::= 'return' Expression ';'
-                    |   'return' ';'
-                    ;
+// Block: declarations and statements mixed (C99 style)
+Block               ::= '{' { Declaration ';' | Statement } '}';
 
-WhileStatement      ::= 'while' '(' Expression ')' Statement;
+// Parameter list: possibly empty, separated by commas
+ParameterList       ::= [ Parameter { ',' Parameter } ];
+Parameter           ::= Type name;
 
-IfStatement         ::= 'if' '(' Expression ')' Statement [ 'else' Statement ];
+// Return type: either a normal Type or 'none'
+ReturnType          ::= Type  |  'none' ;
 
-// Declaration: type, optional '@', then a list of variables with optional init
-Declaration         ::= Type [ '@' ] InitDeclaratorList;
+// Function definition: return type (Type or 'none'), name, parameters, block
+FunctionDefinition  ::= ReturnType name '(' ParameterList ')' Block;
 
-Type                ::= 'int'
-                    |   'byte'
-                    ;
+FunctionDefinitions ::= { FunctionDefinition }; // zero or more functions
 
-// List of variable names, each optionally initialized with a number
-InitDeclaratorList  ::= name [ '=' num ] { ',' name [ '=' num ] };
+GlobalDeclarations  ::= { Declaration ';' };   // zero or more global variable declarations
 
-// Assignment (right-associative, as in C)
-Assignment          ::= Expression [ '=' Assignment ];
+// Program: global variable declarations (only at the top)
+// followed by function definitions.
+Program             ::= GlobalDeclarations FunctionDefinitions;
 
-// Expression hierarchy (precedence from low to high)
-Expression          ::= LogicalOrExpr;
-
-LogicalOrExpr       ::= LogicalAndExpr { '||' LogicalAndExpr };
-
-LogicalAndExpr      ::= BitwiseOrExpr { '&&' BitwiseOrExpr };
-
-BitwiseOrExpr       ::= BitwiseAndExpr { '|' BitwiseAndExpr };
-
-BitwiseAndExpr      ::= EqualityExpr { '&' EqualityExpr };
-
-EqualityExpr        ::= RelationalExpr { ('==' | '!=') RelationalExpr };
-
-RelationalExpr      ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr };
-
-AdditiveExpr        ::= Term { ('+' | '-') Term };
-
-Term                ::= Primary { ('*' | '/') Primary };
-
-Primary             ::= num
-                    |   name [ '++' ]
-                    |   '-' Primary
-                    |   '@' name [ '++' ]   // dereference then increment pointer
-                    |   '#' name            // address-of, no increment allowed
-                    |   '(' Expression ')'
-                    ;
 */
 
 int tmp_var_counter {0};
