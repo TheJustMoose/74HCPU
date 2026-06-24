@@ -116,50 +116,74 @@ string new_tmp() {
   return string("t") + to_string(tmp_var_counter++);
 }
 
+unique_ptr<Node> prim_num() {
+  int val = Lexer::instance().getIntValue();
+  Lexer::instance().consume();
+  return make_unique<Num>(val);
+}
+
+unique_ptr<Node> prim_name() {
+  string str = Lexer::instance().getStrValue();
+  Lexer::instance().consume();
+  unique_ptr<Name> nm = make_unique<Name>(str);
+  Token t = Lexer::instance().currentToken();
+  if (t == tIncrement) {
+    Lexer::instance().consume();
+    return make_unique<IncrementOp>(std::move(nm));
+  }
+  return nm;
+}
+
+unique_ptr<Node> prim_minus() {
+  Lexer::instance().consume();
+  unique_ptr<UnMinus> n = make_unique<UnMinus>(new_tmp());
+  n->child = prim();
+  if (!n->child)
+    throw logic_error("Argument for unary minus was not found");
+  return n;
+}
+
+unique_ptr<Node> prim_atsign() {
+  Lexer::instance().consume();
+  Token t = Lexer::instance().currentToken();
+  if (t != tName)
+    throw logic_error("Error. Waiting for name. You can dereference only variable");
+  return make_unique<DereferenceOp>(prim());
+}
+
+unique_ptr<Node> prim_numbersign() {
+  Lexer::instance().consume();
+  Token t = Lexer::instance().currentToken();
+  if (t != tName)
+    throw logic_error("Error. Waiting for name. You can get only variable address");
+  return make_unique<AddressOf>(prim());
+}
+
+unique_ptr<Node> prim_lbracket() {
+  Lexer::instance().consume();
+  unique_ptr<Node> n = expr();
+  Token t = Lexer::instance().currentToken();
+  if (t != tRBracket)
+    throw logic_error("Error. Waiting for right bracket");
+  Lexer::instance().consume();
+  return n;
+}
+
 unique_ptr<Node> prim() {
   FuncGuard fg("prim");
   Token t = Lexer::instance().currentToken();
   if (t == tNum) {
-    int val = Lexer::instance().getIntValue();
-    Lexer::instance().consume();
-    return make_unique<Num>(val);
+    return prim_num();
   } else if (t == tName) {
-    string str = Lexer::instance().getStrValue();
-    Lexer::instance().consume();
-    unique_ptr<Name> nm = make_unique<Name>(str);
-    t = Lexer::instance().currentToken();
-    if (t == tIncrement) {
-      Lexer::instance().consume();
-      return make_unique<IncrementOp>(std::move(nm));
-    }
-    return nm;
+    return prim_name();
   } else if (t == tMinus) {
-    Lexer::instance().consume();
-    unique_ptr<UnMinus> n = make_unique<UnMinus>(new_tmp());
-    n->child = prim();
-    if (!n->child)
-      throw logic_error("Argument for unary minus was not found");
-    return n;
+    return prim_minus();
   } else if (t == tAtSign) {
-    Lexer::instance().consume();
-    t = Lexer::instance().currentToken();
-    if (t != tName)
-      throw logic_error("Error. Waiting for name. You can dereference only variable");
-    return make_unique<DereferenceOp>(prim());
+    return prim_atsign();
   } else if (t == tNumberSign) {
-    Lexer::instance().consume();
-    t = Lexer::instance().currentToken();
-    if (t != tName)
-      throw logic_error("Error. Waiting for name. You can get only variable address");
-    return make_unique<AddressOf>(prim());
+    return prim_numbersign();
   } else if (t == tLBracket) {
-    Lexer::instance().consume();
-    unique_ptr<Node> n = expr();
-    t = Lexer::instance().currentToken();
-    if (t != tRBracket)
-      throw logic_error("Error. Waiting for right bracket");
-    Lexer::instance().consume();
-    return n;
+    return prim_lbracket();
   } else {
     return {};
   }
