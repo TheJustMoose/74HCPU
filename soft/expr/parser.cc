@@ -189,6 +189,7 @@ unique_ptr<Node> prim() {
   }
 }
 
+// Term ::= Primary { ('*' | '/') Primary };
 unique_ptr<Node> term() {
   FuncGuard fg("term");
   unique_ptr<Node> left = prim();
@@ -213,7 +214,8 @@ unique_ptr<Node> term() {
   return left;
 }
 
-unique_ptr<Node> expr() {
+// AdditiveExpr ::= Term { ('+' | '-') Term };
+unique_ptr<Node> additive_expr() {
   FuncGuard fg("expr");
   unique_ptr<Node> left = term();
   if (!left)
@@ -237,6 +239,42 @@ unique_ptr<Node> expr() {
   return left;
 }
 
+// RelationalExpr ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr };
+unique_ptr<Node> relational_expr() {
+  return additive_expr();
+}
+
+// EqualityExpr ::= RelationalExpr { ('==' | '!=') RelationalExpr };
+unique_ptr<Node> equality_expr() {
+  return relational_expr();
+}
+
+// BitwiseAndExpr ::= EqualityExpr { '&' EqualityExpr };
+unique_ptr<Node> bitwise_and_expr() {
+  return equality_expr();
+}
+
+// BitwiseOrExpr ::= BitwiseAndExpr { '|' BitwiseAndExpr };
+unique_ptr<Node> bitwise_or_expr() {
+  return bitwise_and_expr();
+}
+
+// LogicalAndExpr ::= BitwiseOrExpr { '&&' BitwiseOrExpr };
+unique_ptr<Node> logical_and_expr() {
+  return bitwise_or_expr();
+}
+
+// LogicalOrExpr ::= LogicalAndExpr { '||' LogicalAndExpr };
+unique_ptr<Node> logical_or_expr() {
+  return logical_and_expr();
+}
+
+// Expression ::= LogicalOrExpr;
+unique_ptr<Node> expr() {
+  return logical_or_expr();
+}
+
+// Assignment ::= Expression [ '=' Assignment ];
 unique_ptr<Node> assign() {
   FuncGuard fg("assi");
   unique_ptr<Node> left = expr();  // a
@@ -257,9 +295,6 @@ unique_ptr<Node> assign() {
            << "\" which has not been declared" << endl;
 */
   }
-
-  // TODO: теперь хорошо бы добавить инициализацию объявляемых переменных
-  // и сделать оператор взятия адреса - & (или @ ?)
 
   Token t = Lexer::instance().currentToken();
   if (t == tEnd)
