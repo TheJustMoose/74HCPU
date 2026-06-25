@@ -72,9 +72,9 @@ class BinOp: public Node {
 
 class RelationalOp: public Node {
  public:
-  RelationalOp(Token t);
+  RelationalOp(Token t, std::string tmp_name);
 
-  std::string name() const override { return "relop"; }
+  std::string name() const override { return tmp_name_; }
   std::string op() const override;
 
   std::unique_ptr<Node> left;
@@ -89,6 +89,9 @@ class RelationalOp: public Node {
     right->accept(v);
     v->Visit(this);
   }
+
+ private:
+  std::string tmp_name_ {"ro"};
 };
 
 class UnMinus: public Node {

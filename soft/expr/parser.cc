@@ -252,7 +252,7 @@ unique_ptr<Node> relational_expr() {
 
     unique_ptr<Node> right = additive_expr();
 
-    unique_ptr<RelationalOp> op = make_unique<RelationalOp>(t);  // , new_tmp()
+    unique_ptr<RelationalOp> op = make_unique<RelationalOp>(t, new_tmp());
     op->left = std::move(left);
     op->right = std::move(right);
     return op;

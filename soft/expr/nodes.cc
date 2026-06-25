@@ -42,8 +42,8 @@ DataType BinOp::data_type() {
   return max(ldt, rdt);
 }
 
-RelationalOp::RelationalOp(Token t)
-  : Node(Token2NodeType(t)) {
+RelationalOp::RelationalOp(Token t, string tmp_name)
+  : Node(Token2NodeType(t)), tmp_name_(tmp_name) {
 }
 
 string RelationalOp::op() const {
