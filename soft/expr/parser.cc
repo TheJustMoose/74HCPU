@@ -299,7 +299,7 @@ unique_ptr<Node> assign() {
     return {};
 
   uint8_t var_size {0};
-  if (left->type() == ntName) {
+  if (left->node_type() == ntName) {
     Name* n = dynamic_cast<Name*>(left.get());
     // вообще, где-то здесь не хватает проверки res_in_temp
     // но этот флажок лежит в таблице со списком операций :(

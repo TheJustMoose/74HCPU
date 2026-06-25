@@ -17,13 +17,13 @@ TEST_CASE("Parser: smoke test") {
 
   Node* n = statements[0].get();
   CHECK(n);
-  CHECK_EQ(n->type(), ntSum);
+  CHECK_EQ(n->node_type(), ntSum);
   BinOp* bop = dynamic_cast<BinOp*>(n);
   CHECK(bop);
   CHECK(bop->left);
   CHECK(bop->right);
-  CHECK_EQ(bop->left->type(), ntNum);
-  CHECK_EQ(bop->right->type(), ntNum);
+  CHECK_EQ(bop->left->node_type(), ntNum);
+  CHECK_EQ(bop->right->node_type(), ntNum);
 }
 
 TEST_CASE("Parser: address of test") {
@@ -35,5 +35,5 @@ TEST_CASE("Parser: address of test") {
 
   Node* n = statements[1].get();
   CHECK(n);
-  CHECK_EQ(n->type(), ntAddressOf);
+  CHECK_EQ(n->node_type(), ntAddressOf);
 }

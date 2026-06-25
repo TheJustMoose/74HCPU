@@ -9,7 +9,7 @@ class Visitor;
 
 class Node {
  public:
-  Node(NodeType nt): type_(nt) {}
+  Node(NodeType nt): node_type_(nt) {}
 
   virtual ~Node() = default;
 
@@ -17,12 +17,12 @@ class Node {
 
   virtual std::string name() const { return "??"; }
 
-  NodeType type() const { return type_; }
+  NodeType node_type() const { return node_type_; }
 
   virtual DataType data_type() = 0;
 
   virtual void accept(Visitor* v) = 0;
 
  protected:
-  NodeType type_ {ntUnknown};
+  NodeType node_type_ {ntUnknown};
 };

@@ -106,7 +106,7 @@ class CodeCollector: public Visitor {
         << name_node->name() << " = "
         << op->right->name() << endl;
 
-    bool is_num = op->right && (op->right->type() == ntNum);
+    bool is_num = op->right && (op->right->node_type() == ntNum);
     NumPos np = is_num ? npLeft : npNone;
     res_code.emplace_back(name_node->name(), "", op->right->name(), np, "");
   }
@@ -122,8 +122,8 @@ class CodeCollector: public Visitor {
            << op->left->name() << " " << op->op() << " "
            << op->right->name() << endl;
     }
-    bool r_is_n = op->right && (op->right->type() == ntNum);
-    bool l_is_n = op->left && (op->left->type() == ntNum);
+    bool r_is_n = op->right && (op->right->node_type() == ntNum);
+    bool l_is_n = op->left && (op->left->node_type() == ntNum);
 
     NumPos np {npNone};
     if (r_is_n && l_is_n)
@@ -138,7 +138,7 @@ class CodeCollector: public Visitor {
 
   void Visit(UnMinus* op) override {
     // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
-    bool is_num = op->child && (op->child->type() == ntNum);
+    bool is_num = op->child && (op->child->node_type() == ntNum);
     cout << FuncGuard::stack_str() << op->name() << " = "
         << op->op() << op->child->name() << " " << endl;
     NumPos np = is_num ? npRight : npNone;

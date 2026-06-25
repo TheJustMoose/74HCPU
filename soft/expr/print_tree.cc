@@ -54,7 +54,7 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
     lvl++;
     Tree2List(iop->child.get(), mid, lvl);
   } else {
-    //cout << "Node: " << GetNodeTypeName(n->type()) << endl;
+    //cout << "Node: " << GetNodeTypeName(n->node_type()) << endl;
   }
 }
 
@@ -124,7 +124,7 @@ void PrintTree(Node* n) {
 
     TypeStringIntoTheBuffer(
         line,
-        GetNodeTypeName(n->type()) + " (" + name + ")",  // to_string(gNodeOffset[n])
+        GetNodeTypeName(n->node_type()) + " (" + name + ")",  // to_string(gNodeOffset[n])
         gNodeOffset[n]);
 
     cnt++;

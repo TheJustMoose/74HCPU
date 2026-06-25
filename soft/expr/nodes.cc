@@ -24,7 +24,7 @@ BinOp::BinOp(Token t, string n)
 }
 
 string BinOp::op() const {
-  switch (type()) {
+  switch (node_type()) {
     case ntSum: return "+";
     case ntSub: return "-";
     case ntMul: return "*";
@@ -47,7 +47,7 @@ RelationalOp::RelationalOp(Token t, string tmp_name)
 }
 
 string RelationalOp::op() const {
-  switch (type()) {
+  switch (node_type()) {
     case ntLess: return "<";
     case ntGreater: return ">";
     case ntLessOrEqual: return "<=";
