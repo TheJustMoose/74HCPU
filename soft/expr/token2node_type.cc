@@ -7,6 +7,10 @@ NodeType Token2NodeType(Token t) {
     case tMul: return ntMul;
     case tDiv: return ntDiv;
     case tEqual: return ntAssign;
+    case tLess: return ntLess;
+    case tGreater: return ntGreater;
+    case tLessOrEqual: return ntLessOrEqual;
+    case tGreaterOrEqual: return ntGreaterOrEqual;
     default: return ntUnknown;
   }
 }

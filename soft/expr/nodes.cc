@@ -42,6 +42,20 @@ DataType BinOp::data_type() {
   return max(ldt, rdt);
 }
 
+RelationalOp::RelationalOp(Token t)
+  : Node(Token2NodeType(t)) {
+}
+
+string RelationalOp::op() const {
+  switch (type()) {
+    case ntLess: return "<";
+    case ntGreater: return ">";
+    case ntLessOrEqual: return "<=";
+    case ntGreaterOrEqual: return ">=";
+    default: return "";
+  }
+}
+
 UnMinus::UnMinus(string n)
   : Node(ntUMinus), name_(n) {
 }
@@ -66,9 +80,9 @@ DereferenceOp::DereferenceOp(unique_ptr<Node> n)
 }
 
 DataType DereferenceOp::data_type() {
-/*  if (child)
+  if (child)
     return child->data_type();
-  else*/
+  else
     return dtNotInitialize;
 }
 

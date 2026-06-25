@@ -9,6 +9,10 @@ enum NodeType {
   ntDereference, // @
   ntIncrement,   // ++
   ntDecrement,   // --
+  ntLess,        // <
+  ntGreater,     // >
+  ntLessOrEqual, // <=
+  ntGreaterOrEqual, // >=
   ntUnknown,     // we do not know now what is it
   ntVarDecl,     // variable declaration node
   ntNull

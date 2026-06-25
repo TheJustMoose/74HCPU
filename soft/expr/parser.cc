@@ -241,7 +241,24 @@ unique_ptr<Node> additive_expr() {
 
 // RelationalExpr ::= AdditiveExpr { ('<' | '>' | '<=' | '>=') AdditiveExpr };
 unique_ptr<Node> relational_expr() {
-  return additive_expr();
+  unique_ptr<Node> left = additive_expr();
+  if (!left)
+    return {};
+
+  Token t = Lexer::instance().currentToken();
+  // Comparison operations, unlike arithmetic operations, usually contain only two operands.
+  if (t == tLess || t == tGreater || t == tLessOrEqual || t == tGreaterOrEqual) {
+    Lexer::instance().consume();
+
+    unique_ptr<Node> right = additive_expr();
+
+    unique_ptr<RelationalOp> op = make_unique<RelationalOp>(t);  // , new_tmp()
+    op->left = std::move(left);
+    op->right = std::move(right);
+    return op;
+  }
+
+  return left;
 }
 
 // EqualityExpr ::= RelationalExpr { ('==' | '!=') RelationalExpr };

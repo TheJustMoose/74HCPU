@@ -70,6 +70,27 @@ class BinOp: public Node {
   std::string name_ {"bo"};
 };
 
+class RelationalOp: public Node {
+ public:
+  RelationalOp(Token t);
+
+  std::string name() const override { return "relop"; }
+  std::string op() const override;
+
+  std::unique_ptr<Node> left;
+  std::unique_ptr<Node> right;
+
+  DataType data_type() override {
+    return dtBool;
+  }
+
+  void accept(Visitor* v) override {
+    left->accept(v);  // TODO: check it
+    right->accept(v);
+    v->Visit(this);
+  }
+};
+
 class UnMinus: public Node {
  public:
   UnMinus(std::string n);

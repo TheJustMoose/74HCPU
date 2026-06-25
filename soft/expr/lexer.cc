@@ -90,6 +90,28 @@ void Lexer::findNextToken() {
     return;
   }
 
+  if (c == '<') {
+    c = readChar();
+    if (c == '=')
+      current_token_ = tLessOrEqual;
+    else {
+      current_token_ = tLess;
+      idx_--;
+    }
+    return;
+  }
+
+  if (c == '>') {
+    c = readChar();
+    if (c == '=')
+      current_token_ = tGreaterOrEqual;
+    else {
+      current_token_ = tGreater;
+      idx_--;
+    }
+    return;
+  }
+
   switch (c) {
     case '*': current_token_ = tMul; return;
     case '/': current_token_ = tDiv; return;
