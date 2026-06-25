@@ -29,11 +29,15 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
   //cout << "mid: " << mid << ", lvl: " << lvl << endl;
 
   if (BinOp* bop = dynamic_cast<BinOp*>(n)) {
-    //cout << "binop..." << endl;
     lvl++;
     int offset = kWidth / (lvl*2 + 5);
     Tree2List(bop->left.get(), mid - offset, lvl);
     Tree2List(bop->right.get(), mid + offset, lvl);
+  } else if (RelationalOp* rop = dynamic_cast<RelationalOp*>(n)) {
+    lvl++;
+    int offset = kWidth / (lvl*2 + 5);
+    Tree2List(rop->left.get(), mid - offset, lvl);
+    Tree2List(rop->right.get(), mid + offset, lvl);
   } else if (AssignOp* aop = dynamic_cast<AssignOp*>(n)) {
     //cout << "assign..." << endl;
     lvl++;
@@ -109,6 +113,9 @@ void PrintTree(Node* n) {
 
     if (const BinOp* binop_node = dynamic_cast<const BinOp*>(n))
       name = binop_node->name();
+
+    if (const RelationalOp* rop_node = dynamic_cast<const RelationalOp*>(n))
+      name = rop_node->name();
 
     if (const AssignOp* assop_node = dynamic_cast<const AssignOp*>(n))
       name = assop_node->op();
