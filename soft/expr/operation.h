@@ -26,18 +26,18 @@ struct Operation {
   std::string right_arg {};  // so when we have x = a + b, a is left
   bool removed {false};      // but when x = a, a is left again!
 
-  NumPos arg_is_num_ {npNone};  // private ;)
+  NumPos num_pos_ {npNone};  // private ;)
 
   std::vector<bool> live_in_vars;   // live vars before Operation executing (LIVE_in)
   std::vector<bool> live_out_vars;  // live vars after Operation executing (LIVE_out)
 
-  Operation(std::string res, std::string op, std::string l, NumPos a_arg_is_num,
+  Operation(std::string res, std::string op, std::string l, NumPos num_pos,
             std::string r, bool in_temp = false)
-    : res_arg(res), op_name(op), left_arg(l), arg_is_num_(a_arg_is_num),
+    : res_arg(res), op_name(op), left_arg(l), num_pos_(num_pos),
       right_arg(r), res_in_temp(in_temp) {}
 
   NumPos arg_is_num() {
-    return arg_is_num_;
+    return num_pos_;
   }
 
   std::string str() const {
@@ -62,7 +62,7 @@ struct Operation {
   std::string raw() const {
     return "|" + align(res_arg) + " | = |" + align(left_arg) + " |" +
            align(op_name) + " |" + align(right_arg) + " | " +
-           align(NumPos2String(arg_is_num_)) + " |";
+           align(NumPos2String(num_pos_)) + " |";
   }
 
   std::string live_vars_str() const {
