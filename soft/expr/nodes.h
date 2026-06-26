@@ -60,6 +60,19 @@ class BinOp: public Node {
 
   DataType data_type() override;
 
+  NumPos get_num_pos() {
+    bool r_is_n = right && (right->node_type() == ntNum);
+    bool l_is_n = left && (left->node_type() == ntNum);
+    if (r_is_n && l_is_n)
+      return npBoth;
+    else if (r_is_n)
+      return npRight;
+    else if (l_is_n)
+      return npLeft;
+    else
+      return npNone;
+  }
+
   void accept(Visitor* v) override {
     left->accept(v);
     right->accept(v);
@@ -84,6 +97,10 @@ class RelationalOp: public Node {
     return dtBool;
   }
 
+  NumPos get_num_pos() {
+    return npNone;
+  }
+
   void accept(Visitor* v) override {
     left->accept(v);  // TODO: check it
     right->accept(v);
@@ -104,6 +121,11 @@ class UnMinus: public Node {
   std::unique_ptr<Node> child;
 
   DataType data_type() override;
+
+  NumPos get_num_pos() {
+    bool is_num = child && (child->node_type() == ntNum);
+    return is_num ? npRight : npNone;
+  }
 
   void accept(Visitor* v) override {
     child->accept(v);
@@ -147,6 +169,11 @@ class AssignOp: public Node {
   std::string name() const override { return left ? left->name() : "eq"; }
 
   DataType data_type() override;
+
+  NumPos get_num_pos() {
+    bool is_num = right && (right->node_type() == ntNum);
+    return is_num ? npLeft : npNone;
+  }
 
   void accept(Visitor* v) override {
     left->accept(v);

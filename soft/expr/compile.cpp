@@ -103,12 +103,10 @@ class CodeCollector: public Visitor {
     }
 
     cout << FuncGuard::stack_str()
-        << name_node->name() << " = "
-        << op->right->name() << endl;
+         << name_node->name() << " = "
+         << op->right->name() << endl;
 
-    bool is_num = op->right && (op->right->node_type() == ntNum);
-    NumPos np = is_num ? npLeft : npNone;
-    res_code.emplace_back(name_node->name(), "", op->right->name(), np, "");
+    res_code.emplace_back(name_node->name(), "", op->right->name(), op->get_num_pos(), "");
   }
 
   void Visit(BinOp* op) override {
@@ -122,18 +120,8 @@ class CodeCollector: public Visitor {
            << op->left->name() << " " << op->op() << " "
            << op->right->name() << endl;
     }
-    bool r_is_n = op->right && (op->right->node_type() == ntNum);
-    bool l_is_n = op->left && (op->left->node_type() == ntNum);
 
-    NumPos np {npNone};
-    if (r_is_n && l_is_n)
-      np = npBoth;
-    else if (r_is_n)
-      np = npRight;
-    else if (l_is_n)
-      np = npLeft;
-
-    res_code.emplace_back(op->name(), op->op(), op->left->name(), np, op->right->name(), true);
+    res_code.emplace_back(op->name(), op->op(), op->left->name(), op->get_num_pos(), op->right->name(), true);
   }
 
   void Visit(RelationalOp* op) {
@@ -142,17 +130,16 @@ class CodeCollector: public Visitor {
     else if (!op->right)
       cout << "right node is nullptr" << endl;
     else {
-      res_code.emplace_back(op->name(), op->op(), op->left->name(), npNone, op->right->name(), true);
+      res_code.emplace_back(op->name(), op->op(), op->left->name(), op->get_num_pos(), op->right->name(), true);
     }
   }
 
   void Visit(UnMinus* op) override {
     // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
-    bool is_num = op->child && (op->child->node_type() == ntNum);
     cout << FuncGuard::stack_str() << op->name() << " = "
-        << op->op() << op->child->name() << " " << endl;
-    NumPos np = is_num ? npRight : npNone;
-    res_code.emplace_back(op->name(), op->op(), "", np, op->child->name(), true);
+         << op->op() << op->child->name() << " " << endl;
+
+    res_code.emplace_back(op->name(), op->op(), "", op->get_num_pos(), op->child->name(), true);
   }
 
   void Visit(Name* n) override {
