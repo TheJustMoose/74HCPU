@@ -225,8 +225,10 @@ void Backend::GenerateBinOps(RegsBank0& bank0, Operation op) {
     cmd = "mul";
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
-  else if (op.op_name == "/")
-    cmd = "mul";
+  else if (op.op_name == "<")
+    cmd = "cmp";
+  else if (op.op_name == ">")
+    cmd = "cmp";
   else
     cmd = "unk";
 
