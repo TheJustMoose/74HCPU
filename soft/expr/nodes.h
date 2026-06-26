@@ -98,7 +98,16 @@ class RelationalOp: public Node {
   }
 
   NumPos get_num_pos() {
-    return npNone;
+    bool r_is_n = right && (right->node_type() == ntNum);
+    bool l_is_n = left && (left->node_type() == ntNum);
+    if (r_is_n && l_is_n)
+      return npBoth;
+    else if (r_is_n)
+      return npRight;
+    else if (l_is_n)
+      return npLeft;
+    else
+      return npNone;
   }
 
   void accept(Visitor* v) override {
