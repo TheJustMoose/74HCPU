@@ -136,6 +136,16 @@ class CodeCollector: public Visitor {
     res_code.emplace_back(op->name(), op->op(), op->left->name(), np, op->right->name(), true);
   }
 
+  void Visit(RelationalOp* op) {
+    if (!op->left)
+      cout << "left node is nullptr" << endl;
+    else if (!op->right)
+      cout << "right node is nullptr" << endl;
+    else {
+      res_code.emplace_back(op->name(), op->op(), op->left->name(), npNone, op->right->name(), true);
+    }
+  }
+
   void Visit(UnMinus* op) override {
     // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
     bool is_num = op->child && (op->child->node_type() == ntNum);
