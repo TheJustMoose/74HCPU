@@ -36,7 +36,7 @@ struct Operation {
     : res_arg(res), op_name(op), left_arg(l), num_pos_(num_pos),
       right_arg(r), res_in_temp(in_temp) {}
 
-  NumPos arg_is_num() {
+  NumPos num_pos() {
     return num_pos_;
   }
 
