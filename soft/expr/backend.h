@@ -30,7 +30,7 @@ class Backend {
 
   void GenerateAssignment(RegsBank0& bank0, Operation op, Var& v);
   void GenerateInvertion(RegsBank0& bank0, Operation op);
-  void GenerateArithmOps(RegsBank0& bank0, Operation op);
+  void GenerateBinOps(RegsBank0& bank0, Operation op);
 
  private:
   std::map<std::string, uint16_t> var_addrs_;

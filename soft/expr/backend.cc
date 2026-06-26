@@ -205,7 +205,7 @@ void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
   }
 }
 
-void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
+void Backend::GenerateBinOps(RegsBank0& bank0, Operation op) {
   // c = a + b   -->   c = a, c += b
   // what about var_size ?
   string cmnt1 = op.res_arg + " = " + op.left_arg;  // c = a
@@ -216,7 +216,7 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
 
   string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
 
-  string cmd {"unk"};
+  string cmd;
   if (op.op_name == "+")
     cmd = "add";
   else if (op.op_name == "-")
@@ -225,6 +225,10 @@ void Backend::GenerateArithmOps(RegsBank0& bank0, Operation op) {
     cmd = "mul";
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
+  else if (op.op_name == "/")
+    cmd = "mul";
+  else
+    cmd = "unk";
 
   string right_val = (op.num_pos() == npRight) ? op.right_arg : bank0.FindRegFor(op.right_arg);
   string line21 = cmd + " " + res_reg + ", " + right_val;
@@ -248,7 +252,7 @@ void Backend::GenerateCode(vector<Operation> code) {
     } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
       GenerateInvertion(bank0, op);
     } else {  // arithm ops (left_arg is not empty)
-      GenerateArithmOps(bank0, op);
+      GenerateBinOps(bank0, op);
     }
 
     FreeTheRegisters(bank0, op);
