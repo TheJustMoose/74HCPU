@@ -174,18 +174,18 @@ void Backend::GenerateAssignment(RegsBank0& bank0, Operation op, Var& v) {
 
     string res_reg = FindPtrFor(op.res_arg);
     SwitchToBank1();
-    string line11 = "mov " + res_reg + "L, " + lval;
-    AddAsmInstruction(line11, cmnt1);
-    string line12 = "mov " + res_reg + "H, " + hval;
-    AddAsmInstruction(line12);
+    string line1 = "mov " + res_reg + "L, " + lval;
+    AddAsmInstruction(line1, cmnt1);
+    string line2 = "mov " + res_reg + "H, " + hval;
+    AddAsmInstruction(line2);
     SwitchToBank0();
   } else {  // ordinary regs
     string cmnt1 = op.res_arg + " = " + op.left_arg;
 
     string res_reg = bank0.FindRegFor(op.res_arg);
     string right_val = (op.num_pos() == npLeft) ? op.left_arg : bank0.FindRegFor(op.left_arg);
-    string line11 = "mov " + res_reg + ", " + right_val;
-    AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
+    string line1 = "mov " + res_reg + ", " + right_val;
+    AddAsmInstruction(line1, cmnt1, bank0.DumpRegs());
   }
 }
 
@@ -193,15 +193,15 @@ void Backend::GenerateInvertion(RegsBank0& bank0, Operation op) {
   string cmnt1 = op.res_arg + " = " + op.op_name + op.right_arg;
   string res_reg = bank0.FindRegFor(op.res_arg);
   if (op.num_pos() == npRight) {  // c = -3
-    string line = "mov " + res_reg + ", " + op.op_name + op.right_arg;
-    AddAsmInstruction(line, cmnt1);
+    string line1 = "mov " + res_reg + ", " + op.op_name + op.right_arg;
+    AddAsmInstruction(line1, cmnt1);
   } else {  // R0 = -R1
     // mov R0, ~R1; add R0, 1        // v1
     // xor R0, R0; addc R0, ~R1 + 1  // v2
-    string line21 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg);
-    AddAsmInstruction(line21, cmnt1);
-    string line22 = "add " + res_reg + ", 1";
-    AddAsmInstruction(line22);
+    string line1 = "mov " + res_reg + ", ~" + bank0.FindRegFor(op.right_arg);
+    AddAsmInstruction(line1, cmnt1);
+    string line2 = "add " + res_reg + ", 1";
+    AddAsmInstruction(line2);
   }
 }
 
@@ -211,8 +211,8 @@ void Backend::GenerateBinOps(RegsBank0& bank0, Operation op) {
   string cmnt1 = op.res_arg + " = " + op.left_arg;  // c = a
 
   string res_reg = bank0.FindRegFor(op.res_arg);
-  string line11 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg);
-  AddAsmInstruction(line11, cmnt1, bank0.DumpRegs());
+  string line1 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg);
+  AddAsmInstruction(line1, cmnt1, bank0.DumpRegs());
 
   string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
 
@@ -233,8 +233,8 @@ void Backend::GenerateBinOps(RegsBank0& bank0, Operation op) {
     cmd = "unk";
 
   string right_val = (op.num_pos() == npRight) ? op.right_arg : bank0.FindRegFor(op.right_arg);
-  string line21 = cmd + " " + res_reg + ", " + right_val;
-  AddAsmInstruction(line21, cmnt2, bank0.DumpRegs());
+  string line2 = cmd + " " + res_reg + ", " + right_val;
+  AddAsmInstruction(line2, cmnt2, bank0.DumpRegs());
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
