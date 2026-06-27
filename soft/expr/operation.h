@@ -17,7 +17,11 @@ inline std::string NumPos2String(NumPos np) {
   }
 }
 
-struct Operation {
+class Operation {
+ private:
+  NumPos num_pos_ {npNone};  // private ;)
+
+ public:
   std::string res_arg {};
   bool res_in_temp {false};
   std::string op_name {};
@@ -26,7 +30,6 @@ struct Operation {
   std::string right_arg {};  // so when we have x = a + b, a is left
   bool removed {false};      // but when x = a, a is left again!
 
-  NumPos num_pos_ {npNone};  // private ;)
 
   std::vector<bool> live_in_vars;   // live vars before Operation executing (LIVE_in)
   std::vector<bool> live_out_vars;  // live vars after Operation executing (LIVE_out)
@@ -35,10 +38,6 @@ struct Operation {
             std::string r, bool in_temp = false)
     : res_arg(res), op_name(op), left_arg(l), num_pos_(num_pos),
       right_arg(r), res_in_temp(in_temp) {}
-
-  NumPos num_pos() {
-    return num_pos_;
-  }
 
   std::string str() const {
     std::string suffix {res_in_temp ? " (res_in_temp)" : ""};
@@ -92,6 +91,10 @@ struct Operation {
 
   int argNum() const {
     return !left_arg.empty() + !right_arg.empty();
+  }
+
+  NumPos num_pos() {
+    return num_pos_;
   }
 
   void clear() {
