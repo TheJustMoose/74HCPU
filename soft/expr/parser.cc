@@ -246,7 +246,9 @@ unique_ptr<Node> relational_expr() {
     return {};
 
   Token t = Lexer::instance().currentToken();
-  // Comparison operations, unlike arithmetic operations, usually contain only two operands.
+  // Comparison operations, unlike arithmetic operations (a + b + c + ...),
+  // usually contain only two operands (a < b).
+  // So whill use if instead of while.
   if (t == tLess || t == tGreater || t == tLessOrEqual || t == tGreaterOrEqual) {
     Lexer::instance().consume();
 
@@ -263,7 +265,11 @@ unique_ptr<Node> relational_expr() {
 
 // EqualityExpr ::= RelationalExpr { ('==' | '!=') RelationalExpr };
 unique_ptr<Node> equality_expr() {
-  return relational_expr();
+  unique_ptr<Node> left = relational_expr();
+  if (!left)
+    return {};
+
+  return left;
 }
 
 // BitwiseAndExpr ::= EqualityExpr { '&' EqualityExpr };
