@@ -6,7 +6,7 @@ NodeType Token2NodeType(Token t) {
     case tMinus: return ntSub;
     case tMul: return ntMul;
     case tDiv: return ntDiv;
-    case tEqual: return ntAssign;
+    case tAssign: return ntAssign;
     case tLess: return ntLess;
     case tGreater: return ntGreater;
     case tLessOrEqual: return ntLessOrEqual;

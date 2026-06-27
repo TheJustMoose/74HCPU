@@ -324,7 +324,7 @@ unique_ptr<Node> assign() {
     return left;
 
   unique_ptr<Node> res;
-  if (t == tEqual) {
+  if (t == tAssign) {
     Lexer::instance().consume();
     unique_ptr<AssignOp> op = make_unique<AssignOp>();  // =
     op->left = std::move(left);     // a =
@@ -373,7 +373,7 @@ unique_ptr<Node> declare() {
     Lexer::instance().consume();  // skip var name
 
     t = Lexer::instance().currentToken();
-    if (t == tEqual) {
+    if (t == tAssign) {
       Lexer::instance().consume();
       t = Lexer::instance().currentToken();
       if (t == tNum) {

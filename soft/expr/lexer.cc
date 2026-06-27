@@ -117,7 +117,7 @@ void Lexer::findNextToken() {
     case '/': current_token_ = tDiv; return;
     case '(': current_token_ = tLBracket; return;
     case ')': current_token_ = tRBracket; return;
-    case '=': current_token_ = tEqual; return;
+    case '=': current_token_ = tAssign; return;
     case ',': current_token_ = tComma; return;
     case ';': current_token_ = tSemicolon; return;
     case '@': current_token_ = tAtSign; return;

@@ -98,7 +98,7 @@ TEST_CASE("check Lexer tokens") {
   CHECK_EQ(l6.currentToken(), tRBracket);
 
   Lexer l7("=");
-  CHECK_EQ(l7.currentToken(), tEqual);
+  CHECK_EQ(l7.currentToken(), tAssign);
 
   Lexer l8(";");
   CHECK_EQ(l8.currentToken(), tSemicolon);
