@@ -6,7 +6,7 @@ enum Token {
   tComma, tSemicolon, tAtSign, tNumberSign,
   tLBracket, tRBracket, tAssign,
   tLess, tGreater, tLessOrEqual, tGreaterOrEqual,
-  // tEqual, tNotEqual,
+  tEqual, tNotEqual,
   tIncrement, tDecrement,
   tByte, tInt,
   tNone,

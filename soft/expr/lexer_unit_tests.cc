@@ -111,6 +111,9 @@ TEST_CASE("check Lexer tokens") {
 
   Lexer l11("$");
   CHECK_EQ(l11.currentToken(), tError);
+
+  Lexer l14("==");
+  CHECK_EQ(l14.currentToken(), tEqual);
 }
 
 TEST_CASE("check Lexer and many long strings") {
