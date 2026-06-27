@@ -114,6 +114,24 @@ TEST_CASE("check Lexer tokens") {
 
   Lexer l14("==");
   CHECK_EQ(l14.currentToken(), tEqual);
+
+  Lexer l15("<=");
+  CHECK_EQ(l15.currentToken(), tLessOrEqual);
+
+  Lexer l16(">=");
+  CHECK_EQ(l16.currentToken(), tGreaterOrEqual);
+
+  Lexer l17("!=");
+  CHECK_EQ(l17.currentToken(), tNotEqual);
+
+  Lexer l18("!");
+  CHECK_EQ(l18.currentToken(), tInversion);
+
+  Lexer l19("<");
+  CHECK_EQ(l19.currentToken(), tLess);
+
+  Lexer l20(">");
+  CHECK_EQ(l20.currentToken(), tGreater);
 }
 
 TEST_CASE("check Lexer and many long strings") {

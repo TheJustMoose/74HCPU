@@ -9,6 +9,7 @@ enum Token {
   tEqual, tNotEqual,
   tIncrement, tDecrement,
   tBool, tByte, tInt,
+  tInversion,
   tNone,
   tError, tEnd, tNotInitialized
 };

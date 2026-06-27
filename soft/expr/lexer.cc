@@ -125,6 +125,17 @@ void Lexer::findNextToken() {
     return;
   }
 
+  if (c == '!') {
+    c = readChar();
+    if (c == '=')
+      current_token_ = tNotEqual;
+    else {
+      current_token_ = tInversion;
+      idx_--;
+    }
+    return;
+  }
+
   switch (c) {
     case '*': current_token_ = tMul; return;
     case '/': current_token_ = tDiv; return;
