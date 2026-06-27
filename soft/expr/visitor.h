@@ -12,13 +12,14 @@ class VarDecl;
 
 class Visitor {
  public:
-  virtual void Visit(Node* n) {}
-  virtual void Visit(AssignOp* op) {}
-  virtual void Visit(BinOp* op) {}
-  virtual void Visit(RelationalOp* op) {}
-  virtual void Visit(UnMinus* op) {}
-  virtual void Visit(IncrementOp* op) {}
-  virtual void Visit(DereferenceOp* op) {}
-  virtual void Visit(Name* n) {}
-  virtual void Visit(VarDecl* n) {}
+  virtual void Visit(Node*) {}
+  virtual void Visit(AssignOp*) {}
+  virtual void Visit(BinOp*) {}
+  virtual void Visit(RelationalOp*) {}
+  virtual void Visit(UnMinus*) {}
+  virtual void Visit(IncrementOp*) {}
+  virtual void Visit(DereferenceOp*) {}
+  virtual void Visit(Name*) {}
+  virtual void Visit(AddressOf*) {}
+  virtual void Visit(VarDecl*) {}
 };
