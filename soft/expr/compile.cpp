@@ -103,7 +103,7 @@ class CodeCollector: public Visitor {
          << name_node->name() << " = "
          << asop_node->right->name() << endl;
 
-    res_code.emplace_back(name_node->name(), "", asop_node->right->name(), asop_node->get_num_pos(), "");
+    res_code.emplace_back(name_node->name(), "", asop_node->right->name(), asop_node->get_num_pos(), "", otArithmetic);
   }
 
   void Visit(BinOp* binop_node) override {
@@ -119,7 +119,7 @@ class CodeCollector: public Visitor {
     }
 
     res_code.emplace_back(binop_node->name(), binop_node->op(), binop_node->left->name(),
-                          binop_node->get_num_pos(), binop_node->right->name(), true);
+                          binop_node->get_num_pos(), binop_node->right->name(), otArithmetic, true);
   }
 
   void Visit(Name*) override {
@@ -136,7 +136,7 @@ class CodeCollector: public Visitor {
       cout << "right node is nullptr" << endl;
     else {
       res_code.emplace_back(relop_node->name(), relop_node->op(), relop_node->left->name(),
-                            relop_node->get_num_pos(), relop_node->right->name(), true);
+                            relop_node->get_num_pos(), relop_node->right->name(), otArithmetic, true);
     }
   }
 
@@ -146,13 +146,13 @@ class CodeCollector: public Visitor {
          << unop_node->op() << unop_node->child->name() << " " << endl;
 
     res_code.emplace_back(unop_node->name(), unop_node->op(), "",
-                          unop_node->get_num_pos(), unop_node->child->name(), true);
+                          unop_node->get_num_pos(), unop_node->child->name(), otArithmetic, true);
   }
 
   void Visit(VarDecl* vd_node) override {
     for (string n : vd_node->names)
       if (vd_node->values.find(n) != vd_node->values.end())
-        res_code.emplace_back(n, "", to_string(vd_node->values[n]), npLeft, "");
+        res_code.emplace_back(n, "", to_string(vd_node->values[n]), npLeft, "", otArithmetic);
   }
 
  private:

@@ -17,9 +17,15 @@ inline std::string NumPos2String(NumPos np) {
   }
 }
 
+enum OperationType {
+  otArithmetic,
+  otRelational
+};
+
 class Operation {
  private:
-  NumPos num_pos_ {npNone};  // private ;)
+  NumPos num_pos_ = npNone;
+  OperationType op_type_ = otArithmetic;
 
  public:
   std::string res_arg {};
@@ -30,13 +36,12 @@ class Operation {
   std::string right_arg {};  // so when we have x = a + b, a is left
   bool removed {false};      // but when x = a, a is left again!
 
-
   std::vector<bool> live_in_vars;   // live vars before Operation executing (LIVE_in)
   std::vector<bool> live_out_vars;  // live vars after Operation executing (LIVE_out)
 
   Operation(std::string res, std::string op, std::string l, NumPos num_pos,
-            std::string r, bool in_temp = false)
-    : res_arg(res), op_name(op), left_arg(l), num_pos_(num_pos),
+            std::string r, OperationType op_type, bool in_temp = false)
+    : res_arg(res), op_name(op), left_arg(l), num_pos_(num_pos), op_type_(op_type),
       right_arg(r), res_in_temp(in_temp) {}
 
   std::string str() const {
