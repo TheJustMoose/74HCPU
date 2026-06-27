@@ -1,13 +1,14 @@
 #pragma once
 
-class Node;
+class AddressOf;
 class AssignOp;
 class BinOp;
+class DereferenceOp;
+class IncrementOp;
+class Name;
+class Node;
 class RelationalOp;
 class UnMinus;
-class IncrementOp;
-class DereferenceOp;
-class Name;
 class VarDecl;
 
 class Visitor {
