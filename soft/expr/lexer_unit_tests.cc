@@ -51,9 +51,9 @@ TEST_CASE("check C++") {
 }
 
 TEST_CASE("check Lexer") {
-  Lexer l("a");
-  CHECK_EQ(l.currentToken(), tName);
-  CHECK_EQ(l.getStrValue(), "a");
+  Lexer l1("a");
+  CHECK_EQ(l1.currentToken(), tName);
+  CHECK_EQ(l1.getStrValue(), "a");
 
   Lexer l2("abcd");
   CHECK_EQ(l2.currentToken(), tName);
@@ -70,6 +70,9 @@ TEST_CASE("check Lexer") {
   Lexer l5("65535");
   CHECK_EQ(l5.currentToken(), tNum);
   CHECK_EQ(l5.getIntValue(), 65535);
+
+  Lexer l6("if");
+  CHECK_EQ(l6.currentToken(), tIf);
 }
 
 TEST_CASE("check Lexer tokens") {

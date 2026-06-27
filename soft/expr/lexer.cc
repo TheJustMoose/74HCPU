@@ -58,6 +58,11 @@ void Lexer::findNextToken() {
     if (c)
       idx_--;
 
+    if (name == "if") {
+      current_token_ = tIf;
+      return;
+    }
+
     var_name_ = name;
     if (var_name_ == "int")
       current_token_ = tInt;
