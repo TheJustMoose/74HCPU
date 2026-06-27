@@ -47,13 +47,13 @@ void PrintLiveVars(const vector<Operation>& res_code,
 
 class DataTypesSetter: public Visitor {
  public:
-  void Visit(Name* n) override {
-    if (!n)
+  void Visit(Name* nm_node) override {
+    if (!nm_node)
       return;
 
     Var v;
-    if (getVar(n->name(), v))
-      n->init_data_type(v.data_type);
+    if (getVar(nm_node->name(), v))
+      nm_node->init_data_type(v.data_type);
   }
 };
 
@@ -64,16 +64,16 @@ void SetDataTypes(Node* root) {
 
 class VarsCollector: public Visitor {
  public:
-  void Visit(BinOp* op) override {
-    if (!op)
+  void Visit(BinOp* binop_node) override {
+    if (!binop_node)
       return;
-    AddVar(op->name(), op->data_type(), false);  // is_ptr ?
+    AddVar(binop_node->name(), binop_node->data_type(), false);  // is_ptr ?
   }
 
-  void Visit(UnMinus* op) override {
-    if (!op)
+  void Visit(UnMinus* unop_node) override {
+    if (!unop_node)
       return;
-    AddVar(op->name(), op->data_type(), false);  // can we set is_ptr to true when argument is pointer?
+    AddVar(unop_node->name(), unop_node->data_type(), false);  // can we set is_ptr to true when argument is pointer?
   }
 };
 
@@ -87,13 +87,13 @@ class CodeCollector: public Visitor {
   CodeCollector(vector<Operation>& a_res_code)
     : res_code(a_res_code) {}
 
-  void Visit(AssignOp* op) override {
-    if (!op->left) {
+  void Visit(AssignOp* asop_node) override {
+    if (!asop_node->left) {
       cout << FuncGuard::stack_str() << "left == nullptr" << endl;
       return;
     }
 
-    Name* name_node = dynamic_cast<Name*>(op->left.get());
+    Name* name_node = dynamic_cast<Name*>(asop_node->left.get());
     if (!name_node) {
       cout << FuncGuard::stack_str() << "Error. left node is not variable (Name class)" << endl;
       return;
@@ -101,55 +101,58 @@ class CodeCollector: public Visitor {
 
     cout << FuncGuard::stack_str()
          << name_node->name() << " = "
-         << op->right->name() << endl;
+         << asop_node->right->name() << endl;
 
-    res_code.emplace_back(name_node->name(), "", op->right->name(), op->get_num_pos(), "");
+    res_code.emplace_back(name_node->name(), "", asop_node->right->name(), asop_node->get_num_pos(), "");
   }
 
-  void Visit(BinOp* op) override {
-    if (!op->left)
+  void Visit(BinOp* binop_node) override {
+    if (!binop_node->left)
       cout << "left node is nullptr" << endl;
-    else if (!op->right)
+    else if (!binop_node->right)
       cout << "right node is nullptr" << endl;
     else {
       // Okay, let's put operation result into temp variable
-      cout << FuncGuard::stack_str() << op->name() << " = "
-           << op->left->name() << " " << op->op() << " "
-           << op->right->name() << endl;
+      cout << FuncGuard::stack_str() << binop_node->name() << " = "
+           << binop_node->left->name() << " " << binop_node->op() << " "
+           << binop_node->right->name() << endl;
     }
 
-    res_code.emplace_back(op->name(), op->op(), op->left->name(), op->get_num_pos(), op->right->name(), true);
+    res_code.emplace_back(binop_node->name(), binop_node->op(), binop_node->left->name(),
+                          binop_node->get_num_pos(), binop_node->right->name(), true);
   }
 
-  void Visit(Name* n) override {
+  void Visit(Name*) override {
     // name value will be used by other nodes
   }
 
-  void Visit(Node* n) override {
+  void Visit(Node*) override {
   }
 
-  void Visit(RelationalOp* op) {
-    if (!op->left)
+  void Visit(RelationalOp* relop_node) {
+    if (!relop_node->left)
       cout << "left node is nullptr" << endl;
-    else if (!op->right)
+    else if (!relop_node->right)
       cout << "right node is nullptr" << endl;
     else {
-      res_code.emplace_back(op->name(), op->op(), op->left->name(), op->get_num_pos(), op->right->name(), true);
+      res_code.emplace_back(relop_node->name(), relop_node->op(), relop_node->left->name(),
+                            relop_node->get_num_pos(), relop_node->right->name(), true);
     }
   }
 
-  void Visit(UnMinus* op) override {
+  void Visit(UnMinus* unop_node) override {
     // the negative value is stored in the tree in two nodes: ntUMinus + ntNum
-    cout << FuncGuard::stack_str() << op->name() << " = "
-         << op->op() << op->child->name() << " " << endl;
+    cout << FuncGuard::stack_str() << unop_node->name() << " = "
+         << unop_node->op() << unop_node->child->name() << " " << endl;
 
-    res_code.emplace_back(op->name(), op->op(), "", op->get_num_pos(), op->child->name(), true);
+    res_code.emplace_back(unop_node->name(), unop_node->op(), "",
+                          unop_node->get_num_pos(), unop_node->child->name(), true);
   }
 
-  void Visit(VarDecl* vd) override {
-    for (string n : vd->names)
-      if (vd->values.find(n) != vd->values.end())
-        res_code.emplace_back(n, "", to_string(vd->values[n]), npLeft, "");
+  void Visit(VarDecl* vd_node) override {
+    for (string n : vd_node->names)
+      if (vd_node->values.find(n) != vd_node->values.end())
+        res_code.emplace_back(n, "", to_string(vd_node->values[n]), npLeft, "");
   }
 
  private:

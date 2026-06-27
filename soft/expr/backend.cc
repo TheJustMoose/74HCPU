@@ -214,7 +214,7 @@ void Backend::GenerateBinOps(RegsBank0& bank0, Operation op) {
   string line1 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg);
   AddAsmInstruction(line1, cmnt1, bank0.DumpRegs());
 
-  string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
+  string cmnt2 = op.res_arg + " " + op.op_name + " := " + op.right_arg;  // c += b
 
   string cmd;
   if (op.op_name == "+")
