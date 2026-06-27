@@ -87,9 +87,6 @@ class CodeCollector: public Visitor {
   CodeCollector(vector<Operation>& a_res_code)
     : res_code(a_res_code) {}
 
-  void Visit(Node* n) override {
-  }
-
   void Visit(AssignOp* op) override {
     if (!op->left) {
       cout << FuncGuard::stack_str() << "left == nullptr" << endl;
@@ -124,6 +121,13 @@ class CodeCollector: public Visitor {
     res_code.emplace_back(op->name(), op->op(), op->left->name(), op->get_num_pos(), op->right->name(), true);
   }
 
+  void Visit(Name* n) override {
+    // name value will be used by other nodes
+  }
+
+  void Visit(Node* n) override {
+  }
+
   void Visit(RelationalOp* op) {
     if (!op->left)
       cout << "left node is nullptr" << endl;
@@ -140,10 +144,6 @@ class CodeCollector: public Visitor {
          << op->op() << op->child->name() << " " << endl;
 
     res_code.emplace_back(op->name(), op->op(), "", op->get_num_pos(), op->child->name(), true);
-  }
-
-  void Visit(Name* n) override {
-    // name value will be used by other nodes
   }
 
   void Visit(VarDecl* vd) override {

@@ -13,39 +13,45 @@
 #include <string>
 #include <vector>
 
-class Num: public Node {
+class AddressOf: public Node {
  public:
-  Num(int value);
+  AddressOf(std::unique_ptr<Node> n);
 
-  std::string name() const override {
-    return std::to_string(value_);
+  std::string name() const override { return "addrof"; }
+  std::string op() const override { return "#"; }
+
+  DataType data_type() override;
+  bool is_pointer() { return true; }
+
+  void accept(Visitor* v) override {
+    v->Visit(this);
   }
-  int value() const { return value_; }
 
-  DataType data_type() override { return dtByte; }
-
-  void accept(Visitor* v) override { v->Visit(this); }
-
- private:
-  int value_ {0};
+  std::unique_ptr<Node> child;
 };
 
-class Name: public Node {
+class AssignOp: public Node {
  public:
-  Name(std::string value);
-  void init_data_type(DataType dt) {
-    data_type_ = dt;
+  AssignOp();
+
+  std::string op() const override { return "="; }
+  std::string name() const override { return left ? left->name() : "eq"; }
+
+  DataType data_type() override;
+
+  NumPos get_num_pos() {
+    bool is_num = right && (right->node_type() == ntNum);
+    return is_num ? npLeft : npNone;
   }
 
-  std::string name() const override { return value_; }
+  void accept(Visitor* v) override {
+    left->accept(v);
+    right->accept(v);
+    v->Visit(this);
+  }
 
-  DataType data_type() override { return data_type_; }
-
-  void accept(Visitor* v) override { v->Visit(this); }
-
- private:
-  std::string value_ {""};
-  DataType data_type_ {dtNotInitialize};
+  std::unique_ptr<Node> left;
+  std::unique_ptr<Node> right;
 };
 
 class BinOp: public Node {
@@ -81,6 +87,66 @@ class BinOp: public Node {
 
  private:
   std::string name_ {"bo"};
+};
+
+class DereferenceOp: public Node {
+ public:
+  DereferenceOp(std::unique_ptr<Node> n);
+
+  std::unique_ptr<Node> child;
+
+  DataType data_type() override;
+
+  void accept(Visitor* v) override {}
+};
+
+class IncrementOp: public Node {
+ public:
+  IncrementOp(std::unique_ptr<Name> nm);
+
+  std::unique_ptr<Name> child;
+
+  DataType data_type() override;
+
+  void accept(Visitor* v) override {
+    //child->accept(v);
+    //v->Visit(this);
+  }
+};
+
+class Name: public Node {
+ public:
+  Name(std::string value);
+  void init_data_type(DataType dt) {
+    data_type_ = dt;
+  }
+
+  std::string name() const override { return value_; }
+
+  DataType data_type() override { return data_type_; }
+
+  void accept(Visitor* v) override { v->Visit(this); }
+
+ private:
+  std::string value_ {""};
+  DataType data_type_ {dtNotInitialize};
+};
+
+class Num: public Node {
+ public:
+  Num(int value);
+
+  std::string name() const override {
+    return std::to_string(value_);
+  }
+  int value() const { return value_; }
+
+  DataType data_type() override { return dtByte; }
+
+  void accept(Visitor* v) override { v->Visit(this); }
+
+ private:
+  int value_ {0};
 };
 
 class RelationalOp: public Node {
@@ -143,72 +209,6 @@ class UnMinus: public Node {
 
  private:
   std::string name_{"um"};
-};
-
-class IncrementOp: public Node {
- public:
-  IncrementOp(std::unique_ptr<Name> nm);
-
-  std::unique_ptr<Name> child;
-
-  DataType data_type() override;
-
-  void accept(Visitor* v) override {
-    //child->accept(v);
-    //v->Visit(this);
-  }
-};
-
-class DereferenceOp: public Node {
- public:
-  DereferenceOp(std::unique_ptr<Node> n);
-
-  std::unique_ptr<Node> child;
-
-  DataType data_type() override;
-
-  void accept(Visitor* v) override {}
-};
-
-class AssignOp: public Node {
- public:
-  AssignOp();
-
-  std::string op() const override { return "="; }
-  std::string name() const override { return left ? left->name() : "eq"; }
-
-  DataType data_type() override;
-
-  NumPos get_num_pos() {
-    bool is_num = right && (right->node_type() == ntNum);
-    return is_num ? npLeft : npNone;
-  }
-
-  void accept(Visitor* v) override {
-    left->accept(v);
-    right->accept(v);
-    v->Visit(this);
-  }
-
-  std::unique_ptr<Node> left;
-  std::unique_ptr<Node> right;
-};
-
-class AddressOf: public Node {
- public:
-  AddressOf(std::unique_ptr<Node> n);
-
-  std::string name() const override { return "addrof"; }
-  std::string op() const override { return "#"; }
-
-  DataType data_type() override;
-  bool is_pointer() { return true; }
-
-  void accept(Visitor* v) override {
-    v->Visit(this);
-  }
-
-  std::unique_ptr<Node> child;
 };
 
 class VarDecl: public Node {
