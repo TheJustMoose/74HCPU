@@ -102,6 +102,10 @@ class Operation {
     return num_pos_;
   }
 
+  OperationType op_type() {
+    return op_type_;
+  }
+
   void clear() {
     removed = true;
   }

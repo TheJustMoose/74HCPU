@@ -225,16 +225,30 @@ void Backend::GenerateBinOps(RegsBank0& bank0, Operation op) {
     cmd = "mul";
   else if (op.op_name == "/")
     cmd = "/ - not implemented!";
-  else if (op.op_name == "<")
-    cmd = "cmp";
-  else if (op.op_name == ">")
-    cmd = "cmp";
   else
     cmd = "unk";
 
   string right_val = (op.num_pos() == npRight) ? op.right_arg : bank0.FindRegFor(op.right_arg);
   string line2 = cmd + " " + res_reg + ", " + right_val;
   AddAsmInstruction(line2, cmnt2, bank0.DumpRegs());
+}
+
+void Backend::GenerateRelOps(RegsBank0& bank0, Operation op) {
+  // c = a > b
+  string cmnt1 = op.res_arg + " = " + op.left_arg + " " + op.op_name + " " + op.right_arg;
+
+  string cmd;
+  if (op.op_name == "<")
+    cmd = "cmp";
+  else if (op.op_name == ">")
+    cmd = "cmp";
+  else
+    cmd = "unk";
+
+  string left_reg = bank0.FindRegFor(op.left_arg);
+  string right_val = (op.num_pos() == npRight) ? op.right_arg : bank0.FindRegFor(op.right_arg);
+  string line1 = cmd + " " + left_reg + ", " + right_val;
+  AddAsmInstruction(line1, cmnt1, bank0.DumpRegs());
 }
 
 void Backend::GenerateCode(vector<Operation> code) {
@@ -244,7 +258,9 @@ void Backend::GenerateCode(vector<Operation> code) {
   res_asm_.clear();
 
   for (Operation op : code) {
-    if (!op.op_name.size()) {  // empty op_name means assignment
+    if (op.op_type() == otRelational) {
+      GenerateRelOps(bank0, op);
+    } else if (!op.op_name.size()) {  // empty op_name means assignment
       Var v;
       if (!getVar(op.res_arg, v)) {
         cout << "Variable " << op.res_arg << " was not declared" << endl;

@@ -136,7 +136,7 @@ class CodeCollector: public Visitor {
       cout << "right node is nullptr" << endl;
     else {
       res_code.emplace_back(relop_node->name(), relop_node->op(), relop_node->left->name(),
-                            relop_node->get_num_pos(), relop_node->right->name(), otArithmetic, true);
+                            relop_node->get_num_pos(), relop_node->right->name(), otRelational, true);
     }
   }
 
