@@ -307,7 +307,7 @@ unique_ptr<Node> expr() {
 // Assignment ::= Expression [ '=' Assignment ];
 unique_ptr<Node> assign() {
   FuncGuard fg("assi");
-  unique_ptr<Node> left = expr();  // a
+  unique_ptr<Node> left = expr();  // a (lvalue)
   if (!left)
     return {};
 
@@ -319,7 +319,7 @@ unique_ptr<Node> assign() {
     if (!n)
       throw logic_error("dynamic_cast<Name*> return NULL");
 /*
-    // вынести на потом:
+    // вынести на потом ("семантический" анализ?):
     if (!isDeclared(n->name(), &var_size))
       cout << "You try to assign to variable \"" << n->name()
            << "\" which has not been declared" << endl;
@@ -401,6 +401,7 @@ unique_ptr<Node> declare() {
       Lexer::instance().consume();  // skip comma
       t = Lexer::instance().currentToken();
     } else if (t == tSemicolon) {
+      Lexer::instance().consume();  // skip semicolon
       return n;
     } else {
       cout << "Error. Please add ';' to the end of declaration" << endl;
@@ -440,17 +441,19 @@ Statement ::= Assignment ';'
           ;
 */
 unique_ptr<Node> stmt() {
+  FuncGuard fg("stmt");
+
   Token t = Lexer::instance().currentToken();
   if (t == tIf) {
     Lexer::instance().consume();
     return if_statement();
+  } else {
+    return assign();
   }
-
-  return assign();  // хорошо бы понять, почему #a теперь не генерирует инструкцию
 }
 
 bool stmts(vector<unique_ptr<Node>>& statements) {
-  FuncGuard fg("stmt");
+  FuncGuard fg("stmts");
 
   while (unique_ptr<Node> decl = declare()) {
     statements.push_back(std::move(decl));
