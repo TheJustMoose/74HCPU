@@ -53,6 +53,7 @@ map<Token, string> TokenName {
   {tByte, "tByte"},
   {tInt, "tInt"},
   {tInversion, "tInversion"},
+  {tIf, "tIf"},
   {tNone, "tNone"},
   {tError, "tError"},
   {tEnd, "tEnd"},

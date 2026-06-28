@@ -26,7 +26,7 @@ TEST_CASE("Parser: smoke test") {
   CHECK_EQ(bop->right->node_type(), ntNum);
 }
 
-TEST_CASE("Parser: address of test") {
+TEST_CASE("Parser: address_of test") {
   Lexer::instance().setInputString("int a; #a;");
 
   vector<unique_ptr<Node>> statements;
