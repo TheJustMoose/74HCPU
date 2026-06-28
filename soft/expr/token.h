@@ -10,6 +10,7 @@ enum Token {
   tIncrement, tDecrement,
   tBool, tByte, tInt,
   tInversion,
+  tIf,
   tNone,
   tError, tEnd, tNotInitialized
 };

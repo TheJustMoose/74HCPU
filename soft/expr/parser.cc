@@ -111,6 +111,13 @@ Program             ::= GlobalDeclarations FunctionDefinitions;
 
 */
 
+std::unique_ptr<Node> prim();
+std::unique_ptr<Node> term();
+std::unique_ptr<Node> expr();
+std::unique_ptr<Node> assign();
+std::unique_ptr<Node> declare();
+std::unique_ptr<Node> stmt();
+
 int tmp_var_counter {0};
 string new_tmp() {
   return string("t") + to_string(tmp_var_counter++);
@@ -349,11 +356,13 @@ unique_ptr<Node> declare() {
     dt = dtInt;
   } else if (t == tByte) {
     dt = dtByte;
+  } else if (t == tBool) {
+    dt = dtNotInitialize;  // TODO: fix it
   } else {
     return {};
   }
 
-  Lexer::instance().consume();  // skip int
+  Lexer::instance().consume();  // skip type name
 
   bool is_ptr = false;
   t = Lexer::instance().currentToken();
@@ -403,16 +412,49 @@ unique_ptr<Node> declare() {
   return {};
 }
 
+// IfStatement ::= 'if' '(' Expression ')' Statement [ 'else' Statement ];
+unique_ptr<Node> if_statement() {
+  Token t = Lexer::instance().currentToken();
+  if (t != tLBracket)
+    throw logic_error("If require brackets for condition");
+
+  Lexer::instance().consume();
+  unique_ptr<Node> left = expr();
+
+  if (t != tRBracket)
+    throw logic_error("If require brackets for condition");
+  Lexer::instance().consume();
+
+  unique_ptr<Node> body = stmt();
+
+  // TODO: now we should create if node
+  return {};
+}
+
+/*
+Statement ::= Assignment ';'
+          |   WhileStatement
+          |   IfStatement
+          |   Block
+          |   ReturnStatement
+          ;
+*/
 unique_ptr<Node> stmt() {
-  // stmt -> assign | declare
-  unique_ptr<Node> n = declare();
-  if (!n)
-    n = std::move(assign());
-  return n;
+  Token t = Lexer::instance().currentToken();
+  if (t == tIf) {
+    Lexer::instance().consume();
+    return if_statement();
+  }
+
+  return assign();  // хорошо бы понять, почему #a теперь не генерирует инструкцию
 }
 
 bool stmts(vector<unique_ptr<Node>>& statements) {
   FuncGuard fg("stmt");
+
+  while (unique_ptr<Node> decl = declare()) {
+    statements.push_back(std::move(decl));
+  }
 
   unique_ptr<Node> n(stmt());
   Token t = Lexer::instance().currentToken();

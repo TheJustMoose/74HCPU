@@ -31,7 +31,7 @@ TEST_CASE("Parser: address of test") {
 
   vector<unique_ptr<Node>> statements;
   CHECK(stmts(statements));
-  CHECK_EQ(statements.size(), 2U);  // declaration + address of
+  REQUIRE_EQ(statements.size(), 2U);  // declaration + address of
 
   Node* n = statements[1].get();
   CHECK(n);
