@@ -4,9 +4,10 @@
 
 enum DataType {
   dtNotInitialize = 0,
-  dtBool = 1,
-  dtByte = 2,
-  dtInt = 3,
+  dtNotApplicable = 1,
+  dtBool = 2,
+  dtByte = 3,
+  dtInt = 4
 };
 
 std::string GetDataTypeName(DataType);

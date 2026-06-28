@@ -100,6 +100,18 @@ class DereferenceOp: public Node {
   void accept(Visitor* v) override {}
 };
 
+class IfStatement: public Node {
+ public:
+  IfStatement();
+
+  std::unique_ptr<Node> cond;
+  std::unique_ptr<Node> body;
+
+  DataType data_type() override { return dtNotApplicable; }
+
+  void accept(Visitor* v) override {}
+};
+
 class IncrementOp: public Node {
  public:
   IncrementOp(std::unique_ptr<Name> nm);

@@ -67,6 +67,10 @@ DataType UnMinus::data_type() {
     return dtNotInitialize;
 }
 
+IfStatement::IfStatement()
+  : Node(ntIfStatement) {
+}
+
 IncrementOp::IncrementOp(unique_ptr<Name> nm)
   : Node(ntIncrement), child(std::move(nm)) {
 }

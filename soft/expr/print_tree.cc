@@ -57,6 +57,11 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
   } else if (IncrementOp* iop = dynamic_cast<IncrementOp*>(n)) {
     lvl++;
     Tree2List(iop->child.get(), mid, lvl);
+  } else if (IfStatement* ifop = dynamic_cast<IfStatement*>(n)) {
+    lvl++;
+    int offset = kWidth / (lvl*2 + 5);
+    Tree2List(ifop->cond.get(), mid - offset, lvl);
+    Tree2List(ifop->body.get(), mid + offset, lvl);
   } else {
     //cout << "Node: " << GetNodeTypeName(n->node_type()) << endl;
   }
@@ -128,6 +133,9 @@ void PrintTree(Node* n) {
 
     if (const VarDecl* vard_node = dynamic_cast<const VarDecl*>(n))
       name = vard_node->var_names();
+
+    if (const IfStatement* ifstmt_node = dynamic_cast<const IfStatement*>(n))
+      name = ifstmt_node->name();
 
     TypeStringIntoTheBuffer(
         line,

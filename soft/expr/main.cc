@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
       stringstream buf;
       buf << f.rdbuf();
-      cout << "source code: " << buf.str() << endl;
+      cout << "source code:\n" << buf.str() << endl;
       try {
         Compile(buf.str());
       } catch (const std::exception& e) {

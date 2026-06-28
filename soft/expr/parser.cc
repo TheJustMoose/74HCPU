@@ -420,19 +420,19 @@ unique_ptr<Node> if_statement() {
   Token t = Lexer::instance().currentToken();
   if (t != tLBracket)
     throw logic_error("If require brackets for condition but got " + GetTokenName(t));
-
   Lexer::instance().consume();
-  unique_ptr<Node> left = expr();
+
+  unique_ptr<Node> cond = expr();
 
   t = Lexer::instance().currentToken();
   if (t != tRBracket)
     throw logic_error("If require brackets for condition but got " + GetTokenName(t));
   Lexer::instance().consume();
 
-  unique_ptr<Node> body = stmt();
-
-  // TODO: now we should create if node
-  return {};
+  unique_ptr<IfStatement> res = make_unique<IfStatement>();
+  res->cond = std::move(cond);
+  res->body = std::move(stmt());
+  return res;
 }
 
 /*

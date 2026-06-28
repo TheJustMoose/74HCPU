@@ -22,6 +22,7 @@ map<NodeType, string> NodeName {
   {ntGreater, "ntGreater"},
   {ntLessOrEqual, "ntLessOrEqual"},
   {ntGreaterOrEqual, "ntGreaterOrEqual"},
+  {ntIfStatement, "ntIfStatement"},
   {ntUnknown, "ntUnknown"},
   {ntVarDecl, "ntVarDecl"},
   {ntNull, "ntNull"},
