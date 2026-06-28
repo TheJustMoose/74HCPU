@@ -17,20 +17,19 @@ void Lexer::consume() {
 }
 
 char Lexer::readChar() {
-  char res = (idx_ < input_string_.size()) ? input_string_[idx_++] : 0;
-  return res;
+  return (idx_ < input_string_.size()) ? input_string_[idx_++] : 0;
 }
 
 void Lexer::findNextToken() {
-  if (idx_ >= input_string_.size()) {
-    current_token_ = tEnd;
-    return;
-  }
-
   char c = readChar();
   if (isspace(c)) {     // if we have space, we have to skip it
     while (isspace(c))  // example: a b c
       c = readChar();
+  }
+
+  if (c == 0) {
+    current_token_ = tEnd;
+    return;
   }
 
   // Okay, now c != space
