@@ -223,7 +223,7 @@ unique_ptr<Node> term() {
 
 // AdditiveExpr ::= Term { ('+' | '-') Term };
 unique_ptr<Node> additive_expr() {
-  FuncGuard fg("expr");
+  FuncGuard fg("additive_expr");
   unique_ptr<Node> left = term();
   if (!left)
     return {};
@@ -255,7 +255,7 @@ unique_ptr<Node> relational_expr() {
   Token t = Lexer::instance().currentToken();
   // Comparison operations, unlike arithmetic operations (a + b + c + ...),
   // usually contain only two operands (a < b).
-  // So whill use if instead of while.
+  // So will use if instead of while.
   if (t == tLess || t == tGreater || t == tLessOrEqual || t == tGreaterOrEqual) {
     Lexer::instance().consume();
 
@@ -264,6 +264,7 @@ unique_ptr<Node> relational_expr() {
     unique_ptr<RelationalOp> op = make_unique<RelationalOp>(t, new_tmp());
     op->left = std::move(left);
     op->right = std::move(right);
+    cout << "Will return RelationalOp..." << endl;
     return op;
   }
 
@@ -344,6 +345,7 @@ unique_ptr<Node> assign() {
   return res;
 }
 
+// GlobalDeclarations ::= { Declaration ';' };
 unique_ptr<Node> declare() {
   FuncGuard fg("decl");
 
@@ -417,13 +419,14 @@ unique_ptr<Node> declare() {
 unique_ptr<Node> if_statement() {
   Token t = Lexer::instance().currentToken();
   if (t != tLBracket)
-    throw logic_error("If require brackets for condition");
+    throw logic_error("If require brackets for condition but got " + GetTokenName(t));
 
   Lexer::instance().consume();
   unique_ptr<Node> left = expr();
 
+  t = Lexer::instance().currentToken();
   if (t != tRBracket)
-    throw logic_error("If require brackets for condition");
+    throw logic_error("If require brackets for condition but got " + GetTokenName(t));
   Lexer::instance().consume();
 
   unique_ptr<Node> body = stmt();
