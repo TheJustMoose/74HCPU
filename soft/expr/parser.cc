@@ -452,8 +452,8 @@ unique_ptr<Node> stmt() {
   }
 }
 
-bool stmts(vector<unique_ptr<Node>>& statements) {
-  FuncGuard fg("stmts");
+bool program(vector<unique_ptr<Node>>& statements) {
+  FuncGuard fg("program");
 
   while (unique_ptr<Node> decl = declare()) {
     statements.push_back(std::move(decl));

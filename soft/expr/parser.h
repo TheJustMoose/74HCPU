@@ -6,4 +6,4 @@
 
 #include "node.h"
 
-bool stmts(std::vector<std::unique_ptr<Node>>& statements);
+bool program(std::vector<std::unique_ptr<Node>>& statements);

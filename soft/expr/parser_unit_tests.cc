@@ -12,7 +12,7 @@ TEST_CASE("Parser: smoke test") {
   Lexer::instance().setInputString("1+2;");
 
   vector<unique_ptr<Node>> statements;
-  CHECK(stmts(statements));
+  CHECK(program(statements));
   CHECK_EQ(statements.size(), 1U);
 
   Node* n = statements[0].get();
@@ -30,7 +30,7 @@ TEST_CASE("Parser: address_of test") {
   Lexer::instance().setInputString("int a; #a;");
 
   vector<unique_ptr<Node>> statements;
-  CHECK(stmts(statements));
+  CHECK(program(statements));
   REQUIRE_EQ(statements.size(), 2U);  // declaration + address of
 
   Node* n = statements[1].get();

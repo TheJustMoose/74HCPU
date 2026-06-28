@@ -170,7 +170,7 @@ int Compile(string code) {
   Lexer::instance().setInputString(code);
 
   vector<unique_ptr<Node>> statements;
-  if (!stmts(statements))
+  if (!program(statements))
     return 1;
 
   for (size_t i = 0; i < statements.size(); i++) {
