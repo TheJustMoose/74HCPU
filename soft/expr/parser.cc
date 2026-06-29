@@ -458,24 +458,9 @@ bool program(vector<unique_ptr<Node>>& statements) {
   }
 
   unique_ptr<Node> n(stmt());
-  Token t = Lexer::instance().currentToken();
   while (n) {
-    if (t == tSemicolon) {
-      if (!n) {
-        cout << "Node == null was returned from stmt()" << endl;
-        break;
-      }
-
       statements.push_back(std::move(n));
-
-      Lexer::instance().consume();
       n = stmt();
-      t = Lexer::instance().currentToken();
-    } else {
-      cout << FuncGuard::stack_str()
-           << "**** Error. Please add ';' to the end of statement ****" << endl;
-      return false;
-    }
   }
 
   return true;
