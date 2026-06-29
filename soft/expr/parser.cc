@@ -457,10 +457,8 @@ bool program(vector<unique_ptr<Node>>& statements) {
     statements.push_back(std::move(decl));
   }
 
-  unique_ptr<Node> n(stmt());
-  while (n) {
-      statements.push_back(std::move(n));
-      n = stmt();
+  while (unique_ptr<Node> st = stmt()) {
+    statements.push_back(std::move(st));
   }
 
   return true;
