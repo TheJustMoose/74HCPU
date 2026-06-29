@@ -110,7 +110,6 @@ class IfStatement: public Node {
   DataType data_type() override { return dtNotApplicable; }
 
   void accept(Visitor* v) override {
-    cond->accept(v);
     v->Visit(this);
   }
 };

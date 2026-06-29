@@ -18,6 +18,11 @@
 
 using namespace std;
 
+int label_counter {0};
+string new_label() {
+  return to_string(label_counter++);
+}
+
 void PrintTableHeader() {
   cout << "| res | = | left|  op |right| numIn | optype|" << endl;
 }
@@ -127,8 +132,19 @@ class CodeCollector: public Visitor {
                           binop_node->get_num_pos(), binop_node->right->name(), otBinaryArithm, true);
   }
 
-  void Visit(IfStatement*) override {
+  void Visit(IfStatement* if_node) override {
     cout << "Visit(IfStatement*)" << endl;
+    if (!if_node->cond)
+      cout << "condition node is nullptr" << endl;
+    else if (!if_node->body)
+      cout << "body node is nullptr" << endl;
+    else {
+      if_node->cond->accept(this);
+      if (RelationalOp* rop = dynamic_cast<RelationalOp*>(if_node->cond.get()))
+        res_code.emplace_back("jcnd", "", "then" + new_label(),
+                              npNone, "else" + new_label(), otBranch);
+      if_node->body->accept(this);
+    }
   }
 
   void Visit(Name*) override {

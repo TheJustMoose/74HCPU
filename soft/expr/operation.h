@@ -21,7 +21,10 @@ enum OperationType {
   otBinaryArithm,
   otUnaryArithm,
   otAssignment,
-  otRelational
+  otRelational,
+  otJmp,
+  otBranch,
+  otLabel
 };
 
 inline std::string OpType2String(OperationType ot) {
@@ -30,6 +33,9 @@ inline std::string OpType2String(OperationType ot) {
     case otUnaryArithm: return " unop";
     case otAssignment: return "assig";
     case otRelational: return "relat";
+    case otJmp: return "jmp";
+    case otBranch: return "brnch";
+    case otLabel: return "label";
     default: return "unknown OperationType";
   }
 }
