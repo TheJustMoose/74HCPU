@@ -105,7 +105,8 @@ class IfStatement: public Node {
   IfStatement();
 
   std::unique_ptr<Node> cond;
-  std::unique_ptr<Node> body;
+  std::unique_ptr<Node> then_body;
+  std::unique_ptr<Node> else_body;
 
   DataType data_type() override { return dtNotApplicable; }
 

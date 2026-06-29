@@ -23,6 +23,8 @@ map<const Node*, int> gNodeLevel;
 map<const Node*, int> gNodeOffset;
 
 void Tree2List(Node* n, int mid, int lvl = 0) {
+  if (!n)
+    return;
   gLinearTree.push_back(n);
   gNodeLevel[n] = lvl;
   gNodeOffset[n] = mid;
@@ -61,7 +63,8 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
     lvl++;
     int offset = kWidth / (lvl*2 + 5);
     Tree2List(ifop->cond.get(), mid - offset, lvl);
-    Tree2List(ifop->body.get(), mid + offset, lvl);
+    Tree2List(ifop->then_body.get(), mid + offset, lvl);
+    Tree2List(ifop->else_body.get(), mid + offset, lvl);
   } else {
     //cout << "Node: " << GetNodeTypeName(n->node_type()) << endl;
   }

@@ -23,6 +23,14 @@ string new_label() {
   return to_string(label_counter++);
 }
 
+string RelationalOp2Branch(string op) {
+  if (op == "<")
+    return "jl";
+  if (op == ">")
+    return "jg";
+  return "unk_br";
+}
+
 void PrintTableHeader() {
   cout << "|   res   | = |   left  |    op   |  right  |   numIn  |  optype  |" << endl;
 }
@@ -132,18 +140,54 @@ class CodeCollector: public Visitor {
                           binop_node->get_num_pos(), binop_node->right->name(), otBinaryArithm, true);
   }
 
+  /*
+      if (a > b) {
+          c = 1;
+      } else {
+          c = 2;
+      }
+      d = c + 5;
+
+      cmp a, b           // сравнить a и b
+      jle L_else         // если a <= b, перейти в else
+      c = 1
+      goto L_end
+  L_else:
+      c = 2
+  L_end:
+      d = c + 5
+  */
   void Visit(IfStatement* if_node) override {
     cout << "Visit(IfStatement*)" << endl;
-    if (!if_node->cond)
+    if (!if_node->then_body)
+      cout << "then_body node is nullptr" << endl;
+    else if (!if_node->cond)
       cout << "condition node is nullptr" << endl;
-    else if (!if_node->body)
-      cout << "body node is nullptr" << endl;
-    else {
-      if_node->cond->accept(this);
-      if (RelationalOp* rop = dynamic_cast<RelationalOp*>(if_node->cond.get()))
-        res_code.emplace_back("jcnd", "", "then" + new_label(),
-                              npNone, "else" + new_label(), otBranch);
-      if_node->body->accept(this);
+    else if (RelationalOp* rop = dynamic_cast<RelationalOp*>(if_node->cond.get())) {
+        if_node->cond->accept(this);
+
+        string end_label = "endif" + new_label();
+        string then_label = "then" + new_label();
+        string else_label = "else" + new_label();
+
+        string br = RelationalOp2Branch(rop->op());
+        res_code.emplace_back(br, "", then_label,
+                              npNone, "", otBranch);
+
+        res_code.emplace_back(else_label, "", "",
+                              npNone, "", otLabel);
+        if (if_node->else_body)
+          if_node->else_body->accept(this);
+        res_code.emplace_back("jmp", "", end_label,
+                              npNone, "", otJmp);
+        res_code.emplace_back(then_label, "", "",
+                              npNone, "", otLabel);
+        if (if_node->then_body)
+          if_node->then_body->accept(this);
+        res_code.emplace_back(end_label, "", "",
+                              npNone, "", otLabel);
+    } else {
+        cout << "IfStatement require RelationalOp as a condition" << endl;
     }
   }
 

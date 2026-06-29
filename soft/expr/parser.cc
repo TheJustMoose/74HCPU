@@ -431,7 +431,7 @@ unique_ptr<Node> if_statement() {
 
   unique_ptr<IfStatement> res = make_unique<IfStatement>();
   res->cond = std::move(cond);
-  res->body = std::move(stmt());
+  res->then_body = std::move(stmt());
   return res;
 }
 
