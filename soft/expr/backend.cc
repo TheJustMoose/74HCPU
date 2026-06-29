@@ -273,6 +273,7 @@ void Backend::GenerateCode(vector<Operation> code) {
       GenerateAssignment(bank0, op, v);
     } else {
       cout << "**** FIXME! ****" << endl;
+      cout << "Unknown op type: " << (int)op.op_type() << endl;
     }
 
     FreeTheRegisters(bank0, op);
