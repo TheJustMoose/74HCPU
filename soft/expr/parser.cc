@@ -441,7 +441,9 @@ unique_ptr<Node> stmt() {
   FuncGuard fg("stmt");
 
   Token t = Lexer::instance().currentToken();
-  if (t == tIf) {
+  if (t == tEnd) {
+    return {};
+  } else if (t == tIf) {
     Lexer::instance().consume();
     return if_statement();
   } else {
