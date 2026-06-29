@@ -18,8 +18,12 @@
 
 using namespace std;
 
+void PrintTableHeader() {
+  cout << "| res | = | left|  op |right| numIn | optype|" << endl;
+}
+
 void Print(const vector<Operation>& res_code) {
-  cout << "| res | = | left|  op |right| numIn |" << endl;
+  PrintTableHeader();
   for (const Operation& r : res_code)
     cout << r.raw() << endl;
 }
@@ -38,7 +42,7 @@ void PrintIR(const vector<Operation>& res_code) {
 
 void PrintLiveVars(const vector<Operation>& res_code,
                    map<size_t, string> idx_to_var) {
-  cout << "| res | = | left|  op |right| numIn |" << endl;
+  PrintTableHeader();
   for (const Operation& r : res_code) {
     cout << r.raw() << endl;
     cout << r.live_vars_str(idx_to_var) << endl;
@@ -103,7 +107,8 @@ class CodeCollector: public Visitor {
          << name_node->name() << " = "
          << asop_node->right->name() << endl;
 
-    res_code.emplace_back(name_node->name(), "", asop_node->right->name(), asop_node->get_num_pos(), "", otArithmetic);
+    res_code.emplace_back(name_node->name(), "", asop_node->right->name(),
+                          asop_node->get_num_pos(), "", otAssignment);
   }
 
   void Visit(BinOp* binop_node) override {
@@ -119,7 +124,11 @@ class CodeCollector: public Visitor {
     }
 
     res_code.emplace_back(binop_node->name(), binop_node->op(), binop_node->left->name(),
-                          binop_node->get_num_pos(), binop_node->right->name(), otArithmetic, true);
+                          binop_node->get_num_pos(), binop_node->right->name(), otBinaryArithm, true);
+  }
+
+  void Visit(IfStatement*) override {
+    cout << "Visit(IfStatement*)" << endl;
   }
 
   void Visit(Name*) override {
@@ -146,13 +155,13 @@ class CodeCollector: public Visitor {
          << unop_node->op() << unop_node->child->name() << " " << endl;
 
     res_code.emplace_back(unop_node->name(), unop_node->op(), "",
-                          unop_node->get_num_pos(), unop_node->child->name(), otArithmetic, true);
+                          unop_node->get_num_pos(), unop_node->child->name(), otUnaryArithm, true);
   }
 
   void Visit(VarDecl* vd_node) override {
     for (string n : vd_node->names)
       if (vd_node->values.find(n) != vd_node->values.end())
-        res_code.emplace_back(n, "", to_string(vd_node->values[n]), npLeft, "", otArithmetic);
+        res_code.emplace_back(n, "", to_string(vd_node->values[n]), npLeft, "", otAssignment);
   }
 
  private:

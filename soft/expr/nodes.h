@@ -109,7 +109,10 @@ class IfStatement: public Node {
 
   DataType data_type() override { return dtNotApplicable; }
 
-  void accept(Visitor* v) override {}
+  void accept(Visitor* v) override {
+    cond->accept(v);
+    v->Visit(this);
+  }
 };
 
 class IncrementOp: public Node {
@@ -122,7 +125,7 @@ class IncrementOp: public Node {
 
   void accept(Visitor* v) override {
     //child->accept(v);
-    //v->Visit(this);
+    v->Visit(this);
   }
 };
 

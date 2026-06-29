@@ -18,14 +18,26 @@ inline std::string NumPos2String(NumPos np) {
 }
 
 enum OperationType {
-  otArithmetic,
+  otBinaryArithm,
+  otUnaryArithm,
+  otAssignment,
   otRelational
 };
+
+inline std::string OpType2String(OperationType ot) {
+  switch (ot) {
+    case otBinaryArithm: return "binop";
+    case otUnaryArithm: return " unop";
+    case otAssignment: return "assig";
+    case otRelational: return "relat";
+    default: return "unknown OperationType";
+  }
+}
 
 class Operation {
  private:
   NumPos num_pos_ = npNone;
-  OperationType op_type_ = otArithmetic;
+  OperationType op_type_ = otBinaryArithm;
 
  public:
   std::string res_arg {};
@@ -66,7 +78,8 @@ class Operation {
   std::string raw() const {
     return "|" + align(res_arg) + " | = |" + align(left_arg) + " |" +
            align(op_name) + " |" + align(right_arg) + " | " +
-           align(NumPos2String(num_pos_)) + " |";
+           align(NumPos2String(num_pos_)) + " | " +
+           align(OpType2String(op_type_)) + " |";
   }
 
   std::string live_vars_str() const {

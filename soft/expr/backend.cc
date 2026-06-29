@@ -214,7 +214,7 @@ void Backend::GenerateBinOps(RegsBank0& bank0, Operation op) {
   string line1 = "mov " + res_reg + ", " + bank0.FindRegFor(op.left_arg);
   AddAsmInstruction(line1, cmnt1, bank0.DumpRegs());
 
-  string cmnt2 = op.res_arg + " " + op.op_name + " := " + op.right_arg;  // c += b
+  string cmnt2 = op.res_arg + " " + op.op_name + "= " + op.right_arg;  // c += b
 
   string cmd;
   if (op.op_name == "+")
@@ -258,19 +258,21 @@ void Backend::GenerateCode(vector<Operation> code) {
   res_asm_.clear();
 
   for (Operation op : code) {
-    if (op.op_type() == otRelational) {
+    if (op.op_type() == otBinaryArithm) {  // arithm ops (left_arg is not empty)
+      GenerateBinOps(bank0, op);
+    } else if (op.op_type() == otUnaryArithm) {  // assign ops (t1 = -t1)
+      GenerateInvertion(bank0, op);
+    } else if (op.op_type() == otRelational) {
       GenerateRelOps(bank0, op);
-    } else if (!op.op_name.size()) {  // empty op_name means assignment
+    } else if (op.op_type() == otAssignment) {  // empty op_name means assignment
       Var v;
       if (!getVar(op.res_arg, v)) {
         cout << "Variable " << op.res_arg << " was not declared" << endl;
         continue;
       }
       GenerateAssignment(bank0, op, v);
-    } else if (!op.left_arg.size()) {  // assign ops (t1 = -t1)
-      GenerateInvertion(bank0, op);
-    } else {  // arithm ops (left_arg is not empty)
-      GenerateBinOps(bank0, op);
+    } else {
+      cout << "**** FIXME! ****" << endl;
     }
 
     FreeTheRegisters(bank0, op);

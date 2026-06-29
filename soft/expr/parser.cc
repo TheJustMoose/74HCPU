@@ -455,6 +455,7 @@ unique_ptr<Node> stmt() {
   }
 }
 
+// Program ::= GlobalDeclarations FunctionDefinitions;
 bool program(vector<unique_ptr<Node>>& statements) {
   FuncGuard fg("program");
 
