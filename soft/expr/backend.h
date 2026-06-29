@@ -32,6 +32,9 @@ class Backend {
   void GenerateInvertion(RegsBank0& bank0, Operation op);
   void GenerateBinOps(RegsBank0& bank0, Operation op);
   void GenerateRelOps(RegsBank0& bank0, Operation op);
+  void GenerateLabel(RegsBank0& bank0, Operation op);
+  void GenerateJmp(RegsBank0& bank0, Operation op);
+  void GenerateBranch(RegsBank0& bank0, Operation op);
 
  private:
   std::map<std::string, uint16_t> var_addrs_;

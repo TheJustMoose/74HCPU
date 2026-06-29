@@ -251,6 +251,21 @@ void Backend::GenerateRelOps(RegsBank0& bank0, Operation op) {
   AddAsmInstruction(line1, cmnt1, bank0.DumpRegs());
 }
 
+void Backend::GenerateLabel(RegsBank0& bank0, Operation op) {
+  string line1 = op.res_arg + ":";
+  AddAsmInstruction(line1);
+}
+
+void Backend::GenerateJmp(RegsBank0& bank0, Operation op) {
+  string line1 = op.res_arg + " " + op.left_arg;
+  AddAsmInstruction(line1);
+}
+
+void Backend::GenerateBranch(RegsBank0& bank0, Operation op) {
+  string line1 = op.res_arg + " " + op.left_arg;
+  AddAsmInstruction(line1);
+}
+
 void Backend::GenerateCode(vector<Operation> code) {
   RegSpillable reg_spillable(this, var_addrs_);
   RegsBank0 bank0(&reg_spillable, var_addrs_, res_asm_);
@@ -271,6 +286,12 @@ void Backend::GenerateCode(vector<Operation> code) {
         continue;
       }
       GenerateAssignment(bank0, op, v);
+    } else if (op.op_type() == otLabel) {
+      GenerateLabel(bank0, op);
+    } else if (op.op_type() == otJmp) {
+      GenerateJmp(bank0, op);
+    } else if (op.op_type() == otBranch) {
+      GenerateBranch(bank0, op);
     } else {
       cout << "**** FIXME! ****" << endl;
       cout << "Unknown op type: " << (int)op.op_type() << endl;
