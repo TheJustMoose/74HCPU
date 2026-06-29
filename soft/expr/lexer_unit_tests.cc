@@ -203,3 +203,30 @@ TEST_CASE("check Lexer with sum") {
 
   CheckLexerOutput(l, r);
 }
+
+TEST_CASE("check Lexer last token") {
+  Lexer l("int a = 2; a = 0;");
+
+  CHECK_EQ(l.currentToken(), tInt);
+  l.consume();
+  CHECK_EQ(l.currentToken(), tName);
+  l.consume();
+  CHECK_EQ(l.currentToken(), tAssign);
+  l.consume();
+  CHECK_EQ(l.currentToken(), tNum);
+  l.consume();
+  CHECK_EQ(l.currentToken(), tSemicolon);
+  l.consume();
+
+  CHECK_EQ(l.currentToken(), tName);
+  l.consume();
+  CHECK_EQ(l.currentToken(), tAssign);
+  l.consume();
+  CHECK_EQ(l.currentToken(), tNum);
+  l.consume();
+  CHECK_EQ(l.currentToken(), tSemicolon);
+  l.consume();
+
+  CHECK_EQ(l.currentToken(), tEnd);
+  l.consume();
+}
