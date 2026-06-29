@@ -328,21 +328,15 @@ unique_ptr<Node> assign() {
   }
 
   Token t = Lexer::instance().currentToken();
-  if (t == tEnd)
-    return left;
-
-  unique_ptr<Node> res;
   if (t == tAssign) {
-    Lexer::instance().consume();
-    unique_ptr<AssignOp> op = make_unique<AssignOp>();  // =
+    Lexer::instance().consume();  // skip =
+    unique_ptr<AssignOp> op = make_unique<AssignOp>();
     op->left = std::move(left);     // a =
     op->right = assign();           // a = assign(); // recursion
-    res = std::move(op);    // remove res, use return op
+    return op;    // remove res, use return op
   } else {
-    res = std::move(left);  // remove res, use return left
+    return left;  // remove res, use return left
   }
-
-  return res;
 }
 
 // GlobalDeclarations ::= { Declaration ';' };
