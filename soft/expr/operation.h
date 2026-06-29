@@ -74,7 +74,7 @@ class Operation {
              + op_name + " " + right_arg + suffix;
   }
 
-  std::string align(std::string s, int maxw = 4) const {
+  std::string align(std::string s, int maxw = 8) const {
     std::string res{s};
     while (res.size() < maxw)
       res = " " + res;

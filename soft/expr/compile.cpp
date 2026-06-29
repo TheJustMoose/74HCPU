@@ -24,7 +24,7 @@ string new_label() {
 }
 
 void PrintTableHeader() {
-  cout << "| res | = | left|  op |right| numIn | optype|" << endl;
+  cout << "|   res   | = |   left  |    op   |  right  |   numIn  |  optype  |" << endl;
 }
 
 void Print(const vector<Operation>& res_code) {
