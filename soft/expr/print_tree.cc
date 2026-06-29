@@ -73,7 +73,7 @@ void Tree2List(Node* n, int mid, int lvl = 0) {
 void TypeStringIntoTheBuffer(string& line, string word, int pos) {
   int left = pos - word.size() / 2;
   if (left < 0 || left >= line.size()) {
-    cout << "Error! Word position is ouf of bounds!!" << endl;
+    cout << "Error! Word position is out of bounds!!" << endl;
     return;
   }
 
