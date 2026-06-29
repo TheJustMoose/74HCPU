@@ -55,6 +55,7 @@ map<Token, string> TokenName {
   {tInt, "tInt"},
   {tInversion, "tInversion"},
   {tIf, "tIf"},
+  {tElse, "tElse"},
   {tNone, "tNone"},
   {tError, "tError"},
   {tEnd, "tEnd"},

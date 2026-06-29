@@ -3,8 +3,14 @@
 
 #include <cctype>
 #include <iostream>
+#include <map>
 
 using namespace std;
+
+map<string, Token> keywords {
+  {"if", tIf},
+  {"else", tElse},
+};
 
 // static
 Lexer& Lexer::instance() {
@@ -57,8 +63,8 @@ void Lexer::findNextToken() {
     if (c)
       idx_--;
 
-    if (name == "if") {
-      current_token_ = tIf;
+    if (keywords.find(name) != keywords.end()) {
+      current_token_ = keywords[name];
       return;
     }
 
