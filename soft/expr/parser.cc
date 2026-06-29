@@ -401,7 +401,7 @@ unique_ptr<Node> declare() {
       return n;
     } else {
       cout << "Error. Please add ';' to the end of declaration" << endl;
-      cout << "Got token: " << (int)t << endl;
+      cout << "Got token: " << static_cast<int>(t) << endl;
       return {};
     }
   }
@@ -421,11 +421,18 @@ unique_ptr<Node> if_statement() {
   t = Lexer::instance().currentToken();
   if (t != tRBracket)
     throw logic_error("If require brackets for condition but got " + GetTokenName(t));
-  Lexer::instance().consume();
+  Lexer::instance().consume();  // skip bracket
 
   unique_ptr<IfStatement> res = make_unique<IfStatement>();
   res->cond = std::move(cond);
   res->then_body = std::move(stmt());
+
+  t = Lexer::instance().currentToken();
+  if (t == tElse) {
+    Lexer::instance().consume();
+    res->else_body = std::move(stmt());
+  }
+
   return res;
 }
 
@@ -447,7 +454,9 @@ unique_ptr<Node> stmt() {
     Lexer::instance().consume();
     return if_statement();
   } else {
-    return assign();
+    unique_ptr<Node> res = assign();
+    Lexer::instance().consume();  // skip semicolon
+    return res;
   }
 }
 
